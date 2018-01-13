@@ -1,0 +1,16 @@
+﻿<Window x:Class="MonikAI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MonikAI"
+        mc:Ignorable="d"
+        Title="MonikAI" Height="271.598" Width="343.075" ShowInTaskbar="False" Topmost="True" ResizeMode="NoResize" AllowsTransparency="True" WindowStyle="None" Background="#005CE000"
+        Loaded="MainWindow_OnLoaded" Closing="MainWindow_OnClosing">
+    <Grid>
+        <Image x:Name="backgroundPicture" HorizontalAlignment="Center" VerticalAlignment="Top" Source="/MonikAI;component/gui/logo.png" Opacity="0"/>
+        <Image x:Name="facePicture" HorizontalAlignment="Left" Height="135" VerticalAlignment="Top" Width="105" Margin="113,40,0,0" Source="/MonikAI;component/monika/a.png" Opacity="0"/>
+        <Image x:Name="textPicture" HorizontalAlignment="Left" Height="64" VerticalAlignment="Top" Width="343" Margin="0,208,0,0" Source="/MonikAI;component/gui/textbox.png" Opacity="0"/>
+        <TextBlock x:Name="textBox" Text="" Margin="14,0,0,10" Foreground="White" FontFamily="Verdana" FontSize="14" Opacity="0" Height="41" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="319" TextWrapping="Wrap"/>
+    </Grid>
+</Window>

@@ -1,0 +1,3232 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NDde</name>
+    </assembly>
+    <members>
+        <member name="T:NDde.Client.DdeDisconnectedEventArgs">
+            <summary>
+            This contains information about the <c>Disconnected</c> event.
+            </summary>
+            <threadsafety static="true" instance="false" />
+        </member>
+        <member name="T:NDde.DdeEventArgs">
+            <summary>
+            This is the base class for all NDde event argument classes.
+            </summary>
+        </member>
+        <member name="M:NDde.DdeEventArgs.ToString">
+            <summary>
+            This returns a string containing the current values of all properties.
+            </summary>
+            <returns>
+            A string containing the current values of all properties.
+            </returns>
+        </member>
+        <member name="P:NDde.Client.DdeDisconnectedEventArgs.IsServerInitiated">
+            <summary>
+            This gets a bool indicating whether the client disconnected because of the server.
+            </summary>
+        </member>
+        <member name="P:NDde.Client.DdeDisconnectedEventArgs.IsDisposed">
+            <summary>
+            This gets a bool indicating whether the client disconnected because <c>Dispose</c> was explicitly called.
+            </summary>
+            <remarks>
+            The value will be true if <c>Dispose</c> was explicitly called on <c>DdeClient</c>.  The <c>DdeClient</c> sending this event has 
+            been disposed and can no longer be accessed.  Any exception thrown in the currently executing method will be ignored.
+            </remarks>
+        </member>
+        <member name="T:NDde.NamespaceDoc">
+            <summary>
+            This namespace contains classes for using Dynamic Data Exchange (DDE) in .NET.
+            </summary>
+        </member>
+        <member name="T:NDde.Advanced.NamespaceDoc">
+            <summary>
+            This namespace contains classes for using advanced features of the library.
+            </summary>
+        </member>
+        <member name="T:NDde.Advanced.Monitor.NamespaceDoc">
+            <summary>
+            This namespace contains classes for creating DDE monitors.
+            </summary>
+        </member>
+        <member name="T:NDde.Client.NamespaceDoc">
+            <summary>
+            This namespace contains classes for creating DDE client applications.
+            </summary>
+        </member>
+        <member name="T:NDde.Server.NamespaceDoc">
+            <summary>
+            This namespace contains classes for creating DDE server applications.
+            </summary>
+        </member>
+        <member name="T:NDde.Foundation.Server.DdemlServer.RegistrationManager">
+            <summary>
+            This class is needed to dispose of DDEML resources correctly since the DDEML is thread specific.
+            </summary>
+        </member>
+        <member name="T:NDde.Foundation.Advanced.DdemlContext.InstanceManager">
+            <summary>
+            This class is needed to dispose of DDEML resources correctly since the DDEML is thread specific.
+            </summary>
+        </member>
+        <member name="T:NDde.Advanced.Monitor.DdeCallbackActivityEventArgs">
+            <summary>
+            This contains information about the <c>CallbackActivity</c> event.
+            </summary>
+        </member>
+        <member name="T:NDde.Advanced.Monitor.DdeActivityEventArgs">
+            <summary>
+            This contains information about events on <c>DdeMonitor</c>.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeActivityEventArgs.TaskHandle">
+            <summary>
+            This gets the task handle of the application associated with this event.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeCallbackActivityEventArgs.uType">
+            <summary>
+            See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeCallbackActivityEventArgs.uFmt">
+            <summary>
+            See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeCallbackActivityEventArgs.hConv">
+            <summary>
+            See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeCallbackActivityEventArgs.hsz1">
+            <summary>
+            See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeCallbackActivityEventArgs.hsz2">
+            <summary>
+            See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeCallbackActivityEventArgs.hData">
+            <summary>
+            See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeCallbackActivityEventArgs.dwData1">
+            <summary>
+            See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeCallbackActivityEventArgs.dwData2">
+            <summary>
+            See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeCallbackActivityEventArgs.dwRet">
+            <summary>
+            This gets the return value of the DDEML callback function.  See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="T:NDde.Client.DdeClient">
+            <summary>
+            This represents the client side of a DDE conversation.
+            </summary>
+            <threadsafety static="true" instance="true"/>
+            <remarks>
+            <para>
+            DDE conversations are established by specifying a service name and topic name pair.  The service name is usually the name of the application
+            acting as a DDE server.  A DDE server can respond to multiple service names, but most servers usually only respond to one.  The topic name
+            is a logical context for data and is defined by the server application.  A server can and usually does support many topic names.
+            </para>
+            <para>
+            After a conversation has been established by calling <c>Connect</c> an application can read and write data using the <c>Request</c> and
+            <c>Poke</c> methods respectively by specifying an item name supported by the active conversation.  An item name identifies a unit of data.
+            An application can also be notified of changes by initiating an advise loop on an item name using the <c>StartAdvise</c> method.  Advise
+            loops can either be warm or hot.  A hot advise loop returns the data associated with an item name when it changes whereas a warm advise loop
+            only notifies the application without sending any data.  Commands can be sent to the server using the <c>Execute</c> method.
+            </para>
+            <para>
+            Callbacks and events are invoked on the thread hosting the <c>DdeContext</c>.  All operations must be marshaled onto the thread hosting the
+            <c>DdeContext</c> associated with this object.  Method calls will block until that thread becomes available.  An exception will be generated
+            if the thread does not become available in a timely manner.
+            </para>
+            </remarks>
+            <example>
+        The following example demonstrates how to use a DdeClient.
+            <code lang="C#">
+            using System;
+            using System.Text;
+            using NDde.Client;
+
+            public sealed class Client
+            {
+                public static void Main(string[] args)
+                {
+                    // Wait for the user to press ENTER before proceding.
+                    Console.WriteLine("The Server sample must be running before the client can connect.");
+                    Console.WriteLine("Press ENTER to continue...");
+                    Console.ReadLine();
+                    try
+                    {
+                        // Create a client that connects to 'myapp|mytopic'. 
+                        using (DdeClient client = new DdeClient("myapp", "mytopic"))
+                        {
+                            // Subscribe to the Disconnected event.  This event will notify the application when a conversation has been terminated.
+                            client.Disconnected += OnDisconnected;
+
+                            // Connect to the server.  It must be running or an exception will be thrown.
+                            client.Connect();
+
+                            // Synchronous Execute Operation
+                            client.Execute("mycommand", 60000);
+
+                            // Synchronous Poke Operation
+                            client.Poke("myitem", DateTime.Now.ToString(), 60000);
+
+                            // Syncronous Request Operation
+                            Console.WriteLine("Request: " + client.Request("myitem", 60000));
+
+                            // Asynchronous Execute Operation
+                            client.BeginExecute("mycommand", OnExecuteComplete, client);
+
+                            // Asynchronous Poke Operation
+                            client.BeginPoke("myitem", Encoding.ASCII.GetBytes(DateTime.Now.ToString() + "\0"), 1, OnPokeComplete, client);
+
+                            // Asynchronous Request Operation
+                            client.BeginRequest("myitem", 1, OnRequestComplete, client);
+
+                            // Advise Loop
+                            client.StartAdvise("myitem", 1, true, 60000);
+                            client.Advise += OnAdvise;
+
+                            // Wait for the user to press ENTER before proceding.
+                            Console.WriteLine("Press ENTER to quit...");
+                            Console.ReadLine();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.ToString());
+                        Console.WriteLine("Press ENTER to quit...");
+                        Console.ReadLine();
+                    }
+                }
+
+                private static void OnExecuteComplete(IAsyncResult ar)
+                {
+                    try
+                    {
+                        DdeClient client = (DdeClient)ar.AsyncState;
+                        client.EndExecute(ar);
+                        Console.WriteLine("OnExecuteComplete");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("OnExecuteComplete: " + e.Message);
+                    }
+                }
+
+                private static void OnPokeComplete(IAsyncResult ar)
+                {
+                    try
+                    {
+                        DdeClient client = (DdeClient)ar.AsyncState;
+                        client.EndPoke(ar);
+                        Console.WriteLine("OnPokeComplete");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("OnPokeComplete: " + e.Message);
+                    }
+                }
+
+                private static void OnRequestComplete(IAsyncResult ar)
+                {
+                    try
+                    {
+                        DdeClient client = (DdeClient)ar.AsyncState;
+                        byte[] data = client.EndRequest(ar);
+                        Console.WriteLine("OnRequestComplete: " + Encoding.ASCII.GetString(data));
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("OnRequestComplete: " + e.Message);
+                    }
+                }
+
+                private static void OnStartAdviseComplete(IAsyncResult ar)
+                {
+                    try
+                    {
+                        DdeClient client = (DdeClient)ar.AsyncState;
+                        client.EndStartAdvise(ar);
+                        Console.WriteLine("OnStartAdviseComplete");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("OnStartAdviseComplete: " + e.Message);
+                    }
+                }
+
+                private static void OnStopAdviseComplete(IAsyncResult ar)
+                {
+                    try
+                    {
+                        DdeClient client = (DdeClient)ar.AsyncState;
+                        client.EndStopAdvise(ar);
+                        Console.WriteLine("OnStopAdviseComplete");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("OnStopAdviseComplete: " + e.Message);
+                    }
+                }
+
+                private static void OnAdvise(object sender, DdeAdviseEventArgs args)
+                {
+                    Console.WriteLine("OnAdvise: " + args.Text);
+                }
+
+                private static void OnDisconnected(object sender, DdeDisconnectedEventArgs args)
+                {
+                    Console.WriteLine(
+                        "OnDisconnected: " +
+                        "IsServerInitiated=" + args.IsServerInitiated.ToString() + " " +
+                        "IsDisposed=" + args.IsDisposed.ToString());
+                }
+
+            } // class
+
+            </code>
+            <code lang="Visual Basic">
+            Imports System.Text
+            Imports NDde.Client
+
+            Module Program
+
+                Sub Main()
+
+                    ' Wait for the user to press ENTER before proceding.
+                    Console.WriteLine("The Server sample must be running before the client can connect.")
+                    Console.WriteLine("Press ENTER to continue...")
+                    Console.ReadLine()
+
+                    Try
+                        ' Create a client that connects to 'myapp|mytopic'. 
+                        Using client As DdeClient = New DdeClient("myapp", "mytopic")
+
+                            ' Subscribe to the Disconnected event.  This event will notify the application when a conversation has been terminated.
+                            AddHandler client.Disconnected, AddressOf OnDisconnected
+
+                            ' Connect to the server.  It must be running or an exception will be thrown.
+                            client.Connect()
+
+                            ' Synchronous Execute Operation
+                            client.Execute("mycommand", 60000)
+
+                            ' Synchronous Poke Operation
+                            client.Poke("myitem", DateTime.Now.ToString(), 60000)
+
+                            ' Syncronous Request Operation
+                            Console.WriteLine("Request: " + client.Request("myitem", 60000))
+
+                            ' Asynchronous Execute Operation
+                            client.BeginExecute("mycommand", AddressOf OnExecuteComplete, client)
+
+                            ' Asynchronous Poke Operation
+                            client.BeginPoke("myitem", Encoding.ASCII.GetBytes(DateTime.Now.ToString() + Convert.ToChar(0)), 1, AddressOf OnPokeComplete, client)
+
+                            ' Asynchronous Request Operation
+                            client.BeginRequest("myitem", 1, AddressOf OnRequestComplete, client)
+
+                            ' Advise Loop
+                            client.StartAdvise("myitem", 1, True, 60000)
+                            AddHandler client.Advise, AddressOf OnAdvise
+
+                            ' Wait for the user to press ENTER before proceding.
+                            Console.WriteLine("Press ENTER to quit...")
+                            Console.ReadLine()
+
+                        End Using
+
+                    Catch e As Exception
+
+                        Console.WriteLine(e.ToString())
+                        Console.WriteLine("Press ENTER to quit...")
+                        Console.ReadLine()
+
+                    End Try
+
+                End Sub
+
+                Private Sub OnExecuteComplete(ByVal ar As IAsyncResult)
+                    Try
+                        Dim client As DdeClient = DirectCast(ar.AsyncState, DdeClient)
+                        client.EndExecute(ar)
+                        Console.WriteLine("OnExecuteComplete")
+                    Catch e As Exception
+                        Console.WriteLine("OnExecuteComplete: " + e.Message)
+                    End Try
+                End Sub
+
+                Private Sub OnPokeComplete(ByVal ar As IAsyncResult)
+                    Try
+                        Dim client As DdeClient = DirectCast(ar.AsyncState, DdeClient)
+                        client.EndPoke(ar)
+                        Console.WriteLine("OnPokeComplete")
+                    Catch e As Exception
+                        Console.WriteLine("OnPokeComplete: " + e.Message)
+                    End Try
+                End Sub
+
+                Private Sub OnRequestComplete(ByVal ar As IAsyncResult)
+                    Try
+                        Dim client As DdeClient = DirectCast(ar.AsyncState, DdeClient)
+                        client.EndRequest(ar)
+                        Console.WriteLine("OnRequestComplete")
+                    Catch e As Exception
+                        Console.WriteLine("OnRequestComplete: " + e.Message)
+                    End Try
+                End Sub
+
+                Private Sub OnStartAdviseComplete(ByVal ar As IAsyncResult)
+                    Try
+                        Dim client As DdeClient = DirectCast(ar.AsyncState, DdeClient)
+                        client.EndStartAdvise(ar)
+                        Console.WriteLine("OnStartAdviseComplete")
+                    Catch e As Exception
+                        Console.WriteLine("OnStartAdviseComplete: " + e.Message)
+                    End Try
+                End Sub
+
+                Private Sub OnStopAdviseComplete(ByVal ar As IAsyncResult)
+                    Try
+                        Dim client As DdeClient = DirectCast(ar.AsyncState, DdeClient)
+                        client.EndStopAdvise(ar)
+                        Console.WriteLine("OnStopAdviseComplete")
+                    Catch e As Exception
+                        Console.WriteLine("OnStopAdviseComplete: " + e.Message)
+                    End Try
+                End Sub
+
+                Private Sub OnAdvise(ByVal sender As Object, ByVal args As DdeAdviseEventArgs)
+                    Console.WriteLine("OnAdvise: " + args.Text)
+                End Sub
+
+                Private Sub OnDisconnected(ByVal sender As Object, ByVal args As DdeDisconnectedEventArgs)
+                    Console.WriteLine( _
+                     "OnDisconnected: " + _
+                     "IsServerInitiated=" + args.IsServerInitiated.ToString() + " " + _
+                     "IsDisposed=" + args.IsDisposed.ToString())
+                End Sub
+
+            End Module
+            </code>
+        </example>
+        </member>
+        <member name="M:NDde.Client.DdeClient.#ctor(System.String,System.String)">
+            <overloads>
+            <summary>
+            </summary>
+            </overloads>
+            <summary>
+            This initializes a new instance of the <c>DdeClient</c> class that can connect to a server that supports the specified service name and
+            topic name pair.
+            </summary>
+            <param name="service">
+            A service name supported by a server application.
+            </param>
+            <param name="topic">
+            A topic name support by a server application.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            This is thown when servic or topic exceeds 255 characters.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when service or topic is a null reference.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.#ctor(System.String,System.String,System.ComponentModel.ISynchronizeInvoke)">
+            <summary>
+            This initializes a new instance of the <c>DdeClient</c> class that can connect to a server that supports the specified service name and
+            topic name pair using the specified synchronizing object.
+            </summary>
+            <param name="service">
+            A service name supported by a server application.
+            </param>
+            <param name="topic">
+            A topic name support by a server application.
+            </param>
+            <param name="synchronizingObject">
+            The synchronizing object to use for this instance.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            This is thown when service or topic exceeds 255 characters.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when service or topic is a null reference.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.#ctor(System.String,System.String,NDde.Advanced.DdeContext)">
+            <summary>
+            This initializes a new instance of the <c>DdeClient</c> class that can connect to a server that supports the specified service name and
+            topic name pair and uses the specified context.
+            </summary>
+            <param name="service">
+            A service name supported by a server application.
+            </param>
+            <param name="topic">
+            A topic name support by a server application.
+            </param>
+            <param name="context">
+            The context to use for execution.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            This is thown when servic or topic exceeds 255 characters.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when service or topic is a null reference.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.Dispose">
+            <summary>
+            This terminates the current conversation and releases all resources held by this instance.
+            </summary>
+        </member>
+        <member name="M:NDde.Client.DdeClient.Dispose(System.Boolean)">
+            <summary>
+            This contains the implementation to release all resources held by this instance.
+            </summary>
+            <param name="disposing">
+            True if called by Dispose, false otherwise.
+            </param>
+        </member>
+        <member name="M:NDde.Client.DdeClient.Connect">
+            <summary>
+            This establishes a conversation with a server that supports the specified service name and topic name pair.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the client is already connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the client could not connect to the server.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.TryConnect">
+            <summary>
+            This establishes a conversation with a server that supports the specified service name and topic name pair.
+            </summary>
+            <returns>
+            Zero if the operation succeed or non-zero if the operation failed.
+            </returns>
+        </member>
+        <member name="M:NDde.Client.DdeClient.Disconnect">
+            <summary>
+            This terminates the current conversation.
+            </summary>
+            <event cref="E:NDde.Client.DdeClient.Disconnected"/>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the client was not previously connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thown when the client could not disconnect from the server.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.Pause">
+            <summary>
+            This pauses the current conversation.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the conversation is already paused.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the conversation could not be paused or when the client is not connected.
+            </exception>
+            <remarks>
+            Synchronous operations will timeout if the conversation is paused.  Asynchronous operations can begin, but will not complete until the
+            conversation has resumed.
+            </remarks>
+        </member>
+        <member name="M:NDde.Client.DdeClient.Resume">
+            <summary>
+            This resumes the current conversation.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the conversation was not previously paused or when the client is not connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the conversation could not be resumed.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.Abandon(System.IAsyncResult)">
+            <summary>
+            This terminates an asychronous operation.
+            </summary>
+            <param name="asyncResult">
+            The <c>IAsyncResult</c> object returned by a call that begins an asynchronous operation.
+            </param>
+            <remarks>
+            This method does nothing if the asynchronous operation has already completed.
+            </remarks>
+            <exception cref="T:System.ArgumentException">
+            This is thown when asyncResult is an invalid IAsyncResult.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when asyncResult is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the client is not connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the asynchronous operation could not be abandoned.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.Execute(System.String,System.Int32)">
+            <summary>
+            This sends a command to the server application.
+            </summary>
+            <param name="command">
+            The command to be sent to the server application.
+            </param>
+            <param name="timeout">
+            The amount of time in milliseconds to wait for a response.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            This is thown when command exceeds 255 characters or timeout is negative.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when command is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the client is not connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the server does not process the command.
+            </exception>
+            <remarks>
+            This operation will timeout if the conversation is paused.
+            </remarks>
+        </member>
+        <member name="M:NDde.Client.DdeClient.TryExecute(System.String,System.Int32)">
+            <summary>
+            This sends a command to the server application.
+            </summary>
+            <param name="command">
+            The command to be sent to the server application.
+            </param>
+            <param name="timeout">
+            The amount of time in milliseconds to wait for a response.
+            </param>
+            <returns>
+            Zero if the operation succeed or non-zero if the operation failed.
+            </returns>
+            <remarks>
+            This operation will timeout if the conversation is paused.
+            </remarks>
+        </member>
+        <member name="M:NDde.Client.DdeClient.BeginExecute(System.String,System.AsyncCallback,System.Object)">
+            <summary>
+            This begins an asynchronous operation to send a command to the server application.
+            </summary>
+            <param name="command">
+            The command to be sent to the server application.
+            </param>
+            <param name="callback">
+            The delegate to invoke when this operation completes.
+            </param>
+            <param name="state">
+            An application defined data object to associate with this operation.
+            </param>
+            <returns>
+            An <c>IAsyncResult</c> object for this operation.
+            </returns>
+            <exception cref="T:System.ArgumentException">
+            This is thown when command exceeds 255 characters.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when command is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the client is not connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the asynchronous operation could not begin.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.EndExecute(System.IAsyncResult)">
+            <summary>
+            This throws any exception that occurred during the asynchronous operation.
+            </summary>
+            <param name="asyncResult">
+            The <c>IAsyncResult</c> object returned by a call to <c>BeginExecute</c>.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            This is thown when asyncResult is an invalid IAsyncResult.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when asyncResult is a null reference.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the server does not process the command.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.Poke(System.String,System.String,System.Int32)">
+            <overloads>
+            <summary>
+            </summary>
+            </overloads>
+            <summary>
+            This sends data to the server application.
+            </summary>
+            <param name="item">
+            An item name supported by the current conversation.
+            </param>
+            <param name="data">
+            The data to send.
+            </param>
+            <param name="timeout">
+            The amount of time in milliseconds to wait for a response.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            This is thown when item exceeds 255 characters or timeout is negative.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when item or data is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the client is not connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the server does not process the data.
+            </exception>
+            <remarks>
+            This operation will timeout if the conversation is paused.
+            </remarks>
+        </member>
+        <member name="M:NDde.Client.DdeClient.Poke(System.String,System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            This sends data to the server application.
+            </summary>
+            <param name="item">
+            An item name supported by the current conversation.
+            </param>
+            <param name="data">
+            The data to send.
+            </param>
+            <param name="format">
+            The format of the data.
+            </param>
+            <param name="timeout">
+            The amount of time in milliseconds to wait for a response.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            This is thown when item exceeds 255 characters or timeout is negative.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when item or data is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the client is not connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the server does not process the data.
+            </exception>
+            <remarks>
+            This operation will timeout if the conversation is paused.
+            </remarks>
+        </member>
+        <member name="M:NDde.Client.DdeClient.TryPoke(System.String,System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            This sends data to the server application.
+            </summary>
+            <param name="item">
+            An item name supported by the current conversation.
+            </param>
+            <param name="data">
+            The data to send.
+            </param>
+            <param name="format">
+            The format of the data.
+            </param>
+            <param name="timeout">
+            The amount of time in milliseconds to wait for a response.
+            </param>
+            <returns>
+            Zero if the operation succeed or non-zero if the operation failed.
+            </returns>
+            <remarks>
+            This operation will timeout if the conversation is paused.
+            </remarks>
+        </member>
+        <member name="M:NDde.Client.DdeClient.BeginPoke(System.String,System.Byte[],System.Int32,System.AsyncCallback,System.Object)">
+            <summary>
+            This begins an asynchronous operation to send data to the server application.
+            </summary>
+            <param name="item">
+            An item name supported by the current conversation.
+            </param>
+            <param name="data">
+            The data to send.
+            </param>
+            <param name="format">
+            The format of the data.
+            </param>
+            <param name="callback">
+            The delegate to invoke when this operation completes.
+            </param>
+            <param name="state">
+            An application defined data object to associate with this operation.
+            </param>
+            <returns>
+            An <c>IAsyncResult</c> object for this operation.
+            </returns>
+            <exception cref="T:System.ArgumentException">
+            This is thown when item exceeds 255 characters.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when item or data is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the client is not connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the asynchronous operation could not begin.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.EndPoke(System.IAsyncResult)">
+            <summary>
+            This throws any exception that occurred during the asynchronous operation.
+            </summary>
+            <param name="asyncResult">
+            The <c>IAsyncResult</c> object returned by a call to <c>BeginPoke</c>.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            This is thown when asyncResult is an invalid IAsyncResult.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when asyncResult is a null reference.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the server does not process the data.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.Request(System.String,System.Int32)">
+            <overloads>
+            <summary>
+            </summary>
+            </overloads>
+            <summary>
+            This requests data using the specified item name.
+            </summary>
+            <param name="item">
+            An item name supported by the current conversation.
+            </param>
+            <param name="timeout">
+            The amount of time in milliseconds to wait for a response.
+            </param>
+            <returns>
+            The data returned by the server application in CF_TEXT format.
+            </returns>
+            <exception cref="T:System.ArgumentException">
+            This is thown when item exceeds 255 characters or timeout is negative.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when item is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the client is not connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the server does not process the request.
+            </exception>
+            <remarks>
+            This operation will timeout if the conversation is paused.
+            </remarks>
+        </member>
+        <member name="M:NDde.Client.DdeClient.Request(System.String,System.Int32,System.Int32)">
+            <summary>
+            This requests data using the specified item name.
+            </summary>
+            <param name="item">
+            An item name supported by the current conversation.
+            </param>
+            <param name="format">
+            The format of the data to return.
+            </param>
+            <param name="timeout">
+            The amount of time in milliseconds to wait for a response.
+            </param>
+            <returns>
+            The data returned by the server application.
+            </returns>
+            <exception cref="T:System.ArgumentException">
+            This is thown when item exceeds 255 characters or timeout is negative.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when item is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the client is not connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the server does not process the request.
+            </exception>
+            <remarks>
+            This operation will timeout if the conversation is paused.
+            </remarks>
+        </member>
+        <member name="M:NDde.Client.DdeClient.TryRequest(System.String,System.Int32,System.Int32,System.Byte[]@)">
+            <summary>
+            This requests data using the specified item name.
+            </summary>
+            <param name="item">
+            An item name supported by the current conversation.
+            </param>
+            <param name="format">
+            The format of the data to return.
+            </param>
+            <param name="timeout">
+            The amount of time in milliseconds to wait for a response.
+            </param>
+            <param name="data">
+            The data returned by the server application.
+            </param>
+            <returns>
+            Zero if the operation succeeded or non-zero if the operation failed.
+            </returns>
+            <remarks>
+            This operation will timeout if the conversation is paused.
+            </remarks>
+        </member>
+        <member name="M:NDde.Client.DdeClient.BeginRequest(System.String,System.Int32,System.AsyncCallback,System.Object)">
+            <summary>
+            This begins an asynchronous operation to request data using the specified item name.
+            </summary>
+            <param name="item">
+            An item name supported by the current conversation.
+            </param>
+            <param name="format">
+            The format of the data to return.
+            </param>
+            <param name="callback">
+            The delegate to invoke when this operation completes.
+            </param>
+            <param name="state">
+            An application defined data object to associate with this operation.
+            </param>
+            <returns>
+            An <c>IAsyncResult</c> object for this operation.
+            </returns>
+            <exception cref="T:System.ArgumentException">
+            This is thown when item exceeds 255 characters.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when item is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the client is not connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the asynchronous operation could not begin.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.EndRequest(System.IAsyncResult)">
+            <summary>
+            This gets the data returned by the server application for the operation.
+            </summary>
+            <param name="asyncResult">
+            The <c>IAsyncResult</c> object returned by a call to <c>BeginRequest</c>.
+            </param>
+            <returns>
+            The data returned by the server application.
+            </returns>
+            <exception cref="T:System.ArgumentException">
+            This is thown when asyncResult is an invalid IAsyncResult.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when asyncResult is a null reference.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the server does not process the request.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.StartAdvise(System.String,System.Int32,System.Boolean,System.Int32)">
+            <overloads>
+            <summary>
+            </summary>
+            </overloads>
+            <summary>
+            This initiates an advise loop on the specified item name.
+            </summary>
+            <param name="item">
+            An item name supported by the current conversation.
+            </param>
+            <param name="format">
+            The format of the data to return.
+            </param>
+            <param name="hot">
+            A bool indicating whether data should be included with the notification.
+            </param>
+            <param name="timeout">
+            The amount of time in milliseconds to wait for a response.
+            </param>
+            <event cref="E:NDde.Client.DdeClient.Advise"/>
+            <exception cref="T:System.ArgumentException">
+            This is thown when item exceeds 255 characters or timeout is negative.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when item is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the item is already being advised or when the client is not connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the server does not initiate the advise loop.
+            </exception>
+            <remarks>
+            This operation will timeout if the conversation is paused.
+            </remarks>
+        </member>
+        <member name="M:NDde.Client.DdeClient.StartAdvise(System.String,System.Int32,System.Boolean,System.Boolean,System.Int32,System.Object)">
+            <summary>
+            This initiates an advise loop on the specified item name.
+            </summary>
+            <param name="item">
+            An item name supported by the current conversation.
+            </param>
+            <param name="format">
+            The format of the data to return.
+            </param>
+            <param name="hot">
+            A bool indicating whether data should be included with the notification.
+            </param>
+            <param name="acknowledge">
+            A bool indicating whether the client should acknowledge each advisory before the server will send send another.
+            </param>
+            <param name="timeout">
+            The amount of time in milliseconds to wait for a response.
+            </param>
+            <param name="adviseState">
+            An application defined data object to associate with this advise loop.
+            </param>
+            <event cref="E:NDde.Client.DdeClient.Advise"/>
+            <exception cref="T:System.ArgumentException">
+            This is thown when item exceeds 255 characters or timeout is negative.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when item is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the item is already being advised or when the client is not connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the server does not initiate the advise loop.
+            </exception>
+            <remarks>
+            This operation will timeout if the conversation is paused.
+            </remarks>
+        </member>
+        <member name="M:NDde.Client.DdeClient.BeginStartAdvise(System.String,System.Int32,System.Boolean,System.AsyncCallback,System.Object)">
+            <overloads>
+            <summary>
+            </summary>
+            </overloads>
+            <summary>
+            This begins an asynchronous operation to initiate an advise loop on the specified item name.
+            </summary>
+            <param name="item">
+            An item name supported by the current conversation.
+            </param>
+            <param name="format">
+            The format of the data to be returned.
+            </param>
+            <param name="hot">
+            A bool indicating whether data should be included with the notification.
+            </param>
+            <param name="callback">
+            The delegate to invoke when this operation completes.
+            </param>
+            <param name="asyncState">
+            An application defined data object to associate with this operation.
+            </param>
+            <returns>
+            An <c>IAsyncResult</c> object for this operation.
+            </returns>
+            <event cref="E:NDde.Client.DdeClient.Advise"/>
+            <exception cref="T:System.ArgumentException">
+            This is thown when item exceeds 255 characters.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when item is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the item is already being advised or when the client is not connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the asynchronous operation could not begin.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.BeginStartAdvise(System.String,System.Int32,System.Boolean,System.Boolean,System.AsyncCallback,System.Object,System.Object)">
+            <summary>
+            This begins an asynchronous operation to initiate an advise loop on the specified item name.
+            </summary>
+            <param name="item">
+            An item name supported by the current conversation.
+            </param>
+            <param name="format">
+            The format of the data to be returned.
+            </param>
+            <param name="hot">
+            A bool indicating whether data should be included with the notification.
+            </param>
+            <param name="acknowledge">
+            A bool indicating whether the client should acknowledge each advisory before the server will send send another.
+            </param>
+            <param name="callback">
+            The delegate to invoke when this operation completes.
+            </param>
+            <param name="asyncState">
+            An application defined data object to associate with this operation.
+            </param>
+            <param name="adviseState">
+            An application defined data object to associate with this advise loop.
+            </param>
+            <returns>
+            An <c>IAsyncResult</c> object for this operation.
+            </returns>
+            <event cref="E:NDde.Client.DdeClient.Advise"/>
+            <exception cref="T:System.ArgumentException">
+            This is thown when item exceeds 255 characters.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when item is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the item is already being advised or when the client is not connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the asynchronous operation could not begin.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.EndStartAdvise(System.IAsyncResult)">
+            <summary>
+            This throws any exception that occurred during the operation.
+            </summary>
+            <param name="asyncResult">
+            The <c>IAsyncResult</c> object returned by a call to <c>BeginPoke</c>.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            This is thown when asyncResult is an invalid IAsyncResult.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when asyncResult is a null reference.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the server does not initiate the advise loop.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.StopAdvise(System.String,System.Int32)">
+            <summary>
+            This terminates the advise loop for the specified item name.
+            </summary>
+            <param name="item">
+            An item name that has an active advise loop.
+            </param>
+            <param name="timeout">
+            The amount of time in milliseconds to wait for a response.
+            </param>
+            <remarks>
+            This operation will timeout if the conversation is paused.
+            </remarks>
+            <exception cref="T:System.ArgumentException">
+            This is thown when item exceeds 255 characters or timeout is negative.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when item is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the item is not being advised or when the client is not connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the server does not terminate the advise loop.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.BeginStopAdvise(System.String,System.AsyncCallback,System.Object)">
+            <summary>
+            This begins an asynchronous operation to terminate the advise loop for the specified item name.
+            </summary>
+            <param name="item">
+            An item name that has an active advise loop.
+            </param>
+            <param name="callback">
+            The delegate to invoke when this operation completes.
+            </param>
+            <param name="state">
+            An application defined data object to associate with this operation.
+            </param>
+            <returns>
+            An <c>IAsyncResult</c> object for this operation.
+            </returns>
+            <exception cref="T:System.ArgumentException">
+            This is thown when item exceeds 255 characters.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when item is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the item is not being advised or when the client is not connected.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the asynchronous operation could not begin.
+            </exception>
+        </member>
+        <member name="M:NDde.Client.DdeClient.EndStopAdvise(System.IAsyncResult)">
+            <summary>
+            This throws any exception that occurred during the operation.
+            </summary>
+            <param name="asyncResult">
+            The <c>IAsyncResult</c> object returned by a call to <c>BeginPoke</c>.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            This is thown when asyncResult is an invalid IAsyncResult.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when asyncResult is a null reference.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the server does not terminate the advise loop.
+            </exception>
+        </member>
+        <member name="E:NDde.Client.DdeClient.Advise">
+            <summary>
+            This is raised when the data has changed for an item name that has an advise loop.
+            </summary>
+        </member>
+        <member name="E:NDde.Client.DdeClient.Disconnected">
+            <summary>
+            This is raised when the client has been disconnected.
+            </summary>
+        </member>
+        <member name="P:NDde.Client.DdeClient.DdemlObject">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:NDde.Client.DdeClient.Context">
+            <summary>
+            This gets the context associated with this instance.
+            </summary>
+        </member>
+        <member name="P:NDde.Client.DdeClient.Service">
+            <summary>
+            This gets the service name associated with this conversation.
+            </summary>
+        </member>
+        <member name="P:NDde.Client.DdeClient.Topic">
+            <summary>
+            This gets the topic name associated with this conversation.
+            </summary>
+        </member>
+        <member name="P:NDde.Client.DdeClient.Handle">
+            <summary>
+            This gets the DDEML handle associated with this conversation.
+            </summary>
+            <remarks>
+            <para>
+            This can be used in any DDEML function requiring a conversation handle.
+            </para>
+            <para>
+            <note type="caution">
+            Incorrect usage of the DDEML can cause this object to function incorrectly and can lead to resource leaks.
+            </note>
+            </para>
+            </remarks>
+        </member>
+        <member name="P:NDde.Client.DdeClient.IsPaused">
+            <summary>
+            This gets a bool indicating whether this conversation is paused.
+            </summary>
+        </member>
+        <member name="P:NDde.Client.DdeClient.IsConnected">
+            <summary>
+            This gets a bool indicating whether the conversation is established.
+            </summary>
+            <remarks>
+            <note type="caution">
+            Do not assume that the conversation is still established after checking this property.  The conversation can terminate at any time.
+            </note>
+            </remarks>
+        </member>
+        <member name="T:NDde.Client.DdeClient.AsyncResult">
+            <threadsafety static="true" instance="false" />
+        </member>
+        <member name="T:NDde.Client.DdeClient.InvalidAsyncResult">
+            <threadsafety static="true" instance="false" />
+        </member>
+        <member name="T:NDde.Advanced.Monitor.DdeMonitorFlags">
+            <summary>
+            This specifies the different kinds of DDE activity that can be monitored.
+            </summary>
+        </member>
+        <member name="F:NDde.Advanced.Monitor.DdeMonitorFlags.Callback">
+            <summary>
+            This indicates activity caused by the execution of a DDEML callback.
+            </summary>
+        </member>
+        <member name="F:NDde.Advanced.Monitor.DdeMonitorFlags.Conversation">
+            <summary>
+            This indicates activity caused by conversation.
+            </summary>
+        </member>
+        <member name="F:NDde.Advanced.Monitor.DdeMonitorFlags.Error">
+            <summary>
+            This indicates activity caused by an error.
+            </summary>
+        </member>
+        <member name="F:NDde.Advanced.Monitor.DdeMonitorFlags.Link">
+            <summary>
+            This indicates activity caused by an advise loop.
+            </summary>
+        </member>
+        <member name="F:NDde.Advanced.Monitor.DdeMonitorFlags.Message">
+            <summary>
+            This indicates activity caused by DDE messages.
+            </summary>
+        </member>
+        <member name="T:NDde.Advanced.Monitor.DdeMonitor">
+            <summary>
+            This is used to monitor DDE activity.
+            </summary>
+        </member>
+        <member name="M:NDde.Advanced.Monitor.DdeMonitor.#ctor">
+            <summary>
+            This initializes a new instance of the <c>DdeMonitor</c> class.
+            </summary>
+        </member>
+        <member name="M:NDde.Advanced.Monitor.DdeMonitor.Dispose">
+            <summary>
+            This releases all resources held by this instance.
+            </summary>
+        </member>
+        <member name="M:NDde.Advanced.Monitor.DdeMonitor.Start(NDde.Advanced.Monitor.DdeMonitorFlags)">
+            <summary>
+            This starts monitoring the system for DDE activity.
+            </summary>
+            <param name="flags">
+            A bitwise combination of <c>DdeMonitorFlags</c> that indicate what DDE activity will be monitored.
+            </param>
+        </member>
+        <member name="E:NDde.Advanced.Monitor.DdeMonitor.CallbackActivity">
+            <summary>
+            This is raised anytime a DDEML callback is executed.
+            </summary>
+        </member>
+        <member name="E:NDde.Advanced.Monitor.DdeMonitor.ConversationActivity">
+            <summary>
+            This is raised anytime a conversation is established or terminated.
+            </summary>
+        </member>
+        <member name="E:NDde.Advanced.Monitor.DdeMonitor.ErrorActivity">
+            <summary>
+            This is raised anytime there is an error.
+            </summary>
+        </member>
+        <member name="E:NDde.Advanced.Monitor.DdeMonitor.LinkActivity">
+            <summary>
+            This is raised anytime an advise loop is established or terminated.
+            </summary>
+        </member>
+        <member name="E:NDde.Advanced.Monitor.DdeMonitor.MessageActivity">
+            <summary>
+            This is raised anytime a DDE message is sent or posted.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeMonitor.Context">
+            <summary>
+            This gets the context associated with this instance.
+            </summary>
+        </member>
+        <member name="T:NDde.Advanced.DdeTransaction">
+            <summary>
+            This contains the parameters of the DDEML callback function.
+            </summary>
+            <threadsafety static="true" instance="false" />
+            <remarks>
+            <para>
+            The <c>dwRet</c> property contains the value returned by the DDEML callback function and is the only member that can be modified.  See the
+            MSDN documentation for more information about the members of this class.
+            </para>
+            <para>
+            <note type="caution">
+            Incorrect usage of the DDEML can cause this library to function incorrectly and can lead to resource leaks.
+            </note>
+            </para>
+            </remarks>
+        </member>
+        <member name="M:NDde.Advanced.DdeTransaction.ToString">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:NDde.Advanced.DdeTransaction.uType">
+            <summary>
+            See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.DdeTransaction.uFmt">
+            <summary>
+            See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.DdeTransaction.hConv">
+            <summary>
+            See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.DdeTransaction.hsz1">
+            <summary>
+            See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.DdeTransaction.hsz2">
+            <summary>
+            See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.DdeTransaction.hData">
+            <summary>
+            See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.DdeTransaction.dwData1">
+            <summary>
+            See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.DdeTransaction.dwData2">
+            <summary>
+            See the MSDN documentation for information about this member.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.DdeTransaction.dwRet">
+            <summary>
+            This gets the return value of the DDEML callback function.  See the MSDN documentation for information about this member.
+            </summary>
+            <remarks>
+            This will be ignored if the PreFilterTransaction method returns false.
+            </remarks>
+        </member>
+        <member name="T:NDde.Advanced.DdeRegistrationEventArgs">
+            <summary>
+            This contains information about the <c>Register</c> and <c>Unregister</c> events.
+            </summary>
+            <threadsafety static="true" instance="false" />
+        </member>
+        <member name="P:NDde.Advanced.DdeRegistrationEventArgs.Service">
+            <summary>
+            This gets the service name associated with this event.
+            </summary>
+        </member>
+        <member name="T:NDde.Foundation.Client.DdemlClient.ConversationManager">
+            <summary>
+            This class is needed to dispose of DDEML resources correctly since the DDEML is thread specific.
+            </summary>
+        </member>
+        <member name="T:NDde.Advanced.Monitor.DdeMessageActivityKind">
+            <summary>
+            This represents the kind of message contained in <c>DdeMessageActivityEventArgs</c>.
+            </summary>
+        </member>
+        <member name="F:NDde.Advanced.Monitor.DdeMessageActivityKind.Post">
+            <summary>
+            The message was posted by a DDE application.
+            </summary>
+        </member>
+        <member name="F:NDde.Advanced.Monitor.DdeMessageActivityKind.Send">
+            <summary>
+            The message was sent by a DDE application.
+            </summary>
+        </member>
+        <member name="T:NDde.Advanced.Monitor.DdeMessageActivityEventArgs">
+            <summary>
+            This contains information about the <c>MessageActivity</c> event.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeMessageActivityEventArgs.Kind">
+            <summary>
+            This gets the kind of message associated with this event.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeMessageActivityEventArgs.Message">
+            <summary>
+            This gets the message associated with this event.
+            </summary>
+        </member>
+        <member name="T:NDde.Advanced.DdeMessageLoop">
+            <summary>
+            This is a synchronizing object that can run a message loop on any thread.
+            </summary>
+            <threadsafety static="true" instance="false" />
+        </member>
+        <member name="M:NDde.Advanced.DdeMessageLoop.#ctor">
+            <summary>
+            This initializes a new instance of the <c>DdeMessageLoop</c> class.
+            </summary>
+        </member>
+        <member name="M:NDde.Advanced.DdeMessageLoop.Dispose">
+            <summary>
+            This releases all resources held by this instance.
+            </summary>
+        </member>
+        <member name="M:NDde.Advanced.DdeMessageLoop.System#ComponentModel#ISynchronizeInvoke#BeginInvoke(System.Delegate,System.Object[])">
+            <summary>
+            This begins an asynchronous operation to execute a delegate on the thread hosting this object.
+            </summary>
+            <param name="method">
+            The delegate to execute.
+            </param>
+            <param name="args">
+            The arguments to pass to the delegate.
+            </param>
+            <returns>
+            An <c>IAsyncResult</c> object for this operation.
+            </returns>
+        </member>
+        <member name="M:NDde.Advanced.DdeMessageLoop.System#ComponentModel#ISynchronizeInvoke#EndInvoke(System.IAsyncResult)">
+            <summary>
+            This returns the object that the delegate returned in the operation.
+            </summary>
+            <param name="asyncResult">
+            The <c>IAsyncResult</c> object returned by a call to <c>BeginInvoke</c>.
+            </param>
+            <returns>
+            The object returned by the delegate.
+            </returns>
+        </member>
+        <member name="M:NDde.Advanced.DdeMessageLoop.System#ComponentModel#ISynchronizeInvoke#Invoke(System.Delegate,System.Object[])">
+            <summary>
+            This executes a delegate on the thread hosting this object.
+            </summary>
+            <param name="method">
+            The delegate to execute.
+            </param>
+            <param name="args">
+            The arguments to pass to the delegate.
+            </param>
+            <returns>
+            The object returned by the delegate.
+            </returns>
+        </member>
+        <member name="M:NDde.Advanced.DdeMessageLoop.Run">
+            <summary>
+            This starts a message loop on the current thread.
+            </summary>
+        </member>
+        <member name="M:NDde.Advanced.DdeMessageLoop.Run(System.Windows.Forms.Form)">
+            <summary>
+            This starts a message loop on the current thread and shows the specified form.
+            </summary>
+            <param name="form">
+            The Form to display.
+            </param>
+        </member>
+        <member name="P:NDde.Advanced.DdeMessageLoop.System#ComponentModel#ISynchronizeInvoke#InvokeRequired">
+            <summary>
+            This gets a bool indicating whether the caller must use Invoke.
+            </summary>
+        </member>
+        <member name="T:NDde.Advanced.DdeMessageLoop.HiddenForm">
+            <threadsafety static="true" instance="false" />
+        </member>
+        <member name="T:NDde.Server.DdeConversation">
+            <summary>
+            This represents a DDE conversation established on a <c>DdeServer</c>.
+            </summary>
+            <threadsafety static="true" instance="true" />
+        </member>
+        <member name="M:NDde.Server.DdeConversation.ToString">
+            <summary>
+            This returns a string containing the current values of all properties.
+            </summary>
+            <returns>
+            A string containing the current values of all properties.
+            </returns>
+        </member>
+        <member name="P:NDde.Server.DdeConversation.Service">
+            <summary>
+            This gets the service name associated with this conversation.
+            </summary>
+        </member>
+        <member name="P:NDde.Server.DdeConversation.Topic">
+            <summary>
+            This gets the topic name associated with this conversation.
+            </summary>
+        </member>
+        <member name="P:NDde.Server.DdeConversation.Handle">
+            <summary>
+            This gets the DDEML handle associated with this conversation.
+            </summary>
+            <remarks>
+            <para>
+            This can be used in any DDEML function requiring a conversation handle.
+            </para>
+            <para>
+            <note type="caution">
+            Incorrect usage of the DDEML can cause this object to function incorrectly and can lead to resource leaks.
+            </note>
+            </para>
+            </remarks>
+        </member>
+        <member name="P:NDde.Server.DdeConversation.IsPaused">
+            <summary>
+            This gets a bool indicating whether this conversation is paused.
+            </summary>
+        </member>
+        <member name="P:NDde.Server.DdeConversation.Tag">
+            <summary>
+            This gets an application defined data object associated with this conversation.
+            </summary>
+            <remarks>
+            Use this property to carry state information with the conversation.
+            </remarks>
+        </member>
+        <member name="T:NDde.Advanced.IDdeTransactionFilter">
+            <summary>
+            This defines a transaction filter.
+            </summary>
+            <remarks>
+            <para>
+            Use a transaction filter to intercept the DDEML callback function.  The <c>PreFilterTransaction</c> method will be called every time the
+            DDEML callback function executes.  The <c>Transaction</c> object passed into the method contains the parameters of the DDE callback
+            function.  By using a transaction filter the developer has compelete control over the DDEML.  See the MSDN documentation for more
+            information on using the DDEML.
+            </para>
+            <para>
+            <note type="caution">
+            Incorrect usage of the DDEML can cause this library to function incorrectly and can lead to resource leaks.
+            </note>
+            </para>
+            </remarks>
+        </member>
+        <member name="M:NDde.Advanced.IDdeTransactionFilter.PreFilterTransaction(NDde.Advanced.DdeTransaction)">
+            <summary>
+            This filters a transaction before it is dispatched.
+            </summary>
+            <param name="t">
+            The transaction to be dispatched.
+            </param>
+            <returns>
+            True to filter the transaction and stop it from being dispatched, false otherwise.
+            </returns>
+            <remarks>
+            <para>
+            This method is called everytime the DDEML callback function executes.
+            </para>
+            <para>
+            <note type="caution">
+            Incorrect usage of the DDEML can cause this library to function incorrectly and can lead to resource leaks.
+            </note>
+            </para>
+            </remarks>
+        </member>
+        <member name="T:NDde.Advanced.DdeContext">
+            <summary>
+            This provides an execution context for <c>DdeClient</c> and <c>DdeServer</c>.
+            </summary>
+            <threadsafety static="true" instance="true"/>
+            <remarks>
+            <para>
+            This class provides a context for DDE activity.  All <c>DdeClient</c> and <c>DdeServer</c> objects must be associated with an instance of
+            this class.  If one is not specified in their constructors then a default instance of this class is used.  This class must be initialized
+            before it can begin sending and receiving DDE messages.  This happens automatically upon its first use by a <c>DdeClient</c> or
+            <c>DdeServer</c>.  An application can call <c>Initialize</c> to make the initialization process occur immediately.  This is useful when a
+            calling application expects this class to raise the <c>Register</c> and <c>Unregister</c> events or invoke the
+            <c>ITransactionFilter.PreFilterTransaction</c> method before being used by a <c>DdeClient</c> or <c>DdeServer</c>.
+            </para>
+            <para>
+            Since forms and controls implement <c>ISynchronizeInvoke</c> they can be used as the synchronizing object for this class.  When an instance 
+            of this class is created to use a form or control as the synchronizing object it will use the UI thread for execution.  This is the
+            preferred way of creating an instance of this class when used in a windows application since it avoids multithreaded synchronization issues
+            and cross thread marshaling.  When an instance of this class is created without specifying a synchronizing object it will create and manage
+            its own thread for execution.  This is convenient if you wish to use this library in a console or service application, but with the added
+            cost of cross thread marshaling and the potential for deadlocking application threads.
+            </para>
+            <para>
+            Events are invoked on the thread hosting the <c>DdeContext</c>.  All operations must be marshaled onto the thread hosting the 
+            <c>DdeContext</c>.  Method calls will block until that thread becomes available.  An exception will be generated if the thread does not
+            become available in a timely manner.
+            </para>
+            </remarks>
+            <example>
+        The following example demonstrates how to instantiate a DdeContext in a console application.
+            <code lang="C#">
+            using System;
+            using NDde.Advanced;
+             
+            public class Example 
+            {
+                public static void Main()
+                {
+                    // Create a context that uses a dedicated thread for DDE message pumping.
+                    DdeContext context = new DdeContext();
+                }
+            }
+            </code>
+            <code lang="Visual Basic">
+            Imports NDde.Advanced
+
+            Public Class Example
+                Public Shared Sub Main()
+                    ' Create a context that uses a dedicated thread for DDE message pumping.
+                    Dim context As DdeContext = New DdeContext()
+                End Sub
+            End Class
+            </code>
+            The following example demonstrates how to instantiate a DdeContext in a windows application.
+            <code lang="C#">
+            using System;
+            using NDde.Advanced;
+             
+            public class Example : Form
+            {
+                // Standard Form code omitted for brevity.
+                
+                private DdeContext context = null;
+                
+                private void Form1_Load(object sender, System.EventArgs e)
+                {
+                    // Create a context that uses the UI thread for DDE message pumping.
+                    context = new DdeContext(this);
+                }
+            }
+            </code>
+            <code lang="Visual Basic">
+            Imports NDde.Advanced
+            
+            Public Class Example
+                Inherits Form
+                
+                Private context as DdeContext = Nothing
+                
+                Private Sub Form1_Load(ByVal sender As Object, ByVal e As System.EventArgs)
+                    ' Create a context that uses the UI thread for DDE message pumping.
+                    context = New DdeContext(Me)
+                End Sub
+            End Class
+            </code>
+        </example>
+        </member>
+        <member name="M:NDde.Advanced.DdeContext.#ctor">
+            <overloads>
+            <summary>
+            </summary>
+            </overloads>
+            <summary>
+            This initializes a new instance of the <c>DdeContext</c> class that uses a dedicated thread for execution.
+            </summary>
+            <remarks>
+            This constructor is used when you want the context to create and manage its own thread for DDE message pumping.
+            </remarks>
+        </member>
+        <member name="M:NDde.Advanced.DdeContext.#ctor(System.ComponentModel.ISynchronizeInvoke)">
+            <summary>
+            This initializes a new instance of the <c>DdeContext</c> class that uses the specified synchronizing object for execution.
+            </summary>
+            <param name="synchronizingObject">
+            The synchronizing object to use for execution.
+            </param>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when synchronizer is a null reference.
+            </exception>
+            <remarks>
+            This constructor is used when you want the context to use the specified synchronizing object for DDE message pumping.  Since forms and
+            controls implement <c>ISynchronizeInvoke</c> they can be used as the synchronizing object.  In that case the windows application UI
+            thread that is hosting the form or control is used.
+            </remarks>
+        </member>
+        <member name="M:NDde.Advanced.DdeContext.Dispose">
+            <summary>
+            This releases all resources held by this instance.
+            </summary>
+        </member>
+        <member name="M:NDde.Advanced.DdeContext.Initialize">
+            <summary>
+            This initializes the context.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the context is already initialized.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the context could not be initialized.
+            </exception>
+            <remarks>
+            <para>
+            This class must be initialized before it can begin sending and receiving DDE messages.  This happens automatically upon its first use by
+            a <c>DdeClient</c> or <c>DdeServer</c>.  An application can call <c>Initialize</c> to make the initialization process occur immediately.
+            This is useful when a calling application expects this class to raise the <c>Register</c> and <c>Unregister</c> events or invoke the
+            <c>ITransactionFilter.PreFilterTransaction</c> method before being used by a <c>DdeClient</c> or <c>DdeServer</c>.
+            </para>
+            <para>
+            If you attempt to use a synchronizer that is not hosted on a thread running a windows message loop an exception will be thrown.
+            </para>
+            <para>
+            Explicitly calling this method will allow added <c>ITransactionFilter</c> objects to begin intercepting the DDEML callback function.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:NDde.Advanced.DdeContext.AddTransactionFilter(NDde.Advanced.IDdeTransactionFilter)">
+            <summary>
+            This adds a transaction filter to monitor DDE transactions.
+            </summary>
+            <param name="filter">
+            The implementation of <c>ITransactionFilter</c> that you want to add.
+            </param>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when filter is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the filter was already added.
+            </exception>
+            <remarks>
+            <para>
+            Transaction filters can be used to intercept the DDEML callback.
+            </para>
+            <para>
+            <note type="caution">
+            Incorrect usage of the DDEML can cause this library to function incorrectly and can lead to resource leaks.
+            </note>
+            </para>
+            </remarks>
+        </member>
+        <member name="M:NDde.Advanced.DdeContext.RemoveTransactionFilter(NDde.Advanced.IDdeTransactionFilter)">
+            <summary>
+            This removes a transaction filter and stops it from monitoring DDE transactions.
+            </summary>
+            <param name="filter">
+            The implementation of <c>ITransactionFilter</c> that you want to remove.
+            </param>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when filter is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the filter was not previously added.
+            </exception>
+            <remarks>
+            <para>
+            Transaction filters can be used to intercept the DDEML callback.
+            </para>
+            <para>
+            <note type="caution">
+            Incorrect usage of the DDEML can cause this library to function incorrectly and can lead to resource leaks.
+            </note>
+            </para>
+            </remarks>
+        </member>
+        <member name="M:NDde.Advanced.DdeContext.Invoke(System.Threading.ThreadStart)">
+            <summary>
+            This executes a ThreadStart delegate on the thread hosting this object.
+            </summary>
+            <param name="method">
+            The delegate to execute.
+            </param>
+        </member>
+        <member name="M:NDde.Advanced.DdeContext.Invoke(System.Delegate,System.Object[])">
+            <summary>
+            This executes a delegate on the thread hosting this object.
+            </summary>
+            <param name="method">
+            The delegate to execute.
+            </param>
+            <param name="args">
+            The arguments to pass to the delegate.
+            </param>
+            <returns>
+            The object returned by the delegate.
+            </returns>
+        </member>
+        <member name="M:NDde.Advanced.DdeContext.BeginInvoke(System.Delegate,System.Object[])">
+            <summary>
+            This begins an asynchronous operation to execute a delegate on the thread hosting this object.
+            </summary>
+            <param name="method">
+            The delegate to execute.
+            </param>
+            <param name="args">
+            The arguments to pass to the delegate.
+            </param>
+            <returns>
+            An <c>IAsyncResult</c> object for this operation.
+            </returns>
+        </member>
+        <member name="M:NDde.Advanced.DdeContext.EndInvoke(System.IAsyncResult)">
+            <summary>
+            This returns the object that the delegate returned in the operation.
+            </summary>
+            <param name="asyncResult">
+            The <c>IAsyncResult</c> object returned by a call to <c>BeginInvoke</c>.
+            </param>
+            <returns>
+            The object returned by the delegate.
+            </returns>
+        </member>
+        <member name="E:NDde.Advanced.DdeContext.Register">
+            <summary>
+            This is raised when a service name has been registered by a server using the DDEML.
+            </summary>
+            <remarks>
+            This event will not be raised by servers that do not use the DDEML.
+            </remarks>
+        </member>
+        <member name="E:NDde.Advanced.DdeContext.Unregister">
+            <summary>
+            This is raised when a service name has been unregistered by a server using the DDEML.
+            </summary>
+            <remarks>
+            This event will not be raised by servers that do not use the DDEML.
+            </remarks>
+        </member>
+        <member name="P:NDde.Advanced.DdeContext.DdemlObject">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.DdeContext.InstanceId">
+            <summary>
+            This gets the DDEML instance identifier.
+            </summary>
+            <remarks>
+            <para>
+            This can be used in any DDEML function requiring an instance identifier.
+            </para>
+            <para>
+            <note type="caution">
+            Incorrect usage of the DDEML can cause this library to function incorrectly and can lead to resource leaks.
+            </note>
+            </para>
+            </remarks>
+        </member>
+        <member name="P:NDde.Advanced.DdeContext.IsInitialized">
+            <summary>
+            This gets a bool indicating whether the context is initialized.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.DdeContext.Encoding">
+            <summary>
+            This gets or sets the default encoding that is used.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.DdeContext.InvokeRequired">
+            <summary>
+            This gets a bool indicating whether the caller must use Invoke.
+            </summary>
+        </member>
+        <member name="T:NDde.Advanced.DdeContext.DdemlTransactionFilter">
+            <threadsafety static="true" instance="true" />
+        </member>
+        <member name="T:NDde.Advanced.DdeContext.DdeThread">
+            <threadsafety static="true" instance="true" />
+        </member>
+        <member name="T:NDde.Advanced.DdeContext.DdeThread.HiddenForm">
+            <threadsafety static="true" instance="false" />
+        </member>
+        <member name="T:NDde.Advanced.Monitor.DdeErrorActivityEventArgs">
+            <summary>
+            This contains information about the <c>ErrorActivity</c> event.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeErrorActivityEventArgs.Code">
+            <summary>
+            This gets an error code returned by the DDEML.
+            </summary>
+        </member>
+        <member name="T:NDde.Advanced.Monitor.DdeConversationActivityEventArgs">
+            <summary>
+            This contains information about the <c>ConversationActivity</c> event.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeConversationActivityEventArgs.Service">
+            <summary>
+            This gets the service name associated with the conversation.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeConversationActivityEventArgs.Topic">
+            <summary>
+            This gets the topic name associated with the conversation.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeConversationActivityEventArgs.IsEstablished">
+            <summary>
+            This gets a bool indicating whether the conversation is being established.
+            </summary>
+            <remarks>
+            The value returned by this property will be true if the conversation is being established.  If the conversation
+            is being terminated then the value will be false.
+            </remarks>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeConversationActivityEventArgs.ClientHandle">
+            <summary>
+            This gets the handle to the client application associated with the conversation.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeConversationActivityEventArgs.ServerHandle">
+            <summary>
+            This gets the handle to the server application associated with the conversation.
+            </summary>
+        </member>
+        <member name="T:NDde.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.AdviseFailedMessage">
+            <summary>
+              Looks up a localized string similar to The server failed to advise &quot;${service}|${topic}!${item}&quot;..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.AlreadyBeingAdvisedMessage">
+            <summary>
+              Looks up a localized string similar to An advise loop for &quot;${service}|${topic}!${item}&quot; already exists..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.AlreadyConnectedMessage">
+            <summary>
+              Looks up a localized string similar to The client is already connected..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.AlreadyInitializedMessage">
+            <summary>
+              Looks up a localized string similar to The context is already intialized..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.AlreadyPausedMessage">
+            <summary>
+              Looks up a localized string similar to The specified conversation is already paused..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.AlreadyRegisteredMessage">
+            <summary>
+              Looks up a localized string similar to The service is already registered..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.AsyncResultParameterInvalidMessage">
+            <summary>
+              Looks up a localized string similar to The IAsyncResult must have been returned by a call to ${method}..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.ClientPauseFailedMessage">
+            <summary>
+              Looks up a localized string similar to The client failed to pause the conversation..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.ClientResumeFailedMessage">
+            <summary>
+              Looks up a localized string similar to The client failed to resume the conversation..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.ConnectFailedMessage">
+            <summary>
+              Looks up a localized string similar to The client failed to connect to &quot;${service}|${topic}&quot;.  Make sure the server application is running and that it supports the specified service name and topic name pair..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.ExecuteFailedMessage">
+            <summary>
+              Looks up a localized string similar to The client failed to execute &quot;${command}&quot;..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.FilterAlreadyAddedMessage">
+            <summary>
+              Looks up a localized string similar to The transaction filter has already been added..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.FilterNotAddedMessage">
+            <summary>
+              Looks up a localized string similar to The transaction filter has not been added..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.InitializeFailedMessage">
+            <summary>
+              Looks up a localized string similar to The context failed to initialize..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.MarshalTimeoutMessage">
+            <summary>
+              Looks up a localized string similar to The context timed out attempting to marshal the operation..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.NoMessageLoopMessage">
+            <summary>
+              Looks up a localized string similar to The context is not hosted on a thread with a message loop..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.NotBeingAdvisedMessage">
+            <summary>
+              Looks up a localized string similar to An advise loop for &quot;${service}|${topic}!${item}&quot; does not exist..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.NotConnectedMessage">
+            <summary>
+              Looks up a localized string similar to The client is not connected..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.NotInitializedMessage">
+            <summary>
+              Looks up a localized string similar to The context is not initialized..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.NotPausedMessage">
+            <summary>
+              Looks up a localized string similar to The specified conversation is not paused..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.NotRegisteredMessage">
+            <summary>
+              Looks up a localized string similar to The service is not registered..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.PokeFailedMessage">
+            <summary>
+              Looks up a localized string similar to The client failed to poke &quot;${service}|${topic}!${item}&quot;..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.RegisterFailedMessage">
+            <summary>
+              Looks up a localized string similar to The server failed to register &quot;${service}&quot;..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.RequestFailedMessage">
+            <summary>
+              Looks up a localized string similar to The client failed to request &quot;${service}|${topic}!${item}&quot;..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.ServerPauseAllFailedMessage">
+            <summary>
+              Looks up a localized string similar to The server failed to pause all conversations..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.ServerPauseFailedMessage">
+            <summary>
+              Looks up a localized string similar to The server failed to pause the specified conversation..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.ServerResumeAllFailedMessage">
+            <summary>
+              Looks up a localized string similar to The server failed to resume all conversations..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.ServerResumeFailedMessage">
+            <summary>
+              Looks up a localized string similar to The server failed to resume the specified conversation..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.StartAdviseFailedMessage">
+            <summary>
+              Looks up a localized string similar to The client failed to initiate an advise loop for &quot;${service}|${topic}!${item}&quot;..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.StopAdviseFailedMessage">
+            <summary>
+              Looks up a localized string similar to The client failed to terminate the advise loop for &quot;${service}|${topic}!${item}&quot;..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.StringParameterInvalidMessage">
+            <summary>
+              Looks up a localized string similar to The parameter must be &lt;= 255 characters..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.TimeoutParameterInvalidMessage">
+            <summary>
+              Looks up a localized string similar to The parameter must be &gt; 0..
+            </summary>
+        </member>
+        <member name="P:NDde.Properties.Resources.UnknownErrorMessage">
+            <summary>
+              Looks up a localized string similar to An unknown error occurred..
+            </summary>
+        </member>
+        <member name="T:NDde.DdeException">
+            <summary>
+            This is thrown when a DDE exception occurs.
+            </summary>
+            <threadsafety static="true" instance="false" />
+        </member>
+        <member name="M:NDde.DdeException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            </summary>
+            <param name="info"></param>
+            <param name="context"></param>
+        </member>
+        <member name="M:NDde.DdeException.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            </summary>
+            <param name="info"></param>
+            <param name="context"></param>
+        </member>
+        <member name="P:NDde.DdeException.Code">
+            <summary>
+            This gets an error code returned by the DDEML.
+            </summary>
+            <remarks>
+            <para>
+            The value is zero if the exception was not thrown because of the DDEML.
+            </para>
+            <para>
+            <list type="bullet">
+            <item><term>0x0000</term><description>DMLERR_NO_DMLERROR</description></item>
+            <item><term>0x4000</term><description>DMLERR_ADVACKTIMEOUT</description></item>
+            <item><term>0x4001</term><description>DMLERR_BUSY</description></item>
+            <item><term>0x4002</term><description>DMLERR_DATAACKTIMEOUT</description></item>
+            <item><term>0x4003</term><description>DMLERR_DLL_NOT_INITIALIZED</description></item>
+            <item><term>0x4004</term><description>DMLERR_DLL_USAGE</description></item>
+            <item><term>0x4005</term><description>DMLERR_EXECACKTIMEOUT</description></item>
+            <item><term>0x4006</term><description>DMLERR_INVALIDPARAMETER</description></item>
+            <item><term>0x4007</term><description>DMLERR_LOW_MEMORY</description></item>
+            <item><term>0x4008</term><description>DMLERR_MEMORY_DMLERROR</description></item>
+            <item><term>0x4009</term><description>DMLERR_NOTPROCESSED</description></item>
+            <item><term>0x400A</term><description>DMLERR_NO_CONV_ESTABLISHED</description></item>
+            <item><term>0x400B</term><description>DMLERR_POKEACKTIMEOUT</description></item>
+            <item><term>0x400C</term><description>DMLERR_POSTMSG_FAILED</description></item>
+            <item><term>0x400D</term><description>DMLERR_REENTRANCY</description></item>
+            <item><term>0x400E</term><description>DMLERR_SERVER_DIED</description></item>
+            <item><term>0x400F</term><description>DMLERR_SYS_DMLERROR</description></item>
+            <item><term>0x4010</term><description>DMLERR_UNADVACKTIMEOUT</description></item>
+            <item><term>0x4011</term><description>DMLERR_UNFOUND_QUEUE_ID</description></item>
+            </list>
+            </para>
+            </remarks>
+        </member>
+        <member name="T:NDde.Advanced.Monitor.DdeLinkActivityEventArgs">
+            <summary>
+            This contains information about the <c>LinkActivity</c> event.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeLinkActivityEventArgs.Service">
+            <summary>
+            This gets the service name associated with the link.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeLinkActivityEventArgs.Topic">
+            <summary>
+            This gets the topic name associated with the link.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeLinkActivityEventArgs.Item">
+            <summary>
+            This gets the item name associated with the link.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeLinkActivityEventArgs.Format">
+            <summary>
+            This gets the format of the data associated with the link.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeLinkActivityEventArgs.IsHot">
+            <summary>
+            This gets a bool indicating whether the link is hot.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeLinkActivityEventArgs.IsEstablished">
+            <summary>
+            This gets a bool indicating whether the link is being established.
+            </summary>
+            <remarks>
+            The value returned by this property will be true if the conversation is being established.  If the conversation
+            is being terminated then the value will be false.
+            </remarks>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeLinkActivityEventArgs.IsServerInitiated">
+            <summary>
+            This gets a bool indicating whether the link was terminated by the server.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeLinkActivityEventArgs.ClientHandle">
+            <summary>
+            This gets the handle to the client application associated with the link.
+            </summary>
+        </member>
+        <member name="P:NDde.Advanced.Monitor.DdeLinkActivityEventArgs.ServerHandle">
+            <summary>
+            This gets the handle to the server application associated with the link.
+            </summary>
+        </member>
+        <member name="T:NDde.Server.DdeServer">
+            <summary>
+            This represents the server side of DDE conversations.
+            </summary>
+            <threadsafety static="true" instance="true"/>
+            <remarks>
+            <para>
+            DDE conversations are established by specifying a service name and topic name pair.  The service name is usually the name of the application
+            acting as a DDE server.  A DDE server can respond to multiple service names, but most servers usually only respond to one.  The topic name
+            is a logical context for data and is defined by the server application.  A server can and usually does support many topic names.
+            </para>
+            <para>
+            After this object has registered its service name by calling the <c>Register</c> method clients can connect to it by specifying the service
+            name the server registered and a topic name that it supports.
+            </para>
+            <para>
+            Event methods are invoked on the thread hosting the <c>DdeContext</c>.  All operations must be marshaled onto the thread hosting the 
+            <c>DdeContext</c> associated with this object.  Method calls will block until that thread becomes available.  An exception will be generated
+            if the thread does not become available in a timely manner.
+            </para>
+            <para>
+            <note type="inheritinfo">
+            The event methods must be overridden in a subclass as needed.
+            </note>
+            </para>
+            </remarks>
+            <example>
+        The following example demostrates how to use a DdeServer.
+            <code lang="C#">
+            using System;
+            using System.Collections;
+            using System.Timers;
+            using NDde.Server;
+
+            public class Server
+            {
+                public static void Main()
+                {
+                    try
+                    {
+                        // Create a server that will register the service name 'myapp'.
+                        using (DdeServer server = new MyServer("myapp"))
+                        {
+                            // Register the service name.
+                            server.Register();
+
+                            // Wait for the user to press ENTER before proceding.
+                            Console.WriteLine("Press ENTER to quit...");
+                            Console.ReadLine();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        Console.WriteLine("Press ENTER to quit...");
+                        Console.ReadLine();
+                    }
+                }
+
+                private sealed class MyServer : DdeServer
+                {
+                    private System.Timers.Timer _Timer = new System.Timers.Timer();
+
+                    public MyServer(string service) : base(service)
+                    {
+                        // Create a timer that will be used to advise clients of new data.
+                        _Timer.Elapsed += this.OnTimerElapsed;
+                        _Timer.Interval = 1000;
+                        _Timer.SynchronizingObject = this.Context;
+                        _Timer.Start();
+                    }
+
+                    private void OnTimerElapsed(object sender, ElapsedEventArgs args)
+                    {
+                        // Advise all topic name and item name pairs.
+                        Advise("*", "*");
+                    }
+
+                    protected override bool OnBeforeConnect(string topic)
+                    {
+                        Console.WriteLine("OnBeforeConnect:".PadRight(16)
+                            + " Service='" + base.Service + "'"
+                            + " Topic='" + topic + "'");
+
+                        return true;
+                    }
+
+                    protected override void OnAfterConnect(DdeConversation conversation)
+                    {
+                        Console.WriteLine("OnAfterConnect:".PadRight(16)
+                            + " Service='" + conversation.Service + "'"
+                            + " Topic='" + conversation.Topic + "'"
+                            + " Handle=" + conversation.Handle.ToString());
+                    }
+
+                    protected override void OnDisconnect(DdeConversation conversation)
+                    {
+                        Console.WriteLine("OnDisconnect:".PadRight(16)
+                            + " Service='" + conversation.Service + "'"
+                            + " Topic='" + conversation.Topic + "'"
+                            + " Handle=" + conversation.Handle.ToString());
+                    }
+
+                    protected override bool OnStartAdvise(DdeConversation conversation, string item, int format)
+                    {
+                        Console.WriteLine("OnStartAdvise:".PadRight(16)
+                            + " Service='" + conversation.Service + "'"
+                            + " Topic='" + conversation.Topic + "'"
+                            + " Handle=" + conversation.Handle.ToString()
+                            + " Item='" + item + "'"
+                            + " Format=" + format.ToString());
+
+                        // Initiate the advisory loop only if the format is CF_TEXT.
+                        return format == 1;
+                    }
+
+                    protected override void OnStopAdvise(DdeConversation conversation, string item)
+                    {
+                        Console.WriteLine("OnStopAdvise:".PadRight(16)
+                            + " Service='" + conversation.Service + "'"
+                            + " Topic='" + conversation.Topic + "'"
+                            + " Handle=" + conversation.Handle.ToString()
+                            + " Item='" + item + "'");
+                    }
+
+                    protected override ExecuteResult OnExecute(DdeConversation conversation, string command)
+                    {
+                        Console.WriteLine("OnExecute:".PadRight(16)
+                            + " Service='" + conversation.Service + "'"
+                            + " Topic='" + conversation.Topic + "'"
+                            + " Handle=" + conversation.Handle.ToString()
+                            + " Command='" + command + "'");
+
+                        // Tell the client that the command was processed.
+                        return ExecuteResult.Processed;
+                    }
+
+                    protected override PokeResult OnPoke(DdeConversation conversation, string item, byte[] data, int format)
+                    {
+                        Console.WriteLine("OnPoke:".PadRight(16)
+                            + " Service='" + conversation.Service + "'"
+                            + " Topic='" + conversation.Topic + "'"
+                            + " Handle=" + conversation.Handle.ToString()
+                            + " Item='" + item + "'"
+                            + " Data=" + data.Length.ToString()
+                            + " Format=" + format.ToString());
+
+                        // Tell the client that the data was processed.
+                        return PokeResult.Processed;
+                    }
+
+                    protected override RequestResult OnRequest(DdeConversation conversation, string item, int format)
+                    {
+                        Console.WriteLine("OnRequest:".PadRight(16)
+                            + " Service='" + conversation.Service + "'"
+                            + " Topic='" + conversation.Topic + "'"
+                            + " Handle=" + conversation.Handle.ToString()
+                            + " Item='" + item + "'"
+                            + " Format=" + format.ToString());
+
+                        // Return data to the client only if the format is CF_TEXT.
+                        if (format == 1)
+                        {
+                            return new RequestResult(System.Text.Encoding.ASCII.GetBytes("Time=" + DateTime.Now.ToString() + "\0"));
+                        }
+                        return RequestResult.NotProcessed;
+                    }
+
+                    protected override byte[] OnAdvise(string topic, string item, int format)
+                    {
+                        Console.WriteLine("OnAdvise:".PadRight(16)
+                            + " Service='" + this.Service + "'"
+                            + " Topic='" + topic + "'"
+                            + " Item='" + item + "'"
+                            + " Format=" + format.ToString());
+
+                        // Send data to the client only if the format is CF_TEXT.
+                        if (format == 1)
+                        {
+                            return System.Text.Encoding.ASCII.GetBytes("Time=" + DateTime.Now.ToString() + "\0");
+                        }
+                        return null;
+                    }
+
+                } // class
+
+            } // class
+            </code>
+            <code lang="Visual Basic">
+            Imports NDde.Server
+
+            Module Program
+
+                Sub Main()
+
+                    Try
+
+                        ' Create a server that will register the service name 'myapp'.
+                        Using server As DdeServer = New MyServer("myapp")
+
+                            ' Register the service name.
+                            server.Register()
+
+                            ' Wait for the user to press ENTER before proceding.
+                            Console.WriteLine("Press ENTER to quit...")
+                            Console.ReadLine()
+
+                        End Using
+
+                    Catch e As Exception
+
+                        Console.WriteLine(e)
+                        Console.WriteLine("Press ENTER to quit...")
+                        Console.ReadLine()
+
+                    End Try
+
+                End Sub
+
+                Private Class MyServer
+                    Inherits DdeServer
+
+                    Private WithEvents theTimer As System.Timers.Timer = New System.Timers.Timer()
+
+                    Public Sub New(ByVal service As String)
+                        MyBase.New(service)
+                        ' Create a timer that will be used to advise clients of new data.
+                        theTimer.Interval = 1000
+                        theTimer.SynchronizingObject = Me.Context
+                        theTimer.Start()
+                    End Sub
+
+                    Private Sub theTimer_Elapsed(ByVal sender As Object, ByVal e As System.Timers.ElapsedEventArgs) Handles theTimer.Elapsed
+                        Me.Advise("*", "*")
+                    End Sub
+
+                    Protected Overrides Function OnBeforeConnect(ByVal topic As String) As Boolean
+                        Console.WriteLine("OnBeforeConnect:".PadRight(16) _
+                         + " Service='" + MyBase.Service + "'" _
+                         + " Topic='" + topic + "'")
+
+                        Return True
+                    End Function
+
+                    Protected Overrides Sub OnAfterConnect(ByVal conversation As DdeConversation)
+                        Console.WriteLine("OnAfterConnect:".PadRight(16) _
+                         + " Service='" + conversation.Service + "'" _
+                         + " Topic='" + conversation.Topic + "'" _
+                         + " Handle=" + conversation.Handle.ToString())
+                    End Sub
+
+                    Protected Overrides Sub OnDisconnect(ByVal conversation As DdeConversation)
+                        Console.WriteLine("OnDisconnect:".PadRight(16) _
+                         + " Service='" + conversation.Service + "'" _
+                         + " Topic='" + conversation.Topic + "'" _
+                         + " Handle=" + conversation.Handle.ToString())
+                    End Sub
+
+                    Protected Overrides Function OnStartAdvise(ByVal conversation As DdeConversation, ByVal item As String, ByVal format As Integer) As Boolean
+                        Console.WriteLine("OnStartAdvise:".PadRight(16) _
+                         + " Service='" + conversation.Service + "'" _
+                         + " Topic='" + conversation.Topic + "'" _
+                         + " Handle=" + conversation.Handle.ToString() _
+                         + " Item='" + item + "'" _
+                         + " Format=" + format.ToString())
+
+                        ' Initiate the advisory loop only if the format is CF_TEXT.
+                        Return format = 1
+                    End Function
+
+                    Protected Overrides Sub OnStopAdvise(ByVal conversation As DdeConversation, ByVal item As String)
+                        Console.WriteLine("OnStopAdvise:".PadRight(16) _
+                          + " Service='" + conversation.Service + "'" _
+                          + " Topic='" + conversation.Topic + "'" _
+                          + " Handle=" + conversation.Handle.ToString() _
+                          + " Item='" + item + "'")
+                    End Sub
+
+                    Protected Overrides Function OnExecute(ByVal conversation As DdeConversation, ByVal command As String) As ExecuteResult
+                        Console.WriteLine("OnExecute:".PadRight(16) _
+                         + " Service='" + conversation.Service + "'" _
+                         + " Topic='" + conversation.Topic + "'" _
+                         + " Handle=" + conversation.Handle.ToString() _
+                         + " Command='" + command + "'")
+
+                        ' Tell the client that the command was processed.
+                        Return ExecuteResult.Processed
+                    End Function
+
+                    Protected Overrides Function OnPoke(ByVal conversation As DdeConversation, ByVal item As String, ByVal data As Byte(), ByVal format As Integer) As PokeResult
+                        Console.WriteLine("OnPoke:".PadRight(16) _
+                         + " Service='" + conversation.Service + "'" _
+                         + " Topic='" + conversation.Topic + "'" _
+                         + " Handle=" + conversation.Handle.ToString() _
+                         + " Item='" + item + "'" _
+                         + " Data=" + data.Length.ToString() _
+                         + " Format=" + format.ToString())
+
+                        ' Tell the client that the data was processed.
+                        Return PokeResult.Processed
+                    End Function
+
+                    Protected Overrides Function OnRequest(ByVal conversation As DdeConversation, ByVal item As String, ByVal format As Integer) As RequestResult
+                        Console.WriteLine("OnRequest:".PadRight(16) _
+                         + " Service='" + conversation.Service + "'" _
+                         + " Topic='" + conversation.Topic + "'" _
+                         + " Handle=" + conversation.Handle.ToString() _
+                         + " Item='" + item + "'" _
+                         + " Format=" + format.ToString())
+
+                        ' Return data to the client only if the format is CF_TEXT.
+                        If format = 1 Then
+                            Return New RequestResult(System.Text.Encoding.ASCII.GetBytes("Time=" + DateTime.Now.ToString() + Convert.ToChar(0)))
+                        End If
+                        Return RequestResult.NotProcessed
+                    End Function
+
+                    Protected Overrides Function OnAdvise(ByVal topic As String, ByVal item As String, ByVal format As Integer) As Byte()
+                        Console.WriteLine("OnAdvise:".PadRight(16) _
+                         + " Service='" + Me.Service + "'" _
+                         + " Topic='" + topic + "'" _
+                         + " Item='" + item + "'" _
+                         + " Format=" + format.ToString())
+
+                        ' Send data to the client only if the format is CF_TEXT.
+                        If format = 1 Then
+                            Return System.Text.Encoding.ASCII.GetBytes("Time=" + DateTime.Now.ToString() + Convert.ToChar(0))
+                        End If
+                        Return Nothing
+                    End Function
+
+                End Class
+
+            End Module
+            </code>
+        </example>
+        </member>
+        <member name="M:NDde.Server.DdeServer.#ctor(System.String)">
+            <overloads>
+            <summary>
+            </summary>
+            </overloads>
+            <summary>
+            This initializes a new instance of the <c>DdeServer</c> class that can register the specified service name.
+            </summary>
+            <param name="service">
+            The service name that this instance can register.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            This is thown when service exceeds 255 characters..
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when service is a null reference.
+            </exception>
+        </member>
+        <member name="M:NDde.Server.DdeServer.#ctor(System.String,System.ComponentModel.ISynchronizeInvoke)">
+            <summary>
+            This initializes a new instance of the <c>DdeServer</c> class that can register the specified service name and using the specified
+            synchronizing object.
+            </summary>
+            <param name="service">
+            The service name that this instance can register.
+            </param>
+            <param name="synchronizingObject">
+            The synchronizing object to use for this instance.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            This is thown when service exceeds 255 characters..
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when service is a null reference.
+            </exception>
+        </member>
+        <member name="M:NDde.Server.DdeServer.#ctor(System.String,NDde.Advanced.DdeContext)">
+            <summary>
+            This initializes a new instance of the <c>DdeServer</c> class that can register the specified service name and uses the specified
+            context.
+            </summary>
+            <param name="service">
+            The service name that this instance can register.
+            </param>
+            <param name="context">
+            The context to use for execution.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            This is thown when service exceeds 255 characters..
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when service is a null reference.
+            </exception>
+        </member>
+        <member name="M:NDde.Server.DdeServer.Dispose">
+            <summary>
+            This unregisters service name and releases all resources held by this instance.
+            </summary>
+        </member>
+        <member name="M:NDde.Server.DdeServer.Dispose(System.Boolean)">
+            <summary>
+            This contains the implementation to release all resources held by this instance.
+            </summary>
+            <param name="disposing">
+            True if called by Dispose, false otherwise.
+            </param>
+        </member>
+        <member name="M:NDde.Server.DdeServer.Register">
+            <summary>
+            This registers the service name.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the server is already registered.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the service name could not be registered.
+            </exception>
+        </member>
+        <member name="M:NDde.Server.DdeServer.Unregister">
+            <summary>
+            This unregisters the service name.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the server is not registered.
+            </exception>
+        </member>
+        <member name="M:NDde.Server.DdeServer.Advise(System.String,System.String)">
+            <summary>
+            This notifies all clients that data has changed for the specified topic name and item name pair.
+            </summary>
+            <param name="topic">
+            A topic name supported by this server.
+            </param>
+            <param name="item">
+            An item name supported by this server.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            This is thown when topic or item exceeds 255 characters..
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when topic or item is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the server is not registered.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the notification could not be posted.
+            </exception>
+            <remarks>
+            Use an asterix to indicate that the topic name, item name, or both should be wild.
+            </remarks>
+        </member>
+        <member name="M:NDde.Server.DdeServer.Pause(NDde.Server.DdeConversation)">
+            <overloads>
+            <summary>
+            </summary>
+            <remarks>
+            Pausing a conversation causes this server to queue events until the conversation resumes.
+            </remarks>
+            </overloads>
+            <summary>
+            This pauses the specified conversation.
+            </summary>
+            <param name="conversation">
+            The conversation to pause.
+            </param>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when conversation is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the conversation is already paused or when the server is not registered.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the conversation could not be paused.
+            </exception>
+        </member>
+        <member name="M:NDde.Server.DdeServer.Pause">
+            <summary>
+            This pauses all conversations.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the server is not registered.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the conversations could not be paused.
+            </exception>
+            <remarks>
+            Pausing a conversation causes this object to queue events until the conversation resumes.
+            </remarks>
+        </member>
+        <member name="M:NDde.Server.DdeServer.Resume(NDde.Server.DdeConversation)">
+            <overloads>
+            <summary>
+            </summary>
+            </overloads>
+            <summary>
+            This resumes the specified conversation.
+            </summary>
+            <param name="conversation">
+            The conversation to resume.
+            </param>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when conversation is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the conversation is not paused or when the server is not registered.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the conversation could not be resumed.
+            </exception>
+        </member>
+        <member name="M:NDde.Server.DdeServer.Resume">
+            <summary>
+            This resumes all conversations.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the server is not registered.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the conversations could not be resumed.
+            </exception>
+        </member>
+        <member name="M:NDde.Server.DdeServer.Disconnect(NDde.Server.DdeConversation)">
+            <overloads>
+            <summary>
+            </summary>
+            </overloads>
+            <summary>
+            This terminates the specified conversation.
+            </summary>
+            <param name="conversation">
+            The conversation to terminate.
+            </param>
+            <exception cref="T:System.ArgumentNullException">
+            This is thrown when conversation is a null reference.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the server is not registered.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the conversation could not be terminated.
+            </exception>
+        </member>
+        <member name="M:NDde.Server.DdeServer.Disconnect">
+            <summary>
+            This terminates all conversations.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            This is thrown when the server is not registered.
+            </exception>
+            <exception cref="T:NDde.DdeException">
+            This is thrown when the conversations could not be terminated.
+            </exception>
+        </member>
+        <member name="M:NDde.Server.DdeServer.OnStartAdvise(NDde.Server.DdeConversation,System.String,System.Int32)">
+            <summary>
+            This is invoked when a client attempts to initiate an advise loop.
+            </summary>
+            <param name="conversation">
+            The conversation associated with this event.
+            </param>
+            <param name="item">
+            The item name associated with this event.
+            </param>
+            <param name="format">
+            The format of the data.
+            </param>
+            <returns>
+            True to allow the advise loop, false otherwise.
+            </returns>
+            <remarks>
+            The default implementation accepts all advise loops.
+            </remarks>
+        </member>
+        <member name="M:NDde.Server.DdeServer.OnStopAdvise(NDde.Server.DdeConversation,System.String)">
+            <summary>
+            This is invoked when a client terminates an advise loop.
+            </summary>
+            <param name="conversation">
+            The conversation associated with this event.
+            </param>
+            <param name="item">
+            The item name associated with this event.
+            </param>
+        </member>
+        <member name="M:NDde.Server.DdeServer.OnBeforeConnect(System.String)">
+            <summary>
+            This is invoked when a client attempts to establish a conversation.
+            </summary>
+            <param name="topic">
+            The topic name associated with this event.
+            </param>
+            <returns>
+            True to allow the connection, false otherwise.
+            </returns>
+            <remarks>
+            The default implementation accepts all connections.
+            </remarks>
+        </member>
+        <member name="M:NDde.Server.DdeServer.OnAfterConnect(NDde.Server.DdeConversation)">
+            <summary>
+            This is invoked when a client has successfully established a conversation.
+            </summary>
+            <param name="conversation">
+            The conversation associated with this event.
+            </param>
+        </member>
+        <member name="M:NDde.Server.DdeServer.OnDisconnect(NDde.Server.DdeConversation)">
+            <summary>
+            This is invoked when a client terminates a conversation.
+            </summary>
+            <param name="conversation">
+            The conversation associated with this event.
+            </param>
+        </member>
+        <member name="M:NDde.Server.DdeServer.OnExecute(NDde.Server.DdeConversation,System.String)">
+            <summary>
+            This is invoked when a client sends a command.
+            </summary>
+            <param name="conversation">
+            The conversation associated with this event.
+            </param>
+            <param name="command">
+            The command to be executed.
+            </param>
+            <returns>
+            An <c>ExecuteResult</c> indicating the result.
+            </returns>
+            <remarks>
+            The default implementation returns <c>ExecuteResult.NotProcessed</c> to the client.
+            </remarks>
+        </member>
+        <member name="M:NDde.Server.DdeServer.OnPoke(NDde.Server.DdeConversation,System.String,System.Byte[],System.Int32)">
+            <summary>
+            This is invoked when a client sends data.
+            </summary>
+            <param name="conversation">
+            The conversation associated with this event.
+            </param>
+            <param name="item">
+            The item name associated with this event.
+            </param>
+            <param name="data">
+            The data associated with this event.
+            </param>
+            <param name="format">
+            The format of the data.
+            </param>
+            <returns>
+            A <c>PokeResult</c> indicating the result.
+            </returns>
+            <remarks>
+            The default implementation returns <c>PokeResult.NotProcessed</c> to the client.
+            </remarks>
+        </member>
+        <member name="M:NDde.Server.DdeServer.OnRequest(NDde.Server.DdeConversation,System.String,System.Int32)">
+            <overloads>
+            <summary>
+            </summary>
+            </overloads>
+            <summary>
+            This is invoked when a client attempts to request data.
+            </summary>
+            <param name="conversation">
+            The conversation associated with this event.
+            </param>
+            <param name="item">
+            The item name associated with this event.
+            </param>
+            <param name="format">
+            The format of the data.
+            </param>
+            <returns>
+            A <c>RequestResult</c> indicating the result.
+            </returns>
+            <remarks>
+            The default implementation returns <c>RequestResult.NotProcessed</c> to the client.
+            </remarks>
+        </member>
+        <member name="M:NDde.Server.DdeServer.OnAdvise(System.String,System.String,System.Int32)">
+            <summary>
+            This is invoked when the server is performing a hot advise.
+            </summary>
+            <param name="topic">
+            The topic name associated with this event.
+            </param>
+            <param name="item">
+            The item name associated with this event.
+            </param>
+            <param name="format">
+            The format of the data.
+            </param>
+            <returns>
+            The data that will be sent to the clients.
+            </returns>
+            <remarks>
+            The default implementation sends nothing to the clients.
+            </remarks>
+        </member>
+        <member name="P:NDde.Server.DdeServer.DdemlObject">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:NDde.Server.DdeServer.Context">
+            <summary>
+            This gets the context associated with his instance.
+            </summary>
+        </member>
+        <member name="P:NDde.Server.DdeServer.Service">
+            <summary>
+            This gets the service name associated with this server.
+            </summary>
+        </member>
+        <member name="P:NDde.Server.DdeServer.IsRegistered">
+            <summary>
+            This gets a bool indicating whether the service name is registered.
+            </summary>
+        </member>
+        <member name="T:NDde.Server.DdeServer.ExecuteResult">
+            <summary>
+            This is the return value of the <c>OnExecute</c> method.
+            </summary>
+        </member>
+        <member name="F:NDde.Server.DdeServer.ExecuteResult.Processed">
+            <summary>
+            Return this value if the command was executed successfully.
+            </summary>
+        </member>
+        <member name="F:NDde.Server.DdeServer.ExecuteResult.NotProcessed">
+            <summary>
+            Return this value if the command was not executed successfully.
+            </summary>
+        </member>
+        <member name="F:NDde.Server.DdeServer.ExecuteResult.TooBusy">
+            <summary>
+            Return this value if the server is too busy.
+            </summary>
+        </member>
+        <member name="F:NDde.Server.DdeServer.ExecuteResult.PauseConversation">
+            <summary>
+            Return this value to pause the conversation and execute the command asynchronously.  After the conversation has been resumed the
+            <c>OnExecute</c> method will run again.
+            </summary>
+        </member>
+        <member name="M:NDde.Server.DdeServer.ExecuteResult.Equals(System.Object)">
+            <summary>
+            This determines whether two object instances are equal.
+            </summary>
+            <param name="o">
+            The object to compare with the current object.
+            </param>
+            <returns>
+            True if the specified object is equal to the current object, false otherwise.
+            </returns>
+        </member>
+        <member name="M:NDde.Server.DdeServer.ExecuteResult.GetHashCode">
+            <summary>
+            This returns a hash code for the object.
+            </summary>
+            <returns>
+            A hash code for the object.
+            </returns>
+        </member>
+        <member name="M:NDde.Server.DdeServer.ExecuteResult.op_Equality(NDde.Server.DdeServer.ExecuteResult,NDde.Server.DdeServer.ExecuteResult)">
+            <summary>
+            This determines whether two <c>ExecuteResult</c> objects are equal.
+            </summary>
+            <param name="lhs">
+            The left hand side object.
+            </param>
+            <param name="rhs"></param>
+            The right hand side object.
+            <returns>
+            True if the two objects are equal, false otherwise.
+            </returns>
+        </member>
+        <member name="M:NDde.Server.DdeServer.ExecuteResult.op_Inequality(NDde.Server.DdeServer.ExecuteResult,NDde.Server.DdeServer.ExecuteResult)">
+            <summary>
+            This determines whether two <c>ExecuteResult</c> objects are not equal.
+            </summary>
+            <param name="lhs">
+            The left hand side object.
+            </param>
+            <param name="rhs"></param>
+            The right hand side object.
+            <returns>
+            True if the two objects are not equal, false otherwise.
+            </returns>
+        </member>
+        <member name="T:NDde.Server.DdeServer.PokeResult">
+            <summary>
+            This is the return value of the <c>OnPoke</c> method.
+            </summary>
+        </member>
+        <member name="F:NDde.Server.DdeServer.PokeResult.Processed">
+            <summary>
+            Return this value if the poke was successful.
+            </summary>
+        </member>
+        <member name="F:NDde.Server.DdeServer.PokeResult.NotProcessed">
+            <summary>
+            Return this value if the poke was not successful.
+            </summary>
+        </member>
+        <member name="F:NDde.Server.DdeServer.PokeResult.TooBusy">
+            <summary>
+            Return this value if the server is too busy.
+            </summary>
+        </member>
+        <member name="F:NDde.Server.DdeServer.PokeResult.PauseConversation">
+            <summary>
+            Return this value to pause the conversation and execute the poke asynchronously.  After the conversation has been resumed the
+            <c>OnPoke</c> method will run again.
+            </summary>
+        </member>
+        <member name="M:NDde.Server.DdeServer.PokeResult.Equals(System.Object)">
+            <summary>
+            This determines whether two object instances are equal.
+            </summary>
+            <param name="o">
+            The object to compare with the current object.
+            </param>
+            <returns>
+            True if the specified object is equal to the current object, false otherwise.
+            </returns>
+        </member>
+        <member name="M:NDde.Server.DdeServer.PokeResult.GetHashCode">
+            <summary>
+            This returns a hash code for the object.
+            </summary>
+            <returns>
+            A hash code for the object.
+            </returns>
+        </member>
+        <member name="M:NDde.Server.DdeServer.PokeResult.op_Equality(NDde.Server.DdeServer.PokeResult,NDde.Server.DdeServer.PokeResult)">
+            <summary>
+            This determines whether two <c>PokeResult</c> objects are equal.
+            </summary>
+            <param name="lhs">
+            The left hand side object.
+            </param>
+            <param name="rhs"></param>
+            The right hand side object.
+            <returns>
+            True if the two objects are equal, false otherwise.
+            </returns>
+        </member>
+        <member name="M:NDde.Server.DdeServer.PokeResult.op_Inequality(NDde.Server.DdeServer.PokeResult,NDde.Server.DdeServer.PokeResult)">
+            <summary>
+            This determines whether two <c>ExecuteResult</c> objects are not equal.
+            </summary>
+            <param name="lhs">
+            The left hand side object.
+            </param>
+            <param name="rhs"></param>
+            The right hand side object.
+            <returns>
+            True if the two objects are not equal, false otherwise.
+            </returns>
+        </member>
+        <member name="T:NDde.Server.DdeServer.RequestResult">
+            <summary>
+            This is the return value of the <c>OnRequest</c> method.
+            </summary>
+        </member>
+        <member name="F:NDde.Server.DdeServer.RequestResult.NotProcessed">
+            <summary>
+            Return this value if the request was not successful.
+            </summary>
+        </member>
+        <member name="F:NDde.Server.DdeServer.RequestResult.PauseConversation">
+            <summary>
+            Return this value to pause the conversation and execute the request asynchronously.  After the conversation has been resumed the
+            <c>OnRequest</c> method will run again.
+            </summary>
+        </member>
+        <member name="M:NDde.Server.DdeServer.RequestResult.#ctor(System.Byte[])">
+            <summary>
+            This initializes the <c>RequestResult</c> struct with the data to return to the client.
+            </summary>
+            <param name="data">
+            The data to return to the client.
+            </param>
+        </member>
+        <member name="M:NDde.Server.DdeServer.RequestResult.Equals(System.Object)">
+            <summary>
+            This determines whether two object instances are equal.
+            </summary>
+            <param name="o">
+            The object to compare with the current object.
+            </param>
+            <returns>
+            True if the specified object is equal to the current object, false otherwise.
+            </returns>
+        </member>
+        <member name="M:NDde.Server.DdeServer.RequestResult.GetHashCode">
+            <summary>
+            This returns a hash code for the object.
+            </summary>
+            <returns>
+            A hash code for the object.
+            </returns>
+        </member>
+        <member name="M:NDde.Server.DdeServer.RequestResult.op_Equality(NDde.Server.DdeServer.RequestResult,NDde.Server.DdeServer.RequestResult)">
+            <summary>
+            This determines whether two <c>RequestResult</c> objects are equal.
+            </summary>
+            <param name="lhs">
+            The left hand side object.
+            </param>
+            <param name="rhs"></param>
+            The right hand side object.
+            <returns>
+            True if the two objects are equal, false otherwise.
+            </returns>
+        </member>
+        <member name="M:NDde.Server.DdeServer.RequestResult.op_Inequality(NDde.Server.DdeServer.RequestResult,NDde.Server.DdeServer.RequestResult)">
+            <summary>
+            This determines whether two <c>ExecuteResult</c> objects are not equal.
+            </summary>
+            <param name="lhs">
+            The left hand side object.
+            </param>
+            <param name="rhs"></param>
+            The right hand side object.
+            <returns>
+            True if the two objects are not equal, false otherwise.
+            </returns>
+        </member>
+        <member name="P:NDde.Server.DdeServer.RequestResult.Data">
+            <summary>
+            The data to send to the client application.
+            </summary>
+        </member>
+        <member name="T:NDde.Client.DdeAdviseEventArgs">
+            <summary>
+            This contains information about the <c>Advise</c> event.
+            </summary>
+            <threadsafety static="true" instance="false" />
+        </member>
+        <member name="P:NDde.Client.DdeAdviseEventArgs.Item">
+            <summary>
+            This gets the item name associated with this notification.
+            </summary>
+        </member>
+        <member name="P:NDde.Client.DdeAdviseEventArgs.Format">
+            <summary>
+            This gets the format of the data included in this notification.
+            </summary>
+        </member>
+        <member name="P:NDde.Client.DdeAdviseEventArgs.State">
+            <summary>
+            This gets an application defined data object associated with this advise loop.
+            </summary>
+        </member>
+        <member name="P:NDde.Client.DdeAdviseEventArgs.Data">
+            <summary>
+            This gets the data associated with this notification or null if this is not a hot advise loop.
+            </summary>
+        </member>
+        <member name="P:NDde.Client.DdeAdviseEventArgs.Text">
+            <summary>
+            This gets the text associated with this notification or null if this is not a hot advise loop.
+            </summary>
+        </member>
+    </members>
+</doc>
