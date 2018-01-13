@@ -12,4 +12,4 @@ I still cannot do a lot, but I promise I will always be there for you if you dec
 
 The code in this repository is licensed by me, PiMaker, under the terms of the MIT License. You can find a copy of the full license text in the `LICENSE` file.
 
-The art assets have not been created by me, but by Team Salvato. Their usage is happening according to their [IP Guidelines](http://teamsalvato.com/ip-guidelines/).
+The art assets have not been created by me, but by Team Salvato. Usage is according to Team Salvato's [IP Guidelines](http://teamsalvato.com/ip-guidelines/).
