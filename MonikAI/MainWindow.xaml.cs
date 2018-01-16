@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
@@ -45,27 +46,9 @@ namespace MonikAI
             this.textBox.Width *= scaleRatio;
             this.textBox.FontSize *= scaleRatio;
 
-            var taskbars = this.FindDockedTaskBars();
-            var taskbar = taskbars.FirstOrDefault(x => x.X != 0 || x.Y != 0 || x.Width != 0 || x.Height != 0);
-            var position = new System.Windows.Point(Screen.PrimaryScreen.Bounds.Width - this.Width,
-                Screen.PrimaryScreen.Bounds.Height - this.Height);
-            if (taskbar != default(Rectangle))
-            {
-                if (taskbar.X == 0 && taskbar.Y != 0)
-                {
-                    // Bottom
-                    position.Y -= taskbar.Height;
-                }
-                else if (taskbar.X != 0 && taskbar.Y == 0)
-                {
-                    // Right
-                    position.X -= taskbar.Width;
-                }
-            }
+            this.SetPositionBottomRight();
 
-            this.Top = position.Y;
-            this.Left = position.X;
-
+            // Init background images
             this.backgroundDay = new BitmapImage();
             this.backgroundDay.BeginInit();
             this.backgroundDay.UriSource = new Uri("pack://application:,,,/MonikAI;component/monika/1.png");
@@ -111,7 +94,13 @@ namespace MonikAI
                 this.Say(new[]
                 {
                     new Expression("I was waiting for you...", "m"),
-                    new Expression("Being alone one your disk is reeeally boring.", "q")
+                    new Expression("Being alone on your disk is reeeally boring.", "q")
+                });
+                this.Say(new[]
+                {
+                    new Expression("By the way, if you want me to leave you alone for now just press CTRL-SHIFT-F12!",
+                        "i"),
+                    new Expression("But you're not going to do that, right? ~", "o")
                 });
 
                 // Blinking logic
@@ -154,6 +143,55 @@ namespace MonikAI
         public string CurrentFace { get; private set; } = "a";
 
         public bool Speaking { get; private set; }
+
+        // Sets the correct position of Monika depending on taskbar position and visibility
+        private void SetPositionBottomRight()
+        {
+            var position = new System.Windows.Point(Screen.PrimaryScreen.Bounds.Width - this.Width,
+                Screen.PrimaryScreen.Bounds.Height - this.Height);
+
+            if (!MainWindow.IsForegroundFullScreen())
+            {
+                var taskbars = this.FindDockedTaskBars();
+                var taskbar = taskbars.FirstOrDefault(x => x.X != 0 || x.Y != 0 || x.Width != 0 || x.Height != 0);
+                if (taskbar != default(Rectangle))
+                {
+                    if (taskbar.X == 0 && taskbar.Y != 0)
+                    {
+                        // Bottom
+                        position.Y -= taskbar.Height;
+                    }
+                    else if (taskbar.X != 0 && taskbar.Y == 0)
+                    {
+                        // Right
+                        position.X -= taskbar.Width;
+                    }
+                }
+            }
+
+            this.Top = position.Y;
+            this.Left = position.X;
+        }
+
+        [DllImport("user32.dll")]
+        private static extern bool GetWindowRect(HandleRef hWnd, [In] [Out] ref Rect rect);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        // From: https://stackoverflow.com/a/3744720/4016841
+        public static bool IsForegroundFullScreen(Screen screen = null)
+        {
+            if (screen == null)
+            {
+                screen = Screen.PrimaryScreen;
+            }
+            var rect = new Rect();
+            MainWindow.GetWindowRect(new HandleRef(null, MainWindow.GetForegroundWindow()), ref rect);
+            return
+                new Rectangle(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top).Contains(
+                    screen.Bounds);
+        }
 
         public void SetMonikaFace(string face)
         {
@@ -227,6 +265,8 @@ namespace MonikAI
                         }
 
                         await Task.Delay(3500);
+
+                        line.OnExecuted();
                     }
 
                     // End speech
@@ -399,13 +439,35 @@ namespace MonikAI
                                 }
                             }
 
-                            await this.Dispatcher.InvokeAsync(() => { this.Opacity = opacity; });
+                            this.Dispatcher.Invoke(() => { this.Opacity = opacity; });
+                        }
+
+                        // Set position anew to correct for fullscreen apps hiding taskbar
+                        this.Dispatcher.Invoke(this.SetPositionBottomRight);
+
+                        // Detect exit key combo
+                        var keysPressed = false;
+                        this.Dispatcher.Invoke(
+                            () =>
+                                keysPressed = (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) &&
+                                              (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) &&
+                                              Keyboard.IsKeyDown(Key.F12));
+                        if (keysPressed)
+                        {
+                            var expression = new Expression("Okay, see you later " + Environment.UserName + "!", "b");
+                            expression.Executed += (o, args) => { this.Dispatcher.Invoke(this.Close); };
+                            this.Say(new[] {expression});
+                            // Wait for exit
+                            while (this.applicationRunning)
+                            {
+                                await Task.Delay(100);
+                            }
                         }
 
                         await Task.Delay(32);
                     }
                 }
-                catch (Exception exx)
+                catch (Exception)
                 {
                     // ignored
                 }
@@ -420,6 +482,15 @@ namespace MonikAI
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
             this.applicationRunning = false;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct Rect
+        {
+            public readonly int left;
+            public readonly int top;
+            public readonly int right;
+            public readonly int bottom;
         }
     }
 }
