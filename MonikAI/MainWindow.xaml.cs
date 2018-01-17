@@ -20,6 +20,7 @@ namespace MonikAI
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static IntPtr desktopWindow, shellWindow;
         private readonly BitmapImage backgroundDay;
         private readonly BitmapImage backgroundNight;
 
@@ -29,6 +30,9 @@ namespace MonikAI
         public MainWindow()
         {
             this.InitializeComponent();
+
+            MainWindow.desktopWindow = MainWindow.GetDesktopWindow();
+            MainWindow.shellWindow = MainWindow.GetShellWindow();
 
             var scaleRatio = Screen.PrimaryScreen.Bounds.Height / 1080.0;
             //scaleRatio = 1;
@@ -179,17 +183,33 @@ namespace MonikAI
         [DllImport("user32.dll")]
         private static extern IntPtr GetForegroundWindow();
 
-        // From: https://stackoverflow.com/a/3744720/4016841
+        [DllImport("user32.dll", SetLastError = false)]
+        private static extern IntPtr GetDesktopWindow();
+
+        [DllImport("user32.dll", SetLastError = false)]
+        private static extern IntPtr GetShellWindow();
+
+        // From: https://stackoverflow.com/a/3744720/4016841 (modified)
         public static bool IsForegroundFullScreen(Screen screen = null)
         {
             if (screen == null)
             {
                 screen = Screen.PrimaryScreen;
             }
-            var rect = new Rect();
-            MainWindow.GetWindowRect(new HandleRef(null, MainWindow.GetForegroundWindow()), ref rect);
+
+            var windowBounds = new Rect();
+            var foregroundWindowHandle = MainWindow.GetForegroundWindow();
+
+            if (foregroundWindowHandle.Equals(MainWindow.desktopWindow) ||
+                foregroundWindowHandle.Equals(MainWindow.shellWindow) || foregroundWindowHandle.Equals(IntPtr.Zero))
+            {
+                return false;
+            }
+
+            MainWindow.GetWindowRect(new HandleRef(null, foregroundWindowHandle), ref windowBounds);
             return
-                new Rectangle(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top).Contains(
+                new Rectangle(windowBounds.left, windowBounds.top, windowBounds.right - windowBounds.left,
+                    windowBounds.bottom - windowBounds.top).Contains(
                     screen.Bounds);
         }
 
@@ -300,10 +320,10 @@ namespace MonikAI
         }
 
         [DllImport("user32.dll", EntryPoint = "GetWindowLong")]
-        public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
 
         [DllImport("user32.dll", EntryPoint = "SetWindowLong")]
-        public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
