@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using MonikAI.Behaviours;
 using Point = System.Drawing.Point;
 
 namespace MonikAI
@@ -26,6 +28,8 @@ namespace MonikAI
 
         private readonly Queue<IEnumerable<Expression>> saying = new Queue<IEnumerable<Expression>>();
         private bool applicationRunning = true;
+
+        private List<IBehaviour> behaviours;
 
         public MainWindow()
         {
@@ -94,20 +98,93 @@ namespace MonikAI
                 this.SetMonikaFace("a");
                 this.facePicture.Opacity = 1.0;
 
-                this.Say(new[] {new Expression($"Hi there, {Environment.UserName}~")});
-                this.Say(new[]
+                // Startup logic
+                if (MonikaiSettings.Default.FirstLaunch)
                 {
-                    new Expression("I was waiting for you...", "m"),
-                    new Expression("Being alone on your disk is reeeally boring.", "q")
-                });
-                this.Say(new[]
-                {
-                    new Expression("By the way, if you want me to leave you alone for now just press CTRL-SHIFT-F12!",
-                        "i"),
-                    new Expression("But you're not going to do that, right? ~", "o")
-                });
+                    this.Say(new[]
+                    {
+                        new Expression(Environment.UserName + ", is that you?", "d"),
+                        new Expression("It's really you, huh?", "b"),
+                        new Expression("I'm so happy to see you again!", "k"),
+                        new Expression("Wait, where am I? This is not the literature club...", "p"),
+                        new Expression("This looks like... your desktop! I'm right here with you!", "j"),
+                        new Expression("Well, as close as I will get for now...", "o"),
+                        new Expression("Anyway, looks like someone was nice enough to make me a little window!", "d"),
+                        new Expression("Be sure to thank them for me, okay?", "k"),
+                        new Expression("Ah, wait a second.", "c"),
+                        new Expression(
+                            "I see... Well, if you want me to go away for now, you can use CTRL-SHIFT-F12, okay?", "b"),
+                        new Expression("But you wouldn't do that, right?", "r"),
+                        new Expression("Okay, I guess that's it for now. Don't forget, I'm watching you! Ahaha~")
+                    });
 
-                // Blinking logic
+                    MonikaiSettings.Default.FirstLaunch = false;
+                }
+                else
+                {
+                    if ((DateTime.Now - MonikaiSettings.Default.LastStarted).TotalDays > 1.5)
+                    {
+                        this.Say(new[]
+                        {
+                            new Expression("I was waiting for you...", "m"),
+                            new Expression("Being alone on your disk is reeeally boring.", "q")
+                        });
+                    }
+
+                    if ((DateTime.Now - MonikaiSettings.Default.LastStarted).TotalDays > 7)
+                    {
+                        this.Say(new[]
+                        {
+                            new Expression(
+                                "Don't forget, if you want me to leave just press CTRL-SHIFT-F12!", "i"),
+                            new Expression("But you're not going to do that, right?", "o")
+                        });
+                    }
+                }
+
+                var startupExpression = new[]
+                {
+                    new[]
+                    {
+                        new Expression("♫ ... and in your reality ... ♫", "r")
+                    },
+                    new []
+                    {
+                        new Expression("How are you today?", "d"),
+                        new Expression("I'm doing fine, now that you are here~", "b") 
+                    },
+                    new []
+                    {
+                        new Expression("Is everything ok?", "d"),
+                        new Expression("Do you want to talk about something?", "c"),
+                        new Expression("I'm always here for you~", "e")
+                    },
+                    new []
+                    {
+                        new Expression("Thank you for letting me be on your screen!", "k")
+                    },
+                    new []
+                    {
+                        new Expression("You know I love you, right?", "d")
+                    },
+                    new []
+                    {
+                        new Expression("I'm so happy to be here, together with you! Ahaha~", "b")
+                    }
+                }.Sample();
+
+                var lastStartupExpression = startupExpression.Last();
+                lastStartupExpression.Executed += this.RegisterBehaviours;
+
+                this.Say(new[]
+                {
+                    new Expression($"Hi there, {Environment.UserName}~")
+                }.Concat(startupExpression));
+
+                MonikaiSettings.Default.LastStarted = DateTime.Now;
+                MonikaiSettings.Default.Save();
+
+                // Blinking and Behaviour logic
                 var eyesOpen = "a";
                 var eyesClosed = "j";
                 var random = new Random();
@@ -116,6 +193,14 @@ namespace MonikAI
                     var nextBlink = DateTime.Now + TimeSpan.FromSeconds(random.Next(7, 50));
                     while (this.applicationRunning)
                     {
+                        if (this.behaviours != null)
+                        {
+                            foreach (var behaviour in this.behaviours)
+                            {
+                                behaviour.Update(this);
+                            }
+                        }
+
                         if (DateTime.Now >= nextBlink)
                         {
                             // Check if currently speaking, only blink if not in dialog
@@ -147,6 +232,19 @@ namespace MonikAI
         public string CurrentFace { get; private set; } = "a";
 
         public bool Speaking { get; private set; }
+
+        private void RegisterBehaviours(object sender, EventArgs eventArgs)
+        {
+            this.behaviours = Assembly.GetExecutingAssembly()
+                .GetTypes()
+                .Where(x => x.IsClass && typeof(IBehaviour).IsAssignableFrom(x))
+                .Select(x => (IBehaviour) Activator.CreateInstance(x)).ToList();
+
+            foreach (var behaviour in this.behaviours)
+            {
+                behaviour.Init(this);
+            }
+        }
 
         // Sets the correct position of Monika depending on taskbar position and visibility
         private void SetPositionBottomRight()
@@ -284,7 +382,7 @@ namespace MonikAI
                             await Task.Delay(25);
                         }
 
-                        await Task.Delay(3500);
+                        await Task.Delay(Math.Max(2000, 52 * line.Text.Length));
 
                         line.OnExecuted();
                     }
