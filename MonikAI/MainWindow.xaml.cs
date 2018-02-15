@@ -122,15 +122,6 @@ namespace MonikAI
                 }
                 else
                 {
-                    if ((DateTime.Now - MonikaiSettings.Default.LastStarted).TotalDays > 1.5)
-                    {
-                        this.Say(new[]
-                        {
-                            new Expression("I was waiting for you...", "m"),
-                            new Expression("Being alone on your disk is reeeally boring.", "q")
-                        });
-                    }
-
                     if ((DateTime.Now - MonikaiSettings.Default.LastStarted).TotalDays > 7)
                     {
                         this.Say(new[]
@@ -180,6 +171,15 @@ namespace MonikAI
                 {
                     new Expression($"Hi there, {Environment.UserName}~")
                 }.Concat(startupExpression));
+
+                if ((DateTime.Now - MonikaiSettings.Default.LastStarted).TotalDays > 1.5)
+                {
+                    this.Say(new[]
+                    {
+                        new Expression("I was waiting for you...", "m"),
+                        new Expression("Being alone on your disk is reeeally boring.", "q")
+                    });
+                }
 
                 MonikaiSettings.Default.LastStarted = DateTime.Now;
                 MonikaiSettings.Default.Save();
@@ -480,6 +480,8 @@ namespace MonikAI
             return dockedRects;
         }
 
+        private DateTime lastKeyComboTime = DateTime.Now;
+
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             var handle = new WindowInteropHelper(this).Handle;
@@ -570,15 +572,22 @@ namespace MonikAI
                                 keysPressed = (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) &&
                                               (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) &&
                                               Keyboard.IsKeyDown(Key.F12));
-                        if (keysPressed)
+                        if (keysPressed && (DateTime.Now - this.lastKeyComboTime).TotalSeconds > 2)
                         {
-                            var expression = new Expression("Okay, see you later " + Environment.UserName + "!", "b");
-                            expression.Executed += (o, args) => { this.Dispatcher.Invoke(this.Close); };
-                            this.Say(new[] {expression});
-                            // Wait for exit
-                            while (this.applicationRunning)
+                            this.lastKeyComboTime = DateTime.Now;
+
+                            if (this.Visibility == Visibility.Visible)
                             {
-                                await Task.Delay(100);
+                                var expression =
+                                    new Expression(
+                                        "Okay, see you later " + Environment.UserName +
+                                        "! (Press again for me to return)", "b");
+                                expression.Executed += (o, args) => { this.Dispatcher.Invoke(this.Hide); };
+                                this.Say(new[] {expression});
+                            }
+                            else
+                            {
+                                this.Dispatcher.Invoke(this.Show);
                             }
                         }
 

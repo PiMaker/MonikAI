@@ -25,23 +25,21 @@ namespace MonikAI.Behaviours
                         new[] {new Expression("Have fun surfing the web!", "k")}
                     }, () =>
                     {
+                        // Do not respond to new processes if a browser is already open
                         var browserProcesses =
                             Process.GetProcesses()
-                                .Where(p =>
-                                {
-                                    var exe = ApplicationBehaviour.GetProcessExecutable(p.Id);
-                                    return exe == "firefox.exe" || exe == "chrome.exe";
-                                }).ToList();
-                        return browserProcesses.All(p => (DateTime.Now - p.StartTime).TotalSeconds < 10);
-                    }, TimeSpan.FromSeconds(10), DateTime.MinValue)
+                                .Where(p => p.ProcessName.ToLower().Contains("firefox") || p.ProcessName.ToLower().Contains("chrome")).ToList();
+                        return browserProcesses.All(p => (DateTime.Now - p.StartTime).TotalSeconds < 4);
+                    }, TimeSpan.FromMinutes(5), DateTime.MinValue)
                 },
 
                 {
                     new[] {"putty.exe"},
                     new ResponseTuple(new List<Expression[]>
                     {
-                        new[] {new Expression("PuTTY, huh? I only have experience with the python shell...", "o")}
-                    }, () => true, TimeSpan.FromMinutes(30), DateTime.MinValue)
+                        new[] { new Expression("PuTTY, huh? I only have experience with the python shell...", "o") },
+                        new[] { new Expression("Tell your server I said hello, okay?", "k") }
+                    }, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue)
                 }
             };
 
@@ -78,32 +76,6 @@ namespace MonikAI.Behaviours
                     this.toSay = null;
                 }
             }
-        }
-
-        private static string GetProcessExecutable(int processId)
-        {
-            var methodResult = "";
-
-            try
-            {
-                var query = "SELECT ExecutablePath FROM Win32_Process WHERE ProcessId = " + processId;
-
-                using (var mos = new ManagementObjectSearcher(query))
-                {
-                    using (var moc = mos.Get())
-                    {
-                        var ExecutablePath =
-                            (from mo in moc.Cast<ManagementObject>() select mo["ExecutablePath"]).First().ToString();
-
-                        methodResult = Path.GetFileName(ExecutablePath).Trim().ToLower();
-                    }
-                }
-            }
-            catch
-            {
-            }
-
-            return methodResult;
         }
 
         private void WMIEventArrived(object sender, EventArrivedEventArgs e)
