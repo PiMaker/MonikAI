@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -97,6 +98,13 @@ namespace MonikAI
             {
                 this.SetMonikaFace("a");
                 this.facePicture.Opacity = 1.0;
+
+                if (File.Exists("firstlaunch.txt"))
+                {
+                    File.Delete("firstlaunch.txt");
+                    MonikaiSettings.Default.FirstLaunch = true;
+                    MonikaiSettings.Default.Save();
+                }
 
                 // Startup logic
                 if (MonikaiSettings.Default.FirstLaunch)
