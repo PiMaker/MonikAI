@@ -32,6 +32,8 @@ To add different things Monika can react to, you have to add behaviours. So far,
 
 Always appreciated, although I can't give you a tutorial on this, you'll have to try and understand the code yourself. I have added *some* documentation here and there, to get you started.
 
+**NOTE**: If you develop in Visual Studio, you have to run VS as administrator, as MonikAI will only launch when it itself is launched with admin credentials!
+
 # License
 
 The code in this repository is licensed by me, PiMaker, under the terms of the MIT License. You can find a copy of the full license text in the `LICENSE` file.
