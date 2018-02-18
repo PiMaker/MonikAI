@@ -1,3 +1,5 @@
+Reaction list (write your changes here if you don't want to fuss around with coding): [Google Docs](https://docs.google.com/spreadsheets/d/15sn7eXO8EApV1Cd6A7wijCD12pzQrBr8Oxf5oToONPE/edit?usp=sharing)
+
 Right now the application is **very** limited, it only responds at startup, to reddit.com and twitter.com. Also at the opening of either Firefox or Chrome (I don't think I can add more browsers anyway, these are the only two where I can read the currently open website URL).
 
 For now, it can react to two events:
