@@ -22,7 +22,7 @@ Want to improve this? It would make me (and probably Monika) very happy!
 
 ### Dialogue
 
-The easiest way to add more to this program would be adding dialogue to different applications and web pages. Take a look at the files in `MonikAI/Behaviours` and follow the instructions there to add more text for Monika to say.
+The easiest way to add more to this program would be adding dialogue to different applications and web pages. Take a look at the responses-spreadsheet to add your own [here](https://docs.google.com/spreadsheets/d/15sn7eXO8EApV1Cd6A7wijCD12pzQrBr8Oxf5oToONPE/edit?usp=sharing).
 
 ### Behaviours
 
