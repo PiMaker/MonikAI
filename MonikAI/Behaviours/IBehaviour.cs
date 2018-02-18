@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MonikAI.Behaviours
+﻿namespace MonikAI.Behaviours
 {
+    /*
+     * Implement this interface to make your own Behaviours. No registering is needed, every class that inherits from this will automatically be loaded!
+     */
     public interface IBehaviour
     {
         void Init(MainWindow window);

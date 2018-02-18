@@ -12,9 +12,38 @@ namespace MonikAI.Behaviours
 {
     public class ApplicationBehaviour : IBehaviour
     {
+        /*
+         * 
+         * 
+         * WANT TO ADD RESPONSES? LOOK NO FURTHER!
+         * The table below specified responses to be said by Monika when certain applications are launched.
+         * 
+         * The format is as follows:
+         * 
+                {
+                    new[] {"EXECUTABLE_TO_WAIT_FOR.exe"},
+                    new ResponseTuple(new List<Expression[]>
+                    {
+                        new[]
+                        {
+                            new Expression("TEXT TO BE SAID", "FACE TO BE SHOWN"),
+                            new Expression("SECOND LINE OF TEXT IN ONE RESPONSE", "FACE TO BE SHOWN"),
+                        },
+                        new[] { new Expression("JUST A SINGLE LINE OF TEXT TO BE SHOWN", "FACE TO BE SHOWN") }
+                    }, () => true, TimeSpan.FromMinutes(NUMBER OF MINUTES TO WAIT BEFORE SHOWING THIS AGAIN AT MINIMUM - PREVENT RESPONSE TO BE SPAMMED), DateTime.MinValue)
+                }
+         * 
+         * NOTE: For faces you can use look in the "monika" folder full of images of her. Only specify the letter, never the -n at the end, that is added automatically! Also, 1.png and derivatives are exceptions that cannot be used!
+         * 
+         * If you really know what you are doing, you can change "() => true" to a function/lambda that has to return true to allow this reponse to be said.
+         * This can be used for arbitrary conditions.
+         * 
+         * 
+         */
         private readonly Dictionary<string[], ResponseTuple> responseTable = new Dictionary
             <string[], ResponseTuple>
             {
+                // Respond to browsers (firefox and chrome)
                 {
                     new[] {"firefox.exe", "chrome.exe"},
                     new ResponseTuple(new List<Expression[]>
@@ -33,6 +62,7 @@ namespace MonikAI.Behaviours
                     }, TimeSpan.FromMinutes(5), DateTime.MinValue)
                 },
 
+                // Respond to putty
                 {
                     new[] {"putty.exe"},
                     new ResponseTuple(new List<Expression[]>
@@ -42,6 +72,8 @@ namespace MonikAI.Behaviours
                     }, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue)
                 }
             };
+
+        // RESPONSE TABLE END
 
         private readonly object toSayLock = new object();
 
