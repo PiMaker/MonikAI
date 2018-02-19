@@ -314,9 +314,14 @@ namespace MonikAI
             var position = new System.Windows.Point(screen.Bounds.X + screen.Bounds.Width - this.Width,
                 screen.Bounds.Y + screen.Bounds.Height - this.Height);
 
+            if (MonikaiSettings.Default.LeftAlign)
+            {
+                position.X = screen.Bounds.X;
+            }
+
             if (!MainWindow.IsForegroundFullScreen(screen))
             {
-                var taskbars = this.FindDockedTaskBars(screen);
+                var taskbars = this.FindDockedTaskBars(screen, out bool isLeft);
                 var taskbar = taskbars.FirstOrDefault(x => x.X != 0 || x.Y != 0 || x.Width != 0 || x.Height != 0);
                 if (taskbar != default(Rectangle))
                 {
@@ -327,8 +332,21 @@ namespace MonikAI
                     }
                     else
                     {
-                        // Right
-                        position.X -= taskbar.Width;
+                        // Left/Right
+                        if (isLeft)
+                        {
+                            if (MonikaiSettings.Default.LeftAlign)
+                            {
+                                position.X += taskbar.Width;
+                            }
+                        }
+                        else
+                        {
+                            if (!MonikaiSettings.Default.LeftAlign)
+                            {
+                                position.X -= taskbar.Width;
+                            }
+                        }
                     }
                 }
             }
@@ -499,11 +517,12 @@ namespace MonikAI
         private static extern bool GetCursorPos(ref Point lpPoint);
 
         // From: https://stackoverflow.com/a/9826269/4016841
-        public Rectangle[] FindDockedTaskBars(Screen screen)
+        public Rectangle[] FindDockedTaskBars(Screen screen, out bool isLeft)
         {
             var dockedRects = new Rectangle[4];
 
             var tmpScrn = screen;
+            isLeft = false;
 
             var dockedRectCounter = 0;
             if (!tmpScrn.Bounds.Equals(tmpScrn.WorkingArea))
@@ -519,6 +538,7 @@ namespace MonikAI
                     dockedRects[dockedRectCounter].Y = tmpScrn.Bounds.Top;
                     dockedRects[dockedRectCounter].Width = leftDockedWidth;
                     dockedRects[dockedRectCounter].Height = tmpScrn.Bounds.Height;
+                    isLeft = true;
                     dockedRectCounter += 1;
                 }
 

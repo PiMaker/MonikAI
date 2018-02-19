@@ -20,5 +20,17 @@
     <Setting Name="AutoUpdate" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="LeftAlign" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="HotkeySettings" Type="System.String" Scope="User">
+      <Value Profile="(Default)">CTRL-SHIFT-F10</Value>
+    </Setting>
+    <Setting Name="HotkeyHide" Type="System.String" Scope="User">
+      <Value Profile="(Default)">CTRL-SHIFT-F11</Value>
+    </Setting>
+    <Setting Name="HotkeyExit" Type="System.String" Scope="User">
+      <Value Profile="(Default)">CTRL-SHIFT-F12</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

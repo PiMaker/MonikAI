@@ -94,5 +94,53 @@ namespace MonikAI {
                 this["AutoUpdate"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool LeftAlign {
+            get {
+                return ((bool)(this["LeftAlign"]));
+            }
+            set {
+                this["LeftAlign"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("CTRL-SHIFT-F10")]
+        public string HotkeySettings {
+            get {
+                return ((string)(this["HotkeySettings"]));
+            }
+            set {
+                this["HotkeySettings"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("CTRL-SHIFT-F11")]
+        public string HotkeyHide {
+            get {
+                return ((string)(this["HotkeyHide"]));
+            }
+            set {
+                this["HotkeyHide"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("CTRL-SHIFT-F12")]
+        public string HotkeyExit {
+            get {
+                return ((string)(this["HotkeyExit"]));
+            }
+            set {
+                this["HotkeyExit"] = value;
+            }
+        }
     }
 }
