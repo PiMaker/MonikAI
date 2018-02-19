@@ -118,7 +118,7 @@ namespace MonikAI.Behaviours
         public void Update(MainWindow window)
         {
             this.executionCounter++;
-            if (this.executionCounter < WebBrowserBehaviour.EXECUTION_LIMIT)
+            if (this.executionCounter < WebBrowserBehaviour.EXECUTION_LIMIT * (MonikaiSettings.Default.PotatoPC ? 4 : 1))
             {
                 return;
             }
