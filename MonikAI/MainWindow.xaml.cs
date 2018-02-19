@@ -327,8 +327,11 @@ namespace MonikAI
                 {
                     if (taskbar.Width >= taskbar.Height)
                     {
-                        // Bottom
-                        position.Y -= taskbar.Height;
+                        if (taskbar.Y != screen.Bounds.Y)
+                        {
+                            // Bottom
+                            position.Y -= taskbar.Height;
+                        }
                     }
                     else
                     {
@@ -684,7 +687,7 @@ namespace MonikAI
                             }
                         }
 
-                        await Task.Delay(32);
+                        await Task.Delay(MonikaiSettings.Default.PotatoPC ? 100 : 32);
                     }
                 }
                 catch (Exception)
