@@ -213,7 +213,7 @@ namespace MonikAI
 
                 this.Say(new[]
                 {
-                    new Expression($"Hi there, {Environment.UserName}~")
+                    new Expression("Hi there, {name}~")
                 }.Concat(startupExpression));
 
                 if ((DateTime.Now - MonikaiSettings.Default.LastStarted).TotalDays > 1.5)

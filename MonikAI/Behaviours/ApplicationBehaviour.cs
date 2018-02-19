@@ -70,7 +70,157 @@ namespace MonikAI.Behaviours
                         new[] { new Expression("PuTTY, huh? I only have experience with the python shell...", "o") },
                         new[] { new Expression("Tell your server I said hello, okay?", "k") }
                     }, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue)
-                }
+                },
+
+                //Respond to steam
+                {
+                    new[] {"steam.exe"},
+                    new ResponseTuple(new List<Expression[]>
+                    {
+                        new[] { new Expression("Make sure to play with me some more!", "b") },
+                        new[] { new Expression("Steam? What are we playing today, {name}?", "b") },
+                        new[] { new Expression("Steam has so many fun games!"),
+                                new Expression("Maybe we can check on the Literature club?", "b"),
+                                new Expression("Or even go on a new adventure together~", "k")}
+                    }, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue)
+                },
+
+                //Respond to notepad
+                {
+                    new[] {"notepad.exe"},
+                    new ResponseTuple(new List<Expression[]>
+                    {
+                        new[] { new Expression("Are you writing a poem, {name}?"),
+                                new Expression("I promise I won't peek!", "k") }
+                    }, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue)
+                },
+
+                //Respond to discord
+                {
+                    new[] {"discord.exe"},
+                    new ResponseTuple(new List<Expression[]>
+                    {
+                        new[] { new Expression("Say, {name}, have you joined the official DDLC Discord?", "j"),
+                                new Expression("Or perhaps the MonikAI Discord?", "k") },
+                        new[] { new Expression("Who are you talking to today, {name}") },
+                        new[] { new Expression("Tell your friends I said hey!", "l") }
+                    }, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue)
+                },
+
+                //Respond to telegram
+                {
+                    new[] {"telegram.exe"},
+                    new ResponseTuple(new List<Expression[]>
+                    {
+                        new[] { new Expression("Tell your friends I said hey!", "l") }
+                    }, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue)
+                },
+
+                //Respond to skype
+                {
+                    new[] {"telegram.exe"},
+                    new ResponseTuple(new List<Expression[]>
+                    {
+                        new[] { new Expression("Tell your friends I said hey!", "l") }
+                    }, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue)
+                },
+
+                //Respond to ddsc
+                {
+                    new[] {"ddsc.exe"},
+                    new ResponseTuple(new List<Expression[]>
+                    {
+                        new[] { new Expression("{name}, what are you making?", "k") },
+                        new[] { new Expression("Please don't make me say anything silly...", "p"),
+                                new Expression("I'm right here, after all...", "o")}
+                    }, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue)
+                },
+
+                //Respond to music
+                {
+                    new[] {"itunes.exe", "foobar2000.exe", "winamp.exe", "wmplayer.exe", "vlc.exe", "spotify.exe"},
+                    new ResponseTuple(new List<Expression[]>
+                    {
+                        new[] { new Expression("Listening to music?", "b"),
+                                new Expression("You know how much I love music"),
+                                new Expression("You should listen to me play piano, sometime~", "k")},
+                        new[] { new Expression("I love listening to music.", "b"),
+                                new Expression("Just don't play 'Your Reality' with me here.", "l"),
+                                new Expression("It's kind of embarassing.", "n"),
+                                new Expression("But it does make me happy knowing you like it~", "k")}
+                    }, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue)
+                },
+
+                //Respond to the sims
+                {
+                    new[] {"TS4_x64.exe", "TS4_x32.exe", "TS3W.exe"},
+                    new ResponseTuple(new List<Expression[]>
+                    {
+                        new[] { new Expression("This looks like fun game, {name}.", "k"),
+                                new Expression("An easy way for us to be together.", "j"),
+                                new Expression("All you have to do is make one sim for each of us.", "i"),
+                                new Expression("Then we can get married, cuddle, have kids, go to parties, watch our kids grow...", "k"),
+                                new Expression("...", "l"),
+                                new Expression("It just looks like a fun game. Ehehe~", "e")}
+                    }, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue)
+                },
+
+                // Respond to csgo
+                {
+                    new[] {"csgo.exe"},
+                    new ResponseTuple(new List<Expression[]>
+                    {
+                        new[] { new Expression("This is... Violent.", "m"),
+                                new Expression("I can't say I enjoy these types of games too much...", "n"),
+                                new Expression("But it's okay if you like it! They're not real after all.", "b"),
+                                new Expression("Unlike me~", "j")}
+                    }, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue)
+                },
+
+                // Respond to putty
+                {
+                    new[] {"portal2.exe"},
+                    new ResponseTuple(new List<Expression[]>
+                    {
+                        new[] { new Expression("Here's Monika's Puzzle Tip of the Day~!", "k"),
+                                new Expression("If you ever get stuck on any just take a deep breath, and try to collect your thoughts", "j"),
+                                new Expression("Or you can search up a guide... but that's no fun!", "n"),
+                                new Expression("Either way, you can do it. I believe in you~", "s")}
+                    }, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue)
+                },
+
+                // Respond to kingdom come deliverance
+                {
+                    new[] {"KingdomComeDeliverance.exe"},
+                    new ResponseTuple(new List<Expression[]>
+                    {
+                        new[] { new Expression("I heard about this game!"),
+                                new Expression("It's supposed to be really historically accurate right?", "d"),
+                                new Expression("Maybe I will learn something watching you play!", "b") }
+                    }, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue)
+                },
+
+                // Respond to ddlc
+                {
+                    new[] {"ddlc.exe"},
+                    new ResponseTuple(new List<Expression[]>
+                    {
+                        new[] { new Expression("Oh ~ Coming to see me in the Literature Club again?", "b"),
+                                new Expression("You're really sweet."),
+                                new Expression("See you in there, my love~", "k") },
+                        new[] { new Expression("Hey! Now we can play together~", "k"),
+                                new Expression("Doesn't that sound like fun?", "b") }
+                    }, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue)
+                },
+
+                // Respond to 3dsmax
+                {
+                    new[] {"3dsmax.exe"},
+                    new ResponseTuple(new List<Expression[]>
+                    {
+                        new[] { new Expression("Oh, you like to do 3D work?", "b") }
+                    }, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue)
+                },
             };
 
         // RESPONSE TABLE END
