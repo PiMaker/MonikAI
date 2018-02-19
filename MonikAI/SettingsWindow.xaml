@@ -5,18 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MonikAI"
         mc:Ignorable="d"
-        Title="MonikAI settings" Height="303" Width="495.5" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing">
+        Title="MonikAI settings" Height="286.5" Width="495.5" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="What should I call you?" VerticalAlignment="Top" Margin="10,12,0,0"/>
         <TextBox Height="22" Margin="184,9,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" x:Name="textBoxName" HorizontalAlignment="Left" Width="274"/>
         <CheckBox x:Name="checkBoxPotatoPC"  Content="Potato PC mode" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,94,0,0" ToolTip="I don't blame you, as long as you're with me~"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,38,0,0"><Run Text="Which screen should I be on?"/></TextBlock>
         <ComboBox x:Name="comboBoxScreen" Margin="184,36,0,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Left" Width="274" SelectionChanged="comboBoxScreen_SelectionChanged"/>
-        <Button x:Name="buttonOk" Content="Ok!" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="383,227,0,0" IsDefault="True" Click="buttonOk_Click"/>
+        <Button x:Name="buttonOk" Content="Ok!" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="383,212,0,0" IsDefault="True" Click="buttonOk_Click"/>
         <CheckBox x:Name="checkBoxAutoUpdate"  Content="Automatically update MonikAI" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,74,0,0" ToolTip="This will connect to the internet!"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,134,0,0"><Run Text="Open Settings (this window):"/></TextBlock>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,155,0,0"><Run Text="Hide/Re-Show MonikAI:"/></TextBlock>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,176,0,0"><Run Text="Exit MonikAI:"/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="CTRL-SHIFT-F10" VerticalAlignment="Top" Margin="268,134,0,0"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="CTRL-SHIFT-F11" VerticalAlignment="Top" Margin="268,155,0,0"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="CTRL-SHIFT-F12" VerticalAlignment="Top" Margin="268,176,0,0"/>
+        <Button Content="Set" HorizontalAlignment="Left" VerticalAlignment="Top" Width="68" Margin="184,132,0,0"/>
+        <Button Content="Set" HorizontalAlignment="Left" VerticalAlignment="Top" Width="68" Margin="184,153,0,0"/>
+        <Button Content="Set" HorizontalAlignment="Left" VerticalAlignment="Top" Width="68" Margin="184,174,0,0"/>
 
     </Grid>
 </Window>
