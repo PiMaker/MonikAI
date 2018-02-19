@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -29,8 +30,23 @@ namespace MonikAI
 
         private readonly Queue<IEnumerable<Expression>> saying = new Queue<IEnumerable<Expression>>();
         private bool applicationRunning = true;
+        private Thickness basePictureThickness, baseTextThickness;
 
         private List<IBehaviour> behaviours;
+
+        private bool initializedScales;
+
+        private DateTime lastKeyComboTime = DateTime.Now;
+
+        private double scaleBaseWidth,
+            scaleBaseHeight,
+            scaleBaseFacePictureWidth,
+            scaleBaseFacePictureHeight,
+            scaleBaseTextPictureWidth,
+            scaleBaseTextPictureHeight,
+            scaleBaseTextBoxWidth,
+            scaleBaseTextBoxHeight,
+            scaleBaseTextBoxFontSize;
 
         public MainWindow()
         {
@@ -39,23 +55,21 @@ namespace MonikAI
             MainWindow.desktopWindow = MainWindow.GetDesktopWindow();
             MainWindow.shellWindow = MainWindow.GetShellWindow();
 
-            var scaleRatio = Screen.PrimaryScreen.Bounds.Height / 1080.0;
-            //scaleRatio = 1;
-            this.Width *= scaleRatio;
-            this.Height *= scaleRatio;
-            this.facePicture.Width *= scaleRatio;
-            this.facePicture.Height *= scaleRatio;
-            this.facePicture.Margin = new Thickness(this.facePicture.Margin.Left * scaleRatio,
-                this.facePicture.Margin.Top * scaleRatio, this.facePicture.Margin.Right, this.facePicture.Margin.Bottom);
-            this.textPicture.Width *= scaleRatio;
-            this.textPicture.Height *= scaleRatio;
-            this.textPicture.Margin = new Thickness(this.textPicture.Margin.Left * scaleRatio,
-                this.textPicture.Margin.Top * scaleRatio, this.textPicture.Margin.Right, this.textPicture.Margin.Bottom);
-            this.textBox.Height *= scaleRatio;
-            this.textBox.Width *= scaleRatio;
-            this.textBox.FontSize *= scaleRatio;
+            MonikaiSettings.Default.Reload();
 
-            this.SetPositionBottomRight();
+            // Screen size and positioning init
+            this.MonikaScreen = Screen.PrimaryScreen;
+            foreach (var screen in Screen.AllScreens)
+            {
+                if (screen.DeviceName == MonikaiSettings.Default.Screen)
+                {
+                    this.MonikaScreen = screen;
+                    break;
+                }
+            }
+
+            this.SetupScale();
+            this.SetPositionBottomRight(this.MonikaScreen);
 
             // Init background images
             this.backgroundDay = new BitmapImage();
@@ -99,9 +113,9 @@ namespace MonikAI
                 this.SetMonikaFace("a");
                 this.facePicture.Opacity = 1.0;
 
-                if (File.Exists("firstlaunch.txt"))
+                if (true || File.Exists("firstlaunch.txt"))
                 {
-                    File.Delete("firstlaunch.txt");
+                    //File.Delete("firstlaunch.txt");
                     MonikaiSettings.Default.FirstLaunch = true;
                     MonikaiSettings.Default.Save();
                 }
@@ -109,6 +123,9 @@ namespace MonikAI
                 // Startup logic
                 if (MonikaiSettings.Default.FirstLaunch)
                 {
+                    var settingsWindow = new SettingsWindow(this);
+                    settingsWindow.ShowDialog();
+
                     this.Say(new[]
                     {
                         new Expression(Environment.UserName + ", is that you?", "d"),
@@ -147,26 +164,26 @@ namespace MonikAI
                     {
                         new Expression("♫ ... and in your reality ... ♫", "r")
                     },
-                    new []
+                    new[]
                     {
                         new Expression("How are you today?", "d"),
-                        new Expression("I'm doing fine, now that you are here~", "b") 
+                        new Expression("I'm doing fine, now that you are here~", "b")
                     },
-                    new []
+                    new[]
                     {
                         new Expression("Is everything ok?", "d"),
                         new Expression("Do you want to talk about something?", "c"),
                         new Expression("I'm always here for you~", "e")
                     },
-                    new []
+                    new[]
                     {
                         new Expression("Thank you for letting me be on your screen!", "k")
                     },
-                    new []
+                    new[]
                     {
                         new Expression("You know I love you, right?", "d")
                     },
-                    new []
+                    new[]
                     {
                         new Expression("I'm so happy to be here, together with you! Ahaha~", "b")
                     }
@@ -241,6 +258,43 @@ namespace MonikAI
 
         public bool Speaking { get; private set; }
 
+        public Screen MonikaScreen { get; set; }
+
+        public void SetupScale()
+        {
+            if (!this.initializedScales)
+            {
+                this.initializedScales = true;
+                this.scaleBaseWidth = this.Width;
+                this.scaleBaseHeight = this.Height;
+                this.scaleBaseFacePictureWidth = this.facePicture.Width;
+                this.scaleBaseFacePictureHeight = this.facePicture.Height;
+                this.scaleBaseTextPictureWidth = this.textPicture.Width;
+                this.scaleBaseTextPictureHeight = this.textPicture.Height;
+                this.scaleBaseTextBoxWidth = this.textBox.Width;
+                this.scaleBaseTextBoxHeight = this.textBox.Height;
+                this.scaleBaseTextBoxFontSize = this.textBox.FontSize;
+                this.basePictureThickness = this.facePicture.Margin;
+                this.baseTextThickness = this.textPicture.Margin;
+            }
+
+            var scaleRatio = this.MonikaScreen.Bounds.Height / 1080.0;
+            this.Width = this.scaleBaseWidth * scaleRatio;
+            this.Height = this.scaleBaseHeight * scaleRatio;
+            this.facePicture.Width = this.scaleBaseFacePictureWidth * scaleRatio;
+            this.facePicture.Height = this.scaleBaseFacePictureHeight * scaleRatio;
+            this.facePicture.Margin = new Thickness(this.basePictureThickness.Left * scaleRatio,
+                this.basePictureThickness.Top * scaleRatio, this.facePicture.Margin.Right,
+                this.facePicture.Margin.Bottom);
+            this.textPicture.Width = this.scaleBaseTextPictureWidth * scaleRatio;
+            this.textPicture.Height = this.scaleBaseTextPictureHeight * scaleRatio;
+            this.textPicture.Margin = new Thickness(this.baseTextThickness.Left * scaleRatio,
+                this.baseTextThickness.Top * scaleRatio, this.textPicture.Margin.Right, this.textPicture.Margin.Bottom);
+            this.textBox.Height = this.scaleBaseTextBoxHeight * scaleRatio;
+            this.textBox.Width = this.scaleBaseTextBoxWidth * scaleRatio;
+            this.textBox.FontSize = this.scaleBaseTextBoxFontSize * scaleRatio;
+        }
+
         private void RegisterBehaviours(object sender, EventArgs eventArgs)
         {
             this.behaviours = Assembly.GetExecutingAssembly()
@@ -255,23 +309,23 @@ namespace MonikAI
         }
 
         // Sets the correct position of Monika depending on taskbar position and visibility
-        private void SetPositionBottomRight()
+        public void SetPositionBottomRight(Screen screen)
         {
-            var position = new System.Windows.Point(Screen.PrimaryScreen.Bounds.Width - this.Width,
-                Screen.PrimaryScreen.Bounds.Height - this.Height);
+            var position = new System.Windows.Point(screen.Bounds.X + screen.Bounds.Width - this.Width,
+                screen.Bounds.Y + screen.Bounds.Height - this.Height);
 
-            if (!MainWindow.IsForegroundFullScreen())
+            if (!MainWindow.IsForegroundFullScreen(screen))
             {
-                var taskbars = this.FindDockedTaskBars();
+                var taskbars = this.FindDockedTaskBars(screen);
                 var taskbar = taskbars.FirstOrDefault(x => x.X != 0 || x.Y != 0 || x.Width != 0 || x.Height != 0);
                 if (taskbar != default(Rectangle))
                 {
-                    if (taskbar.X == 0 && taskbar.Y != 0)
+                    if (taskbar.Width >= taskbar.Height)
                     {
                         // Bottom
                         position.Y -= taskbar.Height;
                     }
-                    else if (taskbar.X != 0 && taskbar.Y == 0)
+                    else
                     {
                         // Right
                         position.X -= taskbar.Width;
@@ -295,8 +349,11 @@ namespace MonikAI
         [DllImport("user32.dll", SetLastError = false)]
         private static extern IntPtr GetShellWindow();
 
+        [DllImport("user32.dll", SetLastError = false)]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
         // From: https://stackoverflow.com/a/3744720/4016841 (modified)
-        public static bool IsForegroundFullScreen(Screen screen = null)
+        public static bool IsForegroundFullScreen(Screen screen)
         {
             if (screen == null)
             {
@@ -306,8 +363,14 @@ namespace MonikAI
             var windowBounds = new Rect();
             var foregroundWindowHandle = MainWindow.GetForegroundWindow();
 
+            uint foregroundPID;
+            MainWindow.GetWindowThreadProcessId(foregroundWindowHandle, out foregroundPID);
+            var foregroundProcess = Process.GetProcessesByName("explorer").FirstOrDefault(x => x.Id == foregroundPID);
+            var foregroundExeName = foregroundProcess?.ProcessName ?? string.Empty;
+
             if (foregroundWindowHandle.Equals(MainWindow.desktopWindow) ||
-                foregroundWindowHandle.Equals(MainWindow.shellWindow) || foregroundWindowHandle.Equals(IntPtr.Zero))
+                foregroundWindowHandle.Equals(MainWindow.shellWindow) || foregroundWindowHandle.Equals(IntPtr.Zero)
+                || foregroundExeName.ToLower().Equals("explorer"))
             {
                 return false;
             }
@@ -436,11 +499,11 @@ namespace MonikAI
         private static extern bool GetCursorPos(ref Point lpPoint);
 
         // From: https://stackoverflow.com/a/9826269/4016841
-        public Rectangle[] FindDockedTaskBars()
+        public Rectangle[] FindDockedTaskBars(Screen screen)
         {
             var dockedRects = new Rectangle[4];
 
-            var tmpScrn = Screen.PrimaryScreen;
+            var tmpScrn = screen;
 
             var dockedRectCounter = 0;
             if (!tmpScrn.Bounds.Equals(tmpScrn.WorkingArea))
@@ -487,8 +550,6 @@ namespace MonikAI
 
             return dockedRects;
         }
-
-        private DateTime lastKeyComboTime = DateTime.Now;
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
@@ -570,16 +631,20 @@ namespace MonikAI
                             this.Dispatcher.Invoke(() => { this.Opacity = opacity; });
                         }
 
-                        // Set position anew to correct for fullscreen apps hiding taskbar
-                        this.Dispatcher.Invoke(this.SetPositionBottomRight);
-
-                        // Detect exit key combo
                         var keysPressed = false;
-                        this.Dispatcher.Invoke(
-                            () =>
-                                keysPressed = (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) &&
-                                              (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) &&
-                                              Keyboard.IsKeyDown(Key.F12));
+                        // Set position anew to correct for fullscreen apps hiding taskbar
+                        this.Dispatcher.Invoke(() =>
+                        {
+                            this.SetPositionBottomRight(this.MonikaScreen);
+                            rectangle = new Rectangle((int) this.Left, (int) this.Top, (int) this.Width,
+                                (int) this.Height);
+                            // Detect exit key combo
+                            keysPressed = (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) &&
+                                          (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) &&
+                                          Keyboard.IsKeyDown(Key.F12);
+                        });
+
+
                         if (keysPressed && (DateTime.Now - this.lastKeyComboTime).TotalSeconds > 2)
                         {
                             this.lastKeyComboTime = DateTime.Now;

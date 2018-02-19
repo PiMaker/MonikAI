@@ -46,5 +46,53 @@ namespace MonikAI {
                 this["FirstLaunch"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string UserName {
+            get {
+                return ((string)(this["UserName"]));
+            }
+            set {
+                this["UserName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool PotatoPC {
+            get {
+                return ((bool)(this["PotatoPC"]));
+            }
+            set {
+                this["PotatoPC"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Screen {
+            get {
+                return ((string)(this["Screen"]));
+            }
+            set {
+                this["Screen"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoUpdate {
+            get {
+                return ((bool)(this["AutoUpdate"]));
+            }
+            set {
+                this["AutoUpdate"] = value;
+            }
+        }
     }
 }
