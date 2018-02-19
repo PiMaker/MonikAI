@@ -483,7 +483,6 @@ namespace MonikAI
                     foreach (var line in text)
                     {
                         string completedText = PlaceholderHandling(line.Text);
-                        line.Text = completedText;
                         this.SetMonikaFace(line.Face);
                         for (var i = 0; i < completedText.Length; i++)
                         {
