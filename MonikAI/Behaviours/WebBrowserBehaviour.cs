@@ -81,7 +81,7 @@ namespace MonikAI.Behaviours
                 {
                     new[]
                     {
-                        new Expression("What are we watching?")
+                        new Expression("What are we watching, {name}?")
                     }
                 }, DateTime.MinValue)
             },

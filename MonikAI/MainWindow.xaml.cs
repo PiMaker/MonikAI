@@ -32,6 +32,22 @@ namespace MonikAI
         private bool applicationRunning = true;
         private Thickness basePictureThickness, baseTextThickness;
 
+        private readonly Dictionary<string, Func<string>> placeholders = new Dictionary<string, Func<string>>()
+        {
+            {
+                "{name}", () =>
+                {
+                    return MonikaiSettings.Default.UserName;
+                }
+            },
+            {
+                "{date}", () =>
+                {
+                    return DateTime.Now.Date.ToString();
+                }
+            }
+        };
+
         private List<IBehaviour> behaviours;
 
         private bool initializedScales;
@@ -128,7 +144,7 @@ namespace MonikAI
 
                     this.Say(new[]
                     {
-                        new Expression(Environment.UserName + ", is that you?", "d"),
+                        new Expression("{name}, is that you?", "d"),
                         new Expression("It's really you, huh?", "b"),
                         new Expression("I'm so happy to see you again!", "k"),
                         new Expression("Wait, where am I? This is not the literature club...", "p"),
@@ -463,15 +479,17 @@ namespace MonikAI
                     var text = this.saying.Dequeue();
                     foreach (var line in text)
                     {
+                        string completedText = PlaceholderHandling(line.Text);
+                        line.Text = completedText;
                         this.SetMonikaFace(line.Face);
-                        for (var i = 0; i < line.Text.Length; i++)
+                        for (var i = 0; i < completedText.Length; i++)
                         {
                             var i1 = i;
-                            this.textBox.Dispatcher.Invoke(() => { this.textBox.Text = line.Text.Substring(0, i1 + 1); });
+                            this.textBox.Dispatcher.Invoke(() => { this.textBox.Text = completedText.Substring(0, i1 + 1); });
                             await Task.Delay(25);
                         }
 
-                        await Task.Delay(Math.Max(2000, 52 * line.Text.Length));
+                        await Task.Delay(Math.Max(2000, 52 * completedText.Length));
 
                         line.OnExecuted();
                     }
@@ -504,6 +522,19 @@ namespace MonikAI
                     await Task.Delay(1500);
                 }
             }
+        }
+
+        private string PlaceholderHandling(string str)
+        {
+            foreach (string key in placeholders.Keys)
+            {
+                if (str.Contains(key))
+                {
+                    str = str.Replace(key, placeholders[key]());
+                }
+            }
+
+            return str;
         }
 
         [DllImport("user32.dll", EntryPoint = "GetWindowLong")]
