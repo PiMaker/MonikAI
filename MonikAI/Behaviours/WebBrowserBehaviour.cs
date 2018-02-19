@@ -12,6 +12,7 @@ namespace MonikAI.Behaviours
     {
         // Minimum time that has to elapse before a web page response is shown again
         private readonly TimeSpan minimumElapsedTime = new TimeSpan(0, 10, 0);
+        private readonly Random _random = new Random();
 
         /*
          * 
@@ -23,7 +24,7 @@ namespace MonikAI.Behaviours
          * FORMAT:
          * 
            {
-                "WEB_PAGE (NOTE: ONLY INCLUDE THE BASE DOMAIN, e.g. facebook.com instead of http://facebook.com/something_else) - SUBDOMAINS ARE SUPPORTED (np.reddit.com vs reddit.com)", new ResponseTuple(new List<Expression[]>
+                "WEB_PAGE (YOU CAN INCLUDE ANY DOMAIN NOW. BASE OR OTHERWISE. IF YOU INCLUDE THE BASE AND SPECIFIC DOMAINS IT'LL RANDOMLY CHOOSE (VIA WEIGHTING) - SUBDOMAINS ARE SUPPORTED (np.reddit.com vs reddit.com)", new ResponseTuple(new List<Expression[]>
                 {
                     new[]
                     {
@@ -74,6 +75,33 @@ namespace MonikAI.Behaviours
                         new Expression("Facebook, huh?", "b")
                     }
                 }, DateTime.MinValue)
+            },
+            {
+                "youtube.com", new ResponseTuple(new List<Expression[]>
+                {
+                    new[]
+                    {
+                        new Expression("What are we watching?")
+                    }
+                }, DateTime.MinValue)
+            },
+            {
+                "youtube.com/watch?v=fKNP09P48ew", new ResponseTuple(new List<Expression[]>
+                {
+                    new[]
+                    {
+                        new Expression("10 hours? I'm flattered..", "j")
+                    }
+                }, DateTime.MinValue)
+            },
+            {
+                "youtube.com/user/Vsauce", new ResponseTuple(new List<Expression[]>
+                {
+                    new[]
+                    {
+                        new Expression("Science videos? Expanding knowledge is always the way to go...")
+                    }
+                }, DateTime.MinValue)
             }
         };
 
@@ -85,6 +113,7 @@ namespace MonikAI.Behaviours
         public void Init(MainWindow window)
         {
         }
+
 
         public void Update(MainWindow window)
         {
@@ -124,21 +153,70 @@ namespace MonikAI.Behaviours
 
             if (changed)
             {
+                //Holds all responses to be weighted
+                List<Match> matches = new List<Match>();
                 // Url changed, respond accordingly
-                var match = Regex.Match(this.lastUrl, "(?:http:\\/\\/|https:\\/\\/)(.*?)(?:\\/|$)");
-                if (match.Success && match.Groups.Count == 2)
+                foreach (var pair in this.responseTable)
                 {
-                    foreach (var pair in this.responseTable)
+                    if (this.lastUrl.Contains(pair.Key) &&
+                        DateTime.Now - pair.Value.Item2 > this.minimumElapsedTime)
                     {
-                        if (match.Groups[1].ToString().EndsWith(pair.Key) &&
-                            DateTime.Now - pair.Value.Item2 > this.minimumElapsedTime)
-                        {
-                            window.Say(pair.Value.Item1.Sample());
-                            this.responseTable[pair.Key] = new ResponseTuple(pair.Value.Item1, DateTime.Now);
-                            break;
-                        }
+                        // +1 stops it from having 0 sa a weight, *10 to make the fallback more likely to happen
+                        matches.Add(new Match(pair.Value, (pair.Key.Count(x => x == '/') + 1) * 10, pair.Key));
                     }
                 }
+
+                //Don't need to do anything if there aren't any matches
+                if (matches.Count == 0) return;
+
+                //If there's only one match, use that
+                if (matches.Count == 1)
+                {
+                    window.Say(matches[0].match.Item1.Sample());
+                    this.responseTable[matches[0].key] = new ResponseTuple(matches[0].match.Item1, DateTime.Now);
+                    return;
+                }
+
+                //Choose, by weight, for more than 1 match
+                int maxWeight = matches.Sum(x => x.weight);
+                int rand = _random.Next(0, maxWeight);
+
+                //Shuffles the matches before we start 
+                matches.Shuffle();
+
+                //Select a match by weight
+                Match selected = new Match();
+                foreach(Match m in matches)
+                {
+                    if (rand < m.weight)
+                    {
+                        selected = m;
+                        break;
+                    }
+
+                    rand = rand - m.weight;
+                }
+
+                //This should never occur but I'm being extra safe
+                if (new Match().Equals(selected)) return;
+
+                window.Say(selected.match.Item1.Sample());
+                this.responseTable[selected.key] = new ResponseTuple(selected.match.Item1, DateTime.Now);
+            }
+        }
+
+        //Struct for the weighted matches
+        private struct Match
+        {
+            public ResponseTuple match;
+            public int weight;
+            public string key;
+
+            public Match(ResponseTuple M, int W, string K)
+            {
+                match = M;
+                weight = W;
+                key = K;
             }
         }
 
