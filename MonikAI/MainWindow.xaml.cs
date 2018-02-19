@@ -48,6 +48,8 @@ namespace MonikAI
             scaleBaseTextBoxHeight,
             scaleBaseTextBoxFontSize;
 
+        private SettingsWindow settingsWindow;
+
         public MainWindow()
         {
             this.InitializeComponent();
@@ -56,6 +58,8 @@ namespace MonikAI
             MainWindow.shellWindow = MainWindow.GetShellWindow();
 
             MonikaiSettings.Default.Reload();
+
+            this.settingsWindow = new SettingsWindow(this);
 
             // Screen size and positioning init
             this.MonikaScreen = Screen.PrimaryScreen;
@@ -123,8 +127,7 @@ namespace MonikAI
                 // Startup logic
                 if (MonikaiSettings.Default.FirstLaunch)
                 {
-                    var settingsWindow = new SettingsWindow(this);
-                    settingsWindow.ShowDialog();
+                    this.settingsWindow.ShowDialog();
 
                     this.Say(new[]
                     {
@@ -654,7 +657,9 @@ namespace MonikAI
                             this.Dispatcher.Invoke(() => { this.Opacity = opacity; });
                         }
 
-                        var keysPressed = false;
+                        var hidePressed = false;
+                        var exitPressed = false;
+                        var settingsPressed = false;
                         // Set position anew to correct for fullscreen apps hiding taskbar
                         this.Dispatcher.Invoke(() =>
                         {
@@ -662,13 +667,13 @@ namespace MonikAI
                             rectangle = new Rectangle((int) this.Left, (int) this.Top, (int) this.Width,
                                 (int) this.Height);
                             // Detect exit key combo
-                            keysPressed = (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) &&
-                                          (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) &&
-                                          Keyboard.IsKeyDown(Key.F12);
+                            hidePressed = MainWindow.AreKeysPressed(MonikaiSettings.Default.HotkeyHide);
+                            exitPressed = MainWindow.AreKeysPressed(MonikaiSettings.Default.HotkeyExit);
+                            settingsPressed = MainWindow.AreKeysPressed(MonikaiSettings.Default.HotkeySettings);
                         });
 
 
-                        if (keysPressed && (DateTime.Now - this.lastKeyComboTime).TotalSeconds > 2)
+                        if (hidePressed && (DateTime.Now - this.lastKeyComboTime).TotalSeconds > 2)
                         {
                             this.lastKeyComboTime = DateTime.Now;
 
@@ -687,6 +692,27 @@ namespace MonikAI
                             }
                         }
 
+                        if (exitPressed)
+                        {
+                            var expression =
+                                new Expression(
+                                    "Goodbye for now! Come back soon please~", "b");
+                            expression.Executed += (o, args) => { this.Dispatcher.Invoke(this.Close); };
+                            this.Say(new[] {expression});
+                        }
+
+                        if (settingsPressed)
+                        {
+                            this.Dispatcher.Invoke(() =>
+                            {
+                                if (!this.settingsWindow.IsVisible)
+                                {
+                                    this.settingsWindow = new SettingsWindow(this);
+                                    this.settingsWindow.Show();
+                                }
+                            });
+                        }
+
                         await Task.Delay(MonikaiSettings.Default.PotatoPC ? 100 : 32);
                     }
                 }
@@ -695,6 +721,29 @@ namespace MonikAI
                     // ignored
                 }
             });
+        }
+
+        private static bool AreKeysPressed(string combo)
+        {
+            if (combo.Contains("CTRL") && !Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl))
+            {
+                return false;
+            }
+
+            if (combo.Contains("ALT") && !Keyboard.IsKeyDown(Key.LeftAlt) && !Keyboard.IsKeyDown(Key.RightAlt))
+            {
+                return false;
+            }
+
+            if (combo.Contains("SHIFT") && !Keyboard.IsKeyDown(Key.LeftShift) && !Keyboard.IsKeyDown(Key.RightShift))
+            {
+                return false;
+            }
+
+            var containsDash = combo.Contains("-");
+            var key = containsDash ? combo.Substring(combo.LastIndexOf("-") + 1) : combo;
+            Enum.TryParse(key, true, out Key keyVal);
+            return Keyboard.IsKeyDown(keyVal);
         }
 
         private static double Lerp(double firstFloat, double secondFloat, double by)

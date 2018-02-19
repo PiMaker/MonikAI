@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using System.Windows.Input;
+using System.Windows.Media;
 using MessageBox = System.Windows.MessageBox;
 
 namespace MonikAI
@@ -100,6 +104,109 @@ namespace MonikAI
                 MonikaiSettings.Default.Reset();
                 this.Window_Loaded(this, null);
             }
+        }
+
+        // Settings hotkey
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            await this.HotkeySetTask(this.txtSettings,
+                () => MonikaiSettings.Default.HotkeySettings = this.txtSettings.Text);
+        }
+
+        // Hide hotkey
+        private async void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            await this.HotkeySetTask(this.txtHide, () => MonikaiSettings.Default.HotkeySettings = this.txtHide.Text);
+        }
+
+        // Exit hotkey
+        private async void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            await this.HotkeySetTask(this.txtExit, () => MonikaiSettings.Default.HotkeySettings = this.txtExit.Text);
+        }
+
+        private async Task HotkeySetTask(TextBlock output, Action callback)
+        {
+            output.Dispatcher.Invoke(() => output.Text = "Press and hold any key combination...");
+
+            await this.WaitForKeyChange();
+
+            var timer = DateTime.Now;
+            var state = SettingsWindow.GetKeyboardState().ToList();
+            var invalid = true;
+            while ((DateTime.Now - timer).TotalSeconds < 1)
+            {
+                var newState = SettingsWindow.GetKeyboardState().ToList();
+
+                var ctrlPressed = newState.Where(x => x.Item1 == "LeftCtrl" || x.Item1 == "RightCtrl").Any(x => x.Item2);
+                var altPressed = newState.Where(x => x.Item1 == "LeftAlt" || x.Item1 == "RightAlt").Any(x => x.Item2);
+                var shiftPressed =
+                    newState.Where(x => x.Item1 == "LeftShift" || x.Item1 == "RightShift").Any(x => x.Item2);
+                var otherKeysPressed =
+                    newState.Where(
+                        x =>
+                            x.Item2 &&
+                            !new[] {"LeftCtrl", "RightCtrl", "LeftAlt", "RightAlt", "LeftShift", "RightShift"}.Contains(
+                                x.Item1)).ToList();
+                invalid = otherKeysPressed.Count != 1;
+
+                if (invalid || !state.SequenceEqual(newState))
+                {
+                    timer = DateTime.Now;
+                }
+
+                output.Dispatcher.Invoke(() =>
+                {
+                    if (invalid)
+                    {
+                        output.Text = "Invalid combination";
+                    }
+                    else
+                    {
+                        output.Text = otherKeysPressed.Single().Item1;
+                        if (shiftPressed)
+                        {
+                            output.Text = "SHIFT-" + output.Text;
+                        }
+                        if (altPressed)
+                        {
+                            output.Text = "ALT-" + output.Text;
+                        }
+                        if (ctrlPressed)
+                        {
+                            output.Text = "CTRL-" + output.Text;
+                        }
+                    }
+                });
+
+                state = newState;
+
+                await Task.Delay(10);
+            }
+
+            output.Dispatcher.Invoke(() => output.Foreground = Brushes.GreenYellow);
+            await Task.Delay(500);
+            output.Dispatcher.Invoke(() => output.Foreground = Brushes.Black);
+
+            output.Dispatcher.Invoke(callback);
+        }
+
+        private async Task WaitForKeyChange()
+        {
+            var state = SettingsWindow.GetKeyboardState().ToList();
+            while (state.SequenceEqual(SettingsWindow.GetKeyboardState()))
+            {
+                await Task.Delay(10);
+            }
+        }
+
+        private static IEnumerable<Tuple<string, bool>> GetKeyboardState()
+        {
+            return Enum.GetNames(typeof(Key)).Select(x =>
+            {
+                var key = (Key) Enum.Parse(typeof(Key), x);
+                return new Tuple<string, bool>(x, key != Key.None && Keyboard.IsKeyDown(key));
+            });
         }
     }
 }
