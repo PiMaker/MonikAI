@@ -15,6 +15,7 @@ using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using MonikAI.Behaviours;
+using Octokit;
 using Point = System.Drawing.Point;
 
 namespace MonikAI
@@ -134,10 +135,13 @@ namespace MonikAI
             };
 
             // Blinking behaviour
-            animationFadeMonika.Completed += (sender, args) =>
+            animationFadeMonika.Completed += async (sender, args) =>
             {
                 this.SetMonikaFace("a");
                 this.facePicture.Opacity = 1.0;
+
+                // Start speech-thread
+                Task.Run(async () => await this.SpeakingThread());
 
                 if (true || File.Exists("firstlaunch.txt"))
                 {
@@ -146,7 +150,12 @@ namespace MonikAI
                     MonikaiSettings.Default.Save();
                 }
 
-                this.updater.PerformUpdate(this);
+                IGitHubClient github = new GitHubClient(new ProductHeaderValue("MonikAI"));
+                var contents =
+                    await github.Repository.Content.GetAllContentsByRef("PiMaker", "MonikAI", "/CSV",
+                        "master");
+
+                await this.updater.PerformUpdate(this);
 
                 // Startup logic
                 if (MonikaiSettings.Default.FirstLaunch)
@@ -240,7 +249,7 @@ namespace MonikAI
                 var eyesOpen = "a";
                 var eyesClosed = "j";
                 var random = new Random();
-                Task.Run(async () =>
+                await Task.Run(async () =>
                 {
                     var nextBlink = DateTime.Now + TimeSpan.FromSeconds(random.Next(7, 50));
                     while (this.applicationRunning)
@@ -269,9 +278,6 @@ namespace MonikAI
                         await Task.Delay(250);
                     }
                 });
-
-                // Start speech-thread
-                Task.Run(this.SpeakingThread);
             };
 
             // Startup

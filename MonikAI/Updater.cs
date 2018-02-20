@@ -42,7 +42,14 @@ namespace MonikAI
             Directory.CreateDirectory(Updater.StatePath);
 
             // Retrieve GitHub releases
-            var latestRelease = await this.github.Repository.Release.GetLatest("PiMaker", "MonikAI");
+            var latestRelease = (await (new GitHubClient(new ProductHeaderValue("MonikAI"))).Repository.Release.GetAll("PiMaker",
+                "MonikAI",
+                new ApiOptions
+                {
+                    PageCount = 1,
+                    PageSize = 1,
+                    StartPage = 0
+                })).First();
 
             if (MonikaiSettings.Default.GithubReleaseId == -1)
             {
@@ -69,16 +76,17 @@ namespace MonikAI
         private async Task DownloadCSV()
         {
             var masterSha = (await this.github.Repository.Commit.Get("PiMaker", "MonikAI", "master")).Sha;
-            if (masterSha != MonikaiSettings.Default.GithubMasterSHA)
+            if (masterSha != MonikaiSettings.Default.GithubMasterSHA || true)
             {
                 this.downloadTasks.Add(Task.Run(async () =>
                 {
                     var contents =
                         await this.github.Repository.Content.GetAllContentsByRef("PiMaker", "MonikAI", "/CSV",
                             "master");
+                    var client = new WebClient();
                     foreach (var content in contents)
                     {
-                        File.WriteAllText(Path.Combine(Updater.StatePath, content.Name), content.Content);
+                        await client.DownloadFileTaskAsync(content.DownloadUrl, Path.Combine(Updater.StatePath, content.Name));
                     }
 
                     MonikaiSettings.Default.GithubMasterSHA = masterSha;
@@ -87,21 +95,33 @@ namespace MonikAI
             }
         }
 
-        public void PerformUpdate(MainWindow window)
+        public async Task PerformUpdate(MainWindow window)
         {
-            Task.WaitAll(this.downloadTasks.ToArray());
-
             if (this.updateProgram && MonikaiSettings.Default.AutoUpdate)
             {
+                var closed = false;
+
                 var lastExp = new Expression("Wait a second, I will install it!", "j");
                 lastExp.Executed += (sender, args) =>
                 {
+                    Task.WaitAll(this.downloadTasks.ToArray());
+
                     Process.Start(Path.Combine(Updater.StatePath, "MonikAI.exe"),
                         "/update " + Assembly.GetExecutingAssembly().Location);
+                    closed = true;
                     Environment.Exit(0);
                 };
                 window.Say(new[]
                     {new Expression("Hey, I see there is an update available for my window.", "b"), lastExp});
+
+                while (!closed)
+                {
+                    await Task.Delay(100);
+                }
+            }
+            else
+            {
+                Task.WaitAll(this.downloadTasks.ToArray());
             }
         }
 
@@ -118,6 +138,7 @@ namespace MonikAI
                 File.Exists(Path.Combine(Updater.StatePath, "MonikAI.exe")))
             {
                 File.Delete(Path.Combine(Updater.StatePath, "MonikAI.exe"));
+                return;
             }
 
             if (args.Length > 1 && args[1] != "/update")
