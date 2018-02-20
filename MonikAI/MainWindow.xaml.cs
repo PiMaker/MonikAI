@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -65,6 +65,7 @@ namespace MonikAI
             scaleBaseTextBoxFontSize;
 
         private SettingsWindow settingsWindow;
+        private Updater updater;
 
         public MainWindow()
         {
@@ -74,6 +75,12 @@ namespace MonikAI
             MainWindow.shellWindow = MainWindow.GetShellWindow();
 
             MonikaiSettings.Default.Reload();
+
+            // Perform update and download routines
+            this.updater = new Updater();
+            this.updater.PerformUpdatePost();
+            // Ignore warning, this is supposed to be run async without await
+            this.updater.Init();
 
             this.settingsWindow = new SettingsWindow(this);
 
@@ -139,6 +146,8 @@ namespace MonikAI
                     MonikaiSettings.Default.FirstLaunch = true;
                     MonikaiSettings.Default.Save();
                 }
+
+                this.updater.PerformUpdate(this);
 
                 // Startup logic
                 if (MonikaiSettings.Default.FirstLaunch)
@@ -697,9 +706,9 @@ namespace MonikAI
                             rectangle = new Rectangle((int) this.Left, (int) this.Top, (int) this.Width,
                                 (int) this.Height);
                             // Detect exit key combo
-                            hidePressed = MainWindow.AreKeysPressed(MonikaiSettings.Default.HotkeyHide);
-                            exitPressed = MainWindow.AreKeysPressed(MonikaiSettings.Default.HotkeyExit);
-                            settingsPressed = MainWindow.AreKeysPressed(MonikaiSettings.Default.HotkeySettings);
+                            hidePressed = AreKeysPressed(MonikaiSettings.Default.HotkeyHide);
+                            exitPressed = AreKeysPressed(MonikaiSettings.Default.HotkeyExit);
+                            settingsPressed = AreKeysPressed(MonikaiSettings.Default.HotkeySettings);
                         });
 
 
@@ -753,8 +762,14 @@ namespace MonikAI
             });
         }
 
-        private static bool AreKeysPressed(string combo)
+        private bool AreKeysPressed(string combo)
         {
+            // Prevent keypresses from propagating through the Settings Window to allow for Hotkey Settings
+            if (this.settingsWindow != null && this.settingsWindow.IsVisible)
+            {
+                return false;
+            }
+
             if (combo.Contains("CTRL") && !Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl))
             {
                 return false;
