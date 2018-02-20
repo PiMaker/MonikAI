@@ -174,6 +174,19 @@ namespace MonikAI
                 }
                 else
                 {
+                    if (MonikaiSettings.Default.IsColdShutdown)
+                    {
+                        this.Say(new[]
+                        {
+                            new Expression("<cold shutdown scorn>")
+                        });
+                    }
+                    else
+                    {
+                        MonikaiSettings.Default.IsColdShutdown = true;
+                        MonikaiSettings.Default.Save();
+                    }
+
                     if ((DateTime.Now - MonikaiSettings.Default.LastStarted).TotalDays > 7)
                     {
                         this.Say(new[]
@@ -735,6 +748,8 @@ namespace MonikAI
                             var expression =
                                 new Expression(
                                     "Goodbye for now! Come back soon please~", "b");
+                            MonikaiSettings.Default.IsColdShutdown = false;
+                            MonikaiSettings.Default.Save();
                             expression.Executed += (o, args) => { this.Dispatcher.Invoke(this.Close); };
                             this.Say(new[] {expression});
                         }

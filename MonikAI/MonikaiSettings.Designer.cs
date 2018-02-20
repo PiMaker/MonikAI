@@ -178,5 +178,17 @@ namespace MonikAI {
                 this["AutoStart"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsColdShutdown {
+            get {
+                return ((bool)(this["IsColdShutdown"]));
+            }
+            set {
+                this["IsColdShutdown"] = value;
+            }
+        }
     }
 }
