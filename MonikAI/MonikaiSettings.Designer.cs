@@ -152,6 +152,37 @@ namespace MonikAI {
             }
             set {
                 this["IsForcedShutdown"] = value;
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int GithubReleaseId {
+            get {
+                return ((int)(this["GithubReleaseId"]));
+            }
+            set {
+                this["GithubReleaseId"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GithubMasterSHA {
+            get {
+                return ((string)(this["GithubMasterSHA"]));
+            }
+            set {
+                this["GithubMasterSHA"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AutoStart {
+            get {
+                return ((bool)(this["AutoStart"]));
+            }
+            set {
+                this["AutoStart"] = value;
             }
         }
     }
