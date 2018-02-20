@@ -145,6 +145,13 @@ namespace MonikAI {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsForcedShutdown {
+            get {
+                return ((bool)(this["IsForcedShutdown"]));
+            }
+            set {
+                this["IsForcedShutdown"] = value;
         [global::System.Configuration.DefaultSettingValueAttribute("-1")]
         public int GithubReleaseId {
             get {

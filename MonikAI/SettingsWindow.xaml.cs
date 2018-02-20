@@ -75,7 +75,8 @@ namespace MonikAI
 
         private void buttonOk_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+			MonikaiSettings.Default.Save();
+			this.Close();
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
