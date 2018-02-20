@@ -86,6 +86,7 @@
     <Compile Include="Behaviours\IBehaviour.cs" />
     <Compile Include="Behaviours\WebBrowserBehaviour.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="MonikaiSettings.cs" />
     <Compile Include="MonikaiSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>

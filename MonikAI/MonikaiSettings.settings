@@ -32,5 +32,8 @@
     <Setting Name="HotkeyExit" Type="System.String" Scope="User">
       <Value Profile="(Default)">CTRL-SHIFT-F12</Value>
     </Setting>
+    <Setting Name="IsForcedShutdown" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
