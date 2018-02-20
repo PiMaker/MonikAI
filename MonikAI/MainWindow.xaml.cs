@@ -79,8 +79,7 @@ namespace MonikAI
             // Perform update and download routines
             this.updater = new Updater();
             this.updater.PerformUpdatePost();
-            // Ignore warning, this is supposed to be run async without await
-            this.updater.Init();
+            Task.Run(async () => await this.updater.Init());
 
             this.settingsWindow = new SettingsWindow(this);
 

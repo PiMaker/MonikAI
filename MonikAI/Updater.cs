@@ -50,7 +50,7 @@ namespace MonikAI
                 MonikaiSettings.Default.Save();
             }
 
-            if (MonikaiSettings.Default.GithubReleaseId != latestRelease.Id)
+            if (MonikaiSettings.Default.GithubReleaseId != latestRelease.Id || true)
             {
                 // Application Update detected
                 this.updateProgram = true;
@@ -107,13 +107,20 @@ namespace MonikAI
 
         public void PerformUpdatePost()
         {
-            if (Environment.GetCommandLineArgs()[1] == "/postupdate" &&
+            var args = Environment.GetCommandLineArgs();
+
+            if (args.Length <= 1)
+            {
+                return;
+            }
+
+            if (args.Length > 1 && args[1] == "/postupdate" &&
                 File.Exists(Path.Combine(Updater.StatePath, "MonikAI.exe")))
             {
                 File.Delete(Path.Combine(Updater.StatePath, "MonikAI.exe"));
             }
 
-            if (Environment.GetCommandLineArgs()[1] != "/update")
+            if (args.Length > 1 && args[1] != "/update")
             {
                 return;
             }
