@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Http;
+using System.Net.Security;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,14 +36,15 @@ namespace MonikAI
             {
                 return;
             }
+            
+            var client = new HttpClient();
 
-            // Perform config exchange
-            var client = new WebClient();
-            var onlineConfigRaw = await client.DownloadStringTaskAsync("https://pimaker.github.io/MonikAI/update.json");
+            // Perform config download
+            string onlineConfigRaw;
             UpdateConfig onlineConfig;
-
             try
             {
+                onlineConfigRaw = await client.GetStringAsync("https://pimaker.github.io/MonikAI/update.json");
                 onlineConfig = JsonConvert.DeserializeObject<UpdateConfig>(onlineConfigRaw);
             }
             catch (Exception e)
@@ -66,14 +69,16 @@ namespace MonikAI
                 {
                     this.updateProgram = true;
                     var path = Path.Combine(Updater.StatePath, "MonikAI.exe");
-                    if (File.Exists(path))
+                    var stream = await client.GetStreamAsync(onlineConfig.ProgramURL);
+                    using (var fs = new FileStream(path, FileMode.Create))
                     {
-                        File.Delete(path);
+                        await stream.CopyToAsync(fs);
                     }
-                    await client.DownloadFileTaskAsync(onlineConfig.ProgramURL, path);
+                    stream.Dispose();
                 }));
             }
 
+            // Note: CSV update also occurs when application is first launched or the data directory has been deleted
             if (localConfig.ResponsesVersion < onlineConfig.ResponsesVersion || !dirExisted || MonikaiSettings.Default.FirstLaunch)
             {
                 // CSV update
@@ -87,6 +92,8 @@ namespace MonikAI
         private async Task DownloadCSV(UpdateConfig config)
         {
             var client = new WebClient();
+            client.Headers.Add("User-Agent", "MonikAI");
+
             foreach (var responseURL in config.ResponseURLs)
             {
                 var path = Path.Combine(Updater.StatePath, GetFileNameFromUrl(responseURL));
