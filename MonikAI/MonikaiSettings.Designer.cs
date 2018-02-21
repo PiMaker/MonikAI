@@ -12,7 +12,7 @@ namespace MonikAI {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.5.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.3.0.0")]
     internal sealed partial class MonikaiSettings : global::System.Configuration.ApplicationSettingsBase {
         
         private static MonikaiSettings defaultInstance = ((MonikaiSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new MonikaiSettings())));
@@ -85,7 +85,7 @@ namespace MonikAI {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool AutoUpdate {
             get {
                 return ((bool)(this["AutoUpdate"]));
@@ -145,30 +145,6 @@ namespace MonikAI {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
-        public int GithubReleaseId {
-            get {
-                return ((int)(this["GithubReleaseId"]));
-            }
-            set {
-                this["GithubReleaseId"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string GithubMasterSHA {
-            get {
-                return ((string)(this["GithubMasterSHA"]));
-            }
-            set {
-                this["GithubMasterSHA"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool AutoStart {
             get {
@@ -188,6 +164,30 @@ namespace MonikAI {
             }
             set {
                 this["IsColdShutdown"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastUpdateConfig {
+            get {
+                return ((string)(this["LastUpdateConfig"]));
+            }
+            set {
+                this["LastUpdateConfig"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Setting {
+            get {
+                return ((string)(this["Setting"]));
+            }
+            set {
+                this["Setting"] = value;
             }
         }
     }

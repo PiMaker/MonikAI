@@ -7,12 +7,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Octokit;
+using Newtonsoft.Json;
 
 namespace MonikAI
 {
@@ -23,76 +23,90 @@ namespace MonikAI
 
         private readonly List<Task> downloadTasks = new List<Task>();
 
-        private readonly IGitHubClient github = new GitHubClient(new ProductHeaderValue("MonikAI"));
-
         private bool updateProgram;
 
         public async Task Init()
         {
-            if (!MonikaiSettings.Default.AutoUpdate)
-            {
-                if (MonikaiSettings.Default.FirstLaunch)
-                {
-                    this.downloadTasks.Add(this.DownloadCSV());
-                }
+            var dirExisted = Directory.Exists(Updater.StatePath);
+            Directory.CreateDirectory(Updater.StatePath);
 
+            if (!MonikaiSettings.Default.AutoUpdate && dirExisted)
+            {
                 return;
             }
 
-            Directory.CreateDirectory(Updater.StatePath);
+            // Perform config exchange
+            var client = new WebClient();
+            var onlineConfigRaw = await client.DownloadStringTaskAsync("https://pimaker.github.io/MonikAI/update.json");
+            UpdateConfig onlineConfig;
 
-            // Retrieve GitHub releases
-            var latestRelease = (await (new GitHubClient(new ProductHeaderValue("MonikAI"))).Repository.Release.GetAll("PiMaker",
-                "MonikAI",
-                new ApiOptions
-                {
-                    PageCount = 1,
-                    PageSize = 1,
-                    StartPage = 0
-                })).First();
-
-            if (MonikaiSettings.Default.GithubReleaseId == -1)
+            try
             {
-                MonikaiSettings.Default.GithubReleaseId = latestRelease.Id;
-                MonikaiSettings.Default.Save();
+                onlineConfig = JsonConvert.DeserializeObject<UpdateConfig>(onlineConfigRaw);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("An error has occured while updating MonikAI: " + e.Message, "Warning");
+                return;
             }
 
-            if (MonikaiSettings.Default.GithubReleaseId != latestRelease.Id || true)
+            // General update
+            if (string.IsNullOrWhiteSpace(MonikaiSettings.Default.LastUpdateConfig))
             {
-                // Application Update detected
-                this.updateProgram = true;
+                MonikaiSettings.Default.LastUpdateConfig = onlineConfigRaw;
+            }
+
+            var localConfig =
+                JsonConvert.DeserializeObject<UpdateConfig>(MonikaiSettings.Default.LastUpdateConfig);
+
+            if (localConfig.ProgramVersion < onlineConfig.ProgramVersion)
+            {
+                // Program update
                 this.downloadTasks.Add(Task.Run(async () =>
                 {
-                    var client = new WebClient();
-                    await client.DownloadFileTaskAsync(latestRelease.Assets.First().BrowserDownloadUrl,
-                        Path.Combine(Updater.StatePath, "MonikAI.exe"));
+                    this.updateProgram = true;
+                    var path = Path.Combine(Updater.StatePath, "MonikAI.exe");
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
+                    await client.DownloadFileTaskAsync(onlineConfig.ProgramURL, path);
                 }));
             }
 
-            // Retrieve CSV releases
-            await this.DownloadCSV();
+            if (localConfig.ResponsesVersion < onlineConfig.ResponsesVersion || !dirExisted || MonikaiSettings.Default.FirstLaunch)
+            {
+                // CSV update
+                this.downloadTasks.Add(this.DownloadCSV(onlineConfig));
+            }
+
+            MonikaiSettings.Default.LastUpdateConfig = onlineConfigRaw;
+            MonikaiSettings.Default.Save();
         }
 
-        private async Task DownloadCSV()
+        private async Task DownloadCSV(UpdateConfig config)
         {
-            var masterSha = (await this.github.Repository.Commit.Get("PiMaker", "MonikAI", "master")).Sha;
-            if (masterSha != MonikaiSettings.Default.GithubMasterSHA || true)
+            var client = new WebClient();
+            foreach (var responseURL in config.ResponseURLs)
             {
-                this.downloadTasks.Add(Task.Run(async () =>
+                var path = Path.Combine(Updater.StatePath, GetFileNameFromUrl(responseURL));
+                if (File.Exists(path))
                 {
-                    var contents =
-                        await this.github.Repository.Content.GetAllContentsByRef("PiMaker", "MonikAI", "/CSV",
-                            "master");
-                    var client = new WebClient();
-                    foreach (var content in contents)
-                    {
-                        await client.DownloadFileTaskAsync(content.DownloadUrl, Path.Combine(Updater.StatePath, content.Name));
-                    }
-
-                    MonikaiSettings.Default.GithubMasterSHA = masterSha;
-                    MonikaiSettings.Default.Save();
-                }));
+                    File.Delete(path);
+                }
+                await client.DownloadFileTaskAsync(responseURL, path);
             }
+        }
+
+        static readonly Uri someBaseUri = new Uri("http://canbeanything");
+
+        // From: https://stackoverflow.com/a/40361205
+        static string GetFileNameFromUrl(string url)
+        {
+            if (!Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
+                uri = new Uri(Updater.someBaseUri, url);
+
+            return Path.GetFileName(uri.LocalPath);
         }
 
         public async Task PerformUpdate(MainWindow window)
@@ -123,6 +137,19 @@ namespace MonikAI
             {
                 Task.WaitAll(this.downloadTasks.ToArray());
             }
+            
+            // Validate downloads have actually occured
+            foreach (var file in Directory.GetFiles(Updater.StatePath))
+            {
+                if (file.EndsWith(".csv") || new FileInfo(file).Length > 0)
+                {
+                    return;
+                }
+            }
+
+            // Invalid state detected, no responses available
+            MessageBox.Show("An error has occured loading MonikAI data. Are you connected to the internet? If you disable Auto-Update in the settings you don't need to be connected to the Internet when MonikAI launches. NOTE: If this is your first time launching MonikAI, you need to be connected to the internet regardless!", "Error");
+            Environment.Exit(1);
         }
 
         public void PerformUpdatePost()
