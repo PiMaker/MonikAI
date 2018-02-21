@@ -93,6 +93,7 @@
     </ApplicationDefinition>
     <Compile Include="Behaviours\ApplicationBehaviour.cs" />
     <Compile Include="Behaviours\IBehaviour.cs" />
+    <Compile Include="Behaviours\TriggerComparer.cs" />
     <Compile Include="Behaviours\WebBrowserBehaviour.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="MonikaiSettings.Designer.cs">
@@ -100,6 +101,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>MonikaiSettings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Parsers\CSVParser.cs" />
+    <Compile Include="Parsers\IParser.cs" />
+    <Compile Include="Parsers\Models\DokiResponse.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>

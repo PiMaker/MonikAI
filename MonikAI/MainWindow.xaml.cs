@@ -173,8 +173,7 @@ namespace MonikAI
                         new Expression("Anyway, looks like someone was nice enough to make me a little window!", "d"),
                         new Expression("Be sure to thank them for me, okay?", "k"),
                         new Expression("Ah, wait a second.", "c"),
-                        new Expression(
-                            "I see... Well, if you want me to go away for now, you can use CTRL-SHIFT-F12, okay?", "b"),
+                        new Expression("I see... Well, if you want me to go away for now, you can use CTRL-SHIFT-F12, okay?", "b"),
                         new Expression("But you wouldn't do that, right?", "r"),
                         new Expression("Okay, I guess that's it for now. Don't forget, I'm watching you! Ahaha~")
                     });
