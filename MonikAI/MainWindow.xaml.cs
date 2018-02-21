@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -15,6 +15,7 @@ using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using MonikAI.Behaviours;
+using Octokit;
 using Point = System.Drawing.Point;
 
 namespace MonikAI
@@ -65,6 +66,7 @@ namespace MonikAI
             scaleBaseTextBoxFontSize;
 
         private SettingsWindow settingsWindow;
+        private Updater updater;
 
         public MainWindow()
         {
@@ -74,6 +76,11 @@ namespace MonikAI
             MainWindow.shellWindow = MainWindow.GetShellWindow();
 
             MonikaiSettings.Default.Reload();
+
+            // Perform update and download routines
+            this.updater = new Updater();
+            this.updater.PerformUpdatePost();
+            Task.Run(async () => await this.updater.Init());
 
             this.settingsWindow = new SettingsWindow(this);
 
@@ -128,10 +135,13 @@ namespace MonikAI
             };
 
             // Blinking behaviour
-            animationFadeMonika.Completed += (sender, args) =>
+            animationFadeMonika.Completed += async (sender, args) =>
             {
                 this.SetMonikaFace("a");
                 this.facePicture.Opacity = 1.0;
+
+                // Start speech-thread
+                Task.Run(async () => await this.SpeakingThread());
 
                 if (true || File.Exists("firstlaunch.txt"))
                 {
@@ -139,6 +149,13 @@ namespace MonikAI
                     MonikaiSettings.Default.FirstLaunch = true;
                     MonikaiSettings.Default.Save();
                 }
+
+                IGitHubClient github = new GitHubClient(new ProductHeaderValue("MonikAI"));
+                var contents =
+                    await github.Repository.Content.GetAllContentsByRef("PiMaker", "MonikAI", "/CSV",
+                        "master");
+
+                await this.updater.PerformUpdate(this);
 
                 // Startup logic
                 if (MonikaiSettings.Default.FirstLaunch)
@@ -166,6 +183,19 @@ namespace MonikAI
                 }
                 else
                 {
+                    if (MonikaiSettings.Default.IsColdShutdown)
+                    {
+                        this.Say(new[]
+                        {
+                            new Expression("<cold shutdown scorn>")
+                        });
+                    }
+                    else
+                    {
+                        MonikaiSettings.Default.IsColdShutdown = true;
+                        MonikaiSettings.Default.Save();
+                    }
+
                     if ((DateTime.Now - MonikaiSettings.Default.LastStarted).TotalDays > 7)
                     {
                         this.Say(new[]
@@ -232,7 +262,7 @@ namespace MonikAI
                 var eyesOpen = "a";
                 var eyesClosed = "j";
                 var random = new Random();
-                Task.Run(async () =>
+                await Task.Run(async () =>
                 {
                     var nextBlink = DateTime.Now + TimeSpan.FromSeconds(random.Next(7, 50));
                     while (this.applicationRunning)
@@ -261,9 +291,6 @@ namespace MonikAI
                         await Task.Delay(250);
                     }
                 });
-
-                // Start speech-thread
-                Task.Run(this.SpeakingThread);
             };
 
             // Startup
@@ -697,9 +724,9 @@ namespace MonikAI
                             rectangle = new Rectangle((int) this.Left, (int) this.Top, (int) this.Width,
                                 (int) this.Height);
                             // Detect exit key combo
-                            hidePressed = MainWindow.AreKeysPressed(MonikaiSettings.Default.HotkeyHide);
-                            exitPressed = MainWindow.AreKeysPressed(MonikaiSettings.Default.HotkeyExit);
-                            settingsPressed = MainWindow.AreKeysPressed(MonikaiSettings.Default.HotkeySettings);
+                            hidePressed = AreKeysPressed(MonikaiSettings.Default.HotkeyHide);
+                            exitPressed = AreKeysPressed(MonikaiSettings.Default.HotkeyExit);
+                            settingsPressed = AreKeysPressed(MonikaiSettings.Default.HotkeySettings);
                         });
 
 
@@ -727,6 +754,8 @@ namespace MonikAI
                             var expression =
                                 new Expression(
                                     "Goodbye for now! Come back soon please~", "b");
+                            MonikaiSettings.Default.IsColdShutdown = false;
+                            MonikaiSettings.Default.Save();
                             expression.Executed += (o, args) => { this.Dispatcher.Invoke(this.Close); };
                             this.Say(new[] {expression});
                         }
@@ -753,8 +782,14 @@ namespace MonikAI
             });
         }
 
-        private static bool AreKeysPressed(string combo)
+        private bool AreKeysPressed(string combo)
         {
+            // Prevent keypresses from propagating through the Settings Window to allow for Hotkey Settings
+            if (this.settingsWindow != null && this.settingsWindow.IsVisible)
+            {
+                return false;
+            }
+
             if (combo.Contains("CTRL") && !Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl))
             {
                 return false;
