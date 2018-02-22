@@ -159,7 +159,7 @@ namespace MonikAI
 
                 await this.updater.PerformUpdate(this);
 
-                MessageBox.Show("This is a testing version.");
+                MessageBox.Show("This is a testing build, please do me the favor and don't distribute it right now.");
 
                 // Startup logic
                 if (MonikaiSettings.Default.FirstLaunch)
@@ -566,11 +566,11 @@ namespace MonikAI
 
         private string PlaceholderHandling(string str)
         {
-            foreach (string key in placeholders.Keys)
+            foreach (var key in this.placeholders.Keys)
             {
                 if (str.Contains(key))
                 {
-                    str = str.Replace(key, placeholders[key]());
+                    str = str.Replace(key, this.placeholders[key]());
                 }
             }
 
