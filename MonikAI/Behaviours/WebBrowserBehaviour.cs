@@ -17,6 +17,12 @@ namespace MonikAI.Behaviours
     /// </summary>
     public class WebBrowserBehaviour : IBehaviour
     {
+        // Translation table for shortened URLs
+        private readonly Dictionary<string,string> unshorteningDictionary = new Dictionary<string, string>
+        {
+            {"youtu.be", "youtube.com"}
+        };
+
         // Minimum time that has to elapse before a web page response is shown again
         private readonly TimeSpan minimumElapsedTime = new TimeSpan(0, 12, 0);
         private readonly Random random = new Random();
@@ -127,24 +133,28 @@ namespace MonikAI.Behaviours
             var firefox = this.GetFirefoxURL();
             if (!string.IsNullOrWhiteSpace(firefox))
             {
+                firefox = firefox.ToLower().Trim();
+
                 if (this.lastUrl != firefox)
                 {
                     changed = true;
                 }
 
-                this.lastUrl = firefox.ToLower().Trim();
+                this.lastUrl = firefox;
             }
             else
             {
                 var chrome = this.GetChromeURL();
                 if (!string.IsNullOrWhiteSpace(chrome))
                 {
+                    chrome = chrome.ToLower().Trim();
+
                     if (this.lastUrl != chrome)
                     {
                         changed = true;
                     }
 
-                    this.lastUrl = chrome.ToLower().Trim();
+                    this.lastUrl = chrome;
                 }
             }
 
@@ -152,9 +162,21 @@ namespace MonikAI.Behaviours
             {
                 this.lastUrlChangeTime = DateTime.Now;
                 this.lastUrlResponded = false;
+
+                // Post process lastUrl with expansion table
+                foreach (var pair in this.unshorteningDictionary)
+                {
+                    var found = this.lastUrl.IndexOf(pair.Value);
+                    // Magic number 12, change it and I will find you irl
+                    if (found >= 0 && found < 12)
+                    {
+                        // This actually replaces ALL occurances of the URL in question, but it *should be fine*
+                        this.lastUrl = this.lastUrl.Replace(pair.Key, pair.Value);
+                    }
+                }
             }
 
-            if (!this.lastUrlResponded && (DateTime.Now - this.lastUrlChangeTime).TotalSeconds > 1.5)
+            if (!this.lastUrlResponded && (DateTime.Now - this.lastUrlChangeTime).TotalSeconds > .75)
             {
                 this.lastUrlResponded = true;
 
@@ -192,8 +214,8 @@ namespace MonikAI.Behaviours
                     if (this.lastUrl.Contains(pair.Key) &&
                         DateTime.Now - pair.Value.Item2 > this.minimumElapsedTime)
                     {
-                        // +1 stops it from having 0 sa a weight, *5 to make the fallback more likely to happen
-                        matches.Add(new Match(pair.Value, (pair.Key.Count(x => x == '/') + 1) * 5, pair.Key));
+                        // +1 stops it from having 0 sa a weight, *6 to make the specific more likely to happen
+                        matches.Add(new Match(pair.Value, (pair.Key.Count(x => x == '/') + 1) * 6, pair.Key));
                     }
                 }
 
