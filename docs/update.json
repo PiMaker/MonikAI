@@ -3,9 +3,9 @@
   "ResponsesVersion": 3,
   "ProgramURL": "https://pimaker.github.io/MonikAI/MonikAI.exe",
   "ResponseURLs": [
-    "https://pimaker.github.io/MonikAI/application.csv",
-    "https://pimaker.github.io/MonikAI/google.csv",
-    "https://pimaker.github.io/MonikAI/startup.csv",
-    "https://pimaker.github.io/MonikAI/website.csv"
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/application.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/google.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/startup.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/website.csv"
   ]
 }

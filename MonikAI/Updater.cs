@@ -39,13 +39,15 @@ namespace MonikAI
             
             // You could also use a WebClient here but I'm too lazy to change it back after doing some debugging. Eh, it works.
             var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+            client.DefaultRequestHeaders.Add("User-Agent", "MonikAI");
 
             // Perform config download
             string onlineConfigRaw;
             UpdateConfig onlineConfig;
             try
             {
-                onlineConfigRaw = await client.GetStringAsync("https://pimaker.github.io/MonikAI/update.json");
+                onlineConfigRaw = await client.GetStringAsync("https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/update.json");
                 onlineConfig = JsonConvert.DeserializeObject<UpdateConfig>(onlineConfigRaw);
             }
             catch (Exception e)
@@ -94,6 +96,7 @@ namespace MonikAI
         {
             var client = new WebClient();
             client.Headers.Add("User-Agent", "MonikAI");
+            client.Headers.Add("Cache-Control", "no-cache");
 
             foreach (var responseURL in config.ResponseURLs)
             {
