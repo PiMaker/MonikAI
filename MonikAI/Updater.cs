@@ -30,6 +30,15 @@ namespace MonikAI
         public async Task Init()
         {
             var dirExisted = Directory.Exists(Updater.StatePath);
+
+            if (MonikaiSettings.Default.FirstTimeWithUpdater && dirExisted)
+            {
+                // Delete StatePath from older releases without updater
+                Directory.Delete(Updater.StatePath, true);
+                MonikaiSettings.Default.FirstTimeWithUpdater = false;
+                MonikaiSettings.Default.Save();
+            }
+
             Directory.CreateDirectory(Updater.StatePath);
 
             if (!MonikaiSettings.Default.AutoUpdate && dirExisted)
