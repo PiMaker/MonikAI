@@ -205,13 +205,13 @@ namespace MonikAI {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Regular")]
-        public string IdleWait {
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool FirstTimeWithUpdater {
             get {
-                return ((string)(this["IdleWait"]));
+                return ((bool)(this["FirstTimeWithUpdater"]));
             }
             set {
-                this["IdleWait"] = value;
+                this["FirstTimeWithUpdater"] = value;
             }
         }
     }
