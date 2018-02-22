@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -25,14 +25,28 @@ namespace MonikAI
             this.InitializeComponent();
         }
 
+        private bool sliderEnabled = false;
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            if (MonikaiSettings.Default.FirstLaunch)
+            {
+                MonikaiSettings.Default.AutoUpdate = true;
+            }
+
             // Settings window initialization code
             this.textBoxName.Text = string.IsNullOrWhiteSpace(MonikaiSettings.Default.UserName)
                 ? Environment.UserName
                 : MonikaiSettings.Default.UserName;
             this.checkBoxPotatoPC.IsChecked = MonikaiSettings.Default.PotatoPC;
             this.checkBoxAutoUpdate.IsChecked = MonikaiSettings.Default.AutoUpdate;
+
+            this.sliderScale.Value = MonikaiSettings.Default.ScaleModifier;
+            this.sliderEnabled = true;
+
+            this.txtSettings.Text = MonikaiSettings.Default.HotkeySettings;
+            this.txtExit.Text = MonikaiSettings.Default.HotkeyExit;
+            this.txtHide.Text = MonikaiSettings.Default.HotkeyHide;
 
             if (MonikaiSettings.Default.LeftAlign)
             {
@@ -41,6 +55,11 @@ namespace MonikAI
             else
             {
                 this.radioRight.IsChecked = true;
+            }
+
+            if (MonikaiSettings.Default.DpiWorkaround)
+            {
+                this.buttonWorkaround.Content = "Disable DPI Workaround";
             }
 
             var index = 0;
@@ -56,6 +75,10 @@ namespace MonikAI
                 }
                 index++;
             }
+
+            // Focus window
+            this.Focus();
+            this.Activate();
         }
 
         private void comboBoxScreen_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -127,14 +150,14 @@ namespace MonikAI
 
         private async Task HotkeySetTask(TextBlock output, Action callback)
         {
-            output.Dispatcher.Invoke(() => output.Text = "Press and hold any key combination...");
+            output.Dispatcher.Invoke(() => output.Text = "Press and HOLD any key combination...");
 
             await this.WaitForKeyChange();
 
             var timer = DateTime.Now;
             var state = SettingsWindow.GetKeyboardState().ToList();
             var invalid = true;
-            while ((DateTime.Now - timer).TotalSeconds < 1)
+            while ((DateTime.Now - timer).TotalSeconds < 0.8)
             {
                 var newState = SettingsWindow.GetKeyboardState().ToList();
 
@@ -207,6 +230,42 @@ namespace MonikAI
                 var key = (Key) Enum.Parse(typeof(Key), x);
                 return new Tuple<string, bool>(x, key != Key.None && Keyboard.IsKeyDown(key));
             });
+        }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            // Set DPI awareness or something
+            if (MonikaiSettings.Default.DpiWorkaround)
+            {
+                MessageBox.Show("Workaround has been disabled! MonikAI will now exit, please restart it manually.", "Workaround");
+                MonikaiSettings.Default.DpiWorkaround = false;
+                MonikaiSettings.Default.Save();
+                Environment.Exit(0);
+            }
+            else
+            {
+                if (MessageBox.Show(
+                        "If you don't see Monika on one of your screens right now, MonikAI can activate a workaround that *might* fix your issue - your milage may vary however. Do you want to try the fix?",
+                        "Workaround", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    MonikaiSettings.Default.DpiWorkaround = true;
+                    MonikaiSettings.Default.Save();
+                    MessageBox.Show("Workaround enabled. MonikAI will now exit, please restart it manually.", "Workaround");
+                    Environment.Exit(0);
+                }
+            }
+        }
+
+        private void sliderScale_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (!this.sliderEnabled)
+            {
+                return;
+            }
+
+            // Scale modifier
+            MonikaiSettings.Default.ScaleModifier = this.sliderScale.Value;
+            this.mainWindow.SetupScale();
         }
     }
 }

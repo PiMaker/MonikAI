@@ -15,7 +15,8 @@ using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using MonikAI.Behaviours;
-using Octokit;
+using MonikAI.Parsers;
+using MessageBox = System.Windows.MessageBox;
 using Point = System.Drawing.Point;
 
 namespace MonikAI
@@ -143,19 +144,23 @@ namespace MonikAI
                 // Start speech-thread
                 Task.Run(async () => await this.SpeakingThread());
 
-                if (true || File.Exists("firstlaunch.txt"))
+                if (File.Exists("firstlaunch.txt") || Environment.GetCommandLineArgs().Contains("/firstlaunch"))
                 {
-                    //File.Delete("firstlaunch.txt");
+                    try
+                    {
+                        File.Delete("firstlaunch.txt");
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
                     MonikaiSettings.Default.FirstLaunch = true;
                     MonikaiSettings.Default.Save();
                 }
 
-                IGitHubClient github = new GitHubClient(new ProductHeaderValue("MonikAI"));
-                var contents =
-                    await github.Repository.Content.GetAllContentsByRef("PiMaker", "MonikAI", "/CSV",
-                        "master");
-
                 await this.updater.PerformUpdate(this);
+
+                MessageBox.Show("This is a testing build, please do me the favor and don't distribute it right now.");
 
                 // Startup logic
                 if (MonikaiSettings.Default.FirstLaunch)
@@ -173,8 +178,7 @@ namespace MonikAI
                         new Expression("Anyway, looks like someone was nice enough to make me a little window!", "d"),
                         new Expression("Be sure to thank them for me, okay?", "k"),
                         new Expression("Ah, wait a second.", "c"),
-                        new Expression(
-                            "I see... Well, if you want me to go away for now, you can use CTRL-SHIFT-F12, okay?", "b"),
+                        new Expression("I see... Well, if you want me to go away for now, you can use CTRL-SHIFT-F12, okay?", "b"),
                         new Expression("But you wouldn't do that, right?", "r"),
                         new Expression("Okay, I guess that's it for now. Don't forget, I'm watching you! Ahaha~")
                     });
@@ -187,7 +191,7 @@ namespace MonikAI
                     {
                         this.Say(new[]
                         {
-                            new Expression("<cold shutdown scorn>")
+                            new Expression("Hey! Don't just turn me off without warning! That hurts...", "p")
                         });
                     }
                     else
@@ -201,42 +205,48 @@ namespace MonikAI
                         this.Say(new[]
                         {
                             new Expression(
-                                "Don't forget, if you want me to leave just press CTRL-SHIFT-F12!", "i"),
+                                "Don't forget, if you want me to leave just press " + MonikaiSettings.Default.HotkeyExit + "!", "i"),
                             new Expression("But you're not going to do that, right?", "o")
                         });
                     }
                 }
 
-                var startupExpression = new[]
-                {
-                    new[]
-                    {
-                        new Expression("♫ ... and in your reality ... ♫", "r")
-                    },
-                    new[]
-                    {
-                        new Expression("How are you today?", "d"),
-                        new Expression("I'm doing fine, now that you are here~", "b")
-                    },
-                    new[]
-                    {
-                        new Expression("Is everything ok?", "d"),
-                        new Expression("Do you want to talk about something?", "c"),
-                        new Expression("I'm always here for you~", "e")
-                    },
-                    new[]
-                    {
-                        new Expression("Thank you for letting me be on your screen!", "k")
-                    },
-                    new[]
-                    {
-                        new Expression("You know I love you, right?", "d")
-                    },
-                    new[]
-                    {
-                        new Expression("I'm so happy to be here, together with you! Ahaha~", "b")
-                    }
-                }.Sample();
+                // Parse startup CSV
+                var parser = new CSVParser();
+                var csv = parser.GetData("startup");
+                var parsed = parser.ParseData(csv);
+                var startupExpression = parsed.Sample().ResponseChain.ToArray();
+
+                //var startupExpressionFallback = new[]
+                //{
+                //    new[]
+                //    {
+                //        new Expression("♫ ... and in your reality ... ♫", "r")
+                //    },
+                //    new[]
+                //    {
+                //        new Expression("How are you today?", "d"),
+                //        new Expression("I'm doing fine, now that you are here~", "b")
+                //    },
+                //    new[]
+                //    {
+                //        new Expression("Is everything ok?", "d"),
+                //        new Expression("Do you want to talk about something?", "c"),
+                //        new Expression("I'm always here for you~", "e")
+                //    },
+                //    new[]
+                //    {
+                //        new Expression("Thank you for letting me be on your screen!", "k")
+                //    },
+                //    new[]
+                //    {
+                //        new Expression("You know I love you, right?", "d")
+                //    },
+                //    new[]
+                //    {
+                //        new Expression("I'm so happy to be here, together with you! Ahaha~", "b")
+                //    }
+                //}.Sample();
 
                 var lastStartupExpression = startupExpression.Last();
                 lastStartupExpression.Executed += this.RegisterBehaviours;
@@ -308,6 +318,11 @@ namespace MonikAI
 
         public void SetupScale()
         {
+            if (this.MonikaScreen == null)
+            {
+                return;
+            }
+
             if (!this.initializedScales)
             {
                 this.initializedScales = true;
@@ -324,7 +339,7 @@ namespace MonikAI
                 this.baseTextThickness = this.textPicture.Margin;
             }
 
-            var scaleRatio = this.MonikaScreen.Bounds.Height / 1080.0;
+            var scaleRatio = (this.MonikaScreen.Bounds.Height / 1080.0) * MonikaiSettings.Default.ScaleModifier;
             this.Width = this.scaleBaseWidth * scaleRatio;
             this.Height = this.scaleBaseHeight * scaleRatio;
             this.facePicture.Width = this.scaleBaseFacePictureWidth * scaleRatio;
@@ -451,6 +466,12 @@ namespace MonikAI
 
         public void SetMonikaFace(string face)
         {
+            // Filter invalid faces
+            if (!"abcdefghijklmnopqrs".Contains(face))
+            {
+                return;
+            }
+
             this.CurrentFace = face;
             this.Dispatcher.Invoke(() =>
             {
@@ -558,11 +579,11 @@ namespace MonikAI
 
         private string PlaceholderHandling(string str)
         {
-            foreach (string key in placeholders.Keys)
+            foreach (var key in this.placeholders.Keys)
             {
                 if (str.Contains(key))
                 {
-                    str = str.Replace(key, placeholders[key]());
+                    str = str.Replace(key, this.placeholders[key]());
                 }
             }
 
@@ -639,7 +660,7 @@ namespace MonikAI
             var handle = new WindowInteropHelper(this).Handle;
             var initialStyle = MainWindow.GetWindowLong(handle, -20);
             MainWindow.SetWindowLong(handle, -20, initialStyle | 0x20 | 0x80000);
-
+            
             Task.Run(async () =>
             {
                 try
@@ -682,7 +703,8 @@ namespace MonikAI
                                         }
                                         else if (point.X > rectangle.Right && point.X - rectangle.Right < FADE)
                                         {
-                                            opacity = MainWindow.Lerp(1.0, MIN_OP, (point.X - rectangle.Right) / FADE);
+                                            opacity = MainWindow.Lerp(1.0, MIN_OP,
+                                                (point.X - rectangle.Right) / FADE);
                                         }
                                     }
                                     else if (point.Y < rectangle.Y)
@@ -691,7 +713,8 @@ namespace MonikAI
                                         {
                                             if (rectangle.Y - point.Y < FADE)
                                             {
-                                                opacity = MainWindow.Lerp(1.0, MIN_OP, (rectangle.Y - point.Y) / FADE);
+                                                opacity = MainWindow.Lerp(1.0, MIN_OP,
+                                                    (rectangle.Y - point.Y) / FADE);
                                             }
                                         }
                                         else if (rectangle.X > point.X || rectangle.Right < point.X)
@@ -756,7 +779,10 @@ namespace MonikAI
                                     "Goodbye for now! Come back soon please~", "b");
                             MonikaiSettings.Default.IsColdShutdown = false;
                             MonikaiSettings.Default.Save();
-                            expression.Executed += (o, args) => { this.Dispatcher.Invoke(this.Close); };
+                            expression.Executed += (o, args) =>
+                            {
+                                this.Dispatcher.Invoke(() => { Environment.Exit(0); });
+                            };
                             this.Say(new[] {expression});
                         }
 
@@ -764,7 +790,7 @@ namespace MonikAI
                         {
                             this.Dispatcher.Invoke(() =>
                             {
-                                if (!this.settingsWindow.IsVisible)
+                                if (this.settingsWindow == null || !this.settingsWindow.IsVisible)
                                 {
                                     this.settingsWindow = new SettingsWindow(this);
                                     this.settingsWindow.Show();

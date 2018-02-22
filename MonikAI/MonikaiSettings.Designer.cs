@@ -85,7 +85,7 @@ namespace MonikAI {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool AutoUpdate {
             get {
                 return ((bool)(this["AutoUpdate"]));
@@ -145,30 +145,6 @@ namespace MonikAI {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
-        public int GithubReleaseId {
-            get {
-                return ((int)(this["GithubReleaseId"]));
-            }
-            set {
-                this["GithubReleaseId"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string GithubMasterSHA {
-            get {
-                return ((string)(this["GithubMasterSHA"]));
-            }
-            set {
-                this["GithubMasterSHA"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool AutoStart {
             get {
@@ -188,6 +164,42 @@ namespace MonikAI {
             }
             set {
                 this["IsColdShutdown"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastUpdateConfig {
+            get {
+                return ((string)(this["LastUpdateConfig"]));
+            }
+            set {
+                this["LastUpdateConfig"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public double ScaleModifier {
+            get {
+                return ((double)(this["ScaleModifier"]));
+            }
+            set {
+                this["ScaleModifier"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DpiWorkaround {
+            get {
+                return ((bool)(this["DpiWorkaround"]));
+            }
+            set {
+                this["DpiWorkaround"] = value;
             }
         }
     }

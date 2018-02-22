@@ -11,6 +11,11 @@ namespace MonikAI
 
         public Expression(string text, string face)
         {
+            if (string.IsNullOrWhiteSpace(face))
+            {
+                face = "a";
+            }
+
             this.Text = text;
             this.Face = face;
         }

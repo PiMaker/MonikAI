@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MonikAI
 {
@@ -9,7 +10,7 @@ namespace MonikAI
 
         public static T Sample<T>(this IList<T> list)
         {
-            return list[ExtensionMethods.sampler.Next(0, list.Count)];
+            return !list.Any() ? default(T) : list[ExtensionMethods.sampler.Next(0, list.Count)];
         }
 
         public static void Shuffle<T>(this IList<T> list)
