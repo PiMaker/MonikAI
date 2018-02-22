@@ -109,6 +109,9 @@ namespace MonikAI.Behaviours
             }
         }
 
+        private DateTime lastUrlChangeTime = DateTime.MinValue;
+        private bool lastUrlResponded = false;
+
         public void Update(MainWindow window)
         {
             this.executionCounter++;
@@ -147,6 +150,20 @@ namespace MonikAI.Behaviours
 
             if (changed)
             {
+                this.lastUrlChangeTime = DateTime.Now;
+                this.lastUrlResponded = false;
+            }
+
+            if (!this.lastUrlResponded && (DateTime.Now - this.lastUrlChangeTime).TotalSeconds > 1.5)
+            {
+                this.lastUrlResponded = true;
+
+                // Ignore entries while typing, kind of anyway
+                if (this.lastUrl.Length < 6)
+                {
+                    return;
+                }
+
                 var googleMatch = Regex.Match(this.lastUrl, WebBrowserBehaviour.GOOGLE_REGEX, RegexOptions.Compiled);
                 if (googleMatch.Success)
                 {

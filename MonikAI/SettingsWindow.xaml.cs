@@ -25,6 +25,8 @@ namespace MonikAI
             this.InitializeComponent();
         }
 
+        private bool sliderEnabled = false;
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             if (MonikaiSettings.Default.FirstLaunch)
@@ -38,6 +40,13 @@ namespace MonikAI
                 : MonikaiSettings.Default.UserName;
             this.checkBoxPotatoPC.IsChecked = MonikaiSettings.Default.PotatoPC;
             this.checkBoxAutoUpdate.IsChecked = MonikaiSettings.Default.AutoUpdate;
+
+            this.sliderScale.Value = MonikaiSettings.Default.ScaleModifier;
+            this.sliderEnabled = true;
+
+            this.txtSettings.Text = MonikaiSettings.Default.HotkeySettings;
+            this.txtExit.Text = MonikaiSettings.Default.HotkeyExit;
+            this.txtHide.Text = MonikaiSettings.Default.HotkeyHide;
 
             if (MonikaiSettings.Default.LeftAlign)
             {
@@ -148,7 +157,7 @@ namespace MonikAI
             var timer = DateTime.Now;
             var state = SettingsWindow.GetKeyboardState().ToList();
             var invalid = true;
-            while ((DateTime.Now - timer).TotalSeconds < 1)
+            while ((DateTime.Now - timer).TotalSeconds < 0.8)
             {
                 var newState = SettingsWindow.GetKeyboardState().ToList();
 
@@ -249,6 +258,11 @@ namespace MonikAI
 
         private void sliderScale_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            if (!this.sliderEnabled)
+            {
+                return;
+            }
+
             // Scale modifier
             MonikaiSettings.Default.ScaleModifier = this.sliderScale.Value;
             this.mainWindow.SetupScale();
