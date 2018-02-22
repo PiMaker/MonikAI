@@ -445,6 +445,12 @@ namespace MonikAI
 
         public void SetMonikaFace(string face)
         {
+            // Filter invalid faces
+            if (!"abcdefghijklmnopqrs".Contains(face))
+            {
+                return;
+            }
+
             this.CurrentFace = face;
             this.Dispatcher.Invoke(() =>
             {
