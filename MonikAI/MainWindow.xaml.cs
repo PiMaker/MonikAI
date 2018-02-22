@@ -15,7 +15,6 @@ using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using MonikAI.Behaviours;
-using Octokit;
 using Point = System.Drawing.Point;
 
 namespace MonikAI
@@ -149,11 +148,6 @@ namespace MonikAI
                     MonikaiSettings.Default.FirstLaunch = true;
                     MonikaiSettings.Default.Save();
                 }
-
-                IGitHubClient github = new GitHubClient(new ProductHeaderValue("MonikAI"));
-                var contents =
-                    await github.Repository.Content.GetAllContentsByRef("PiMaker", "MonikAI", "/CSV",
-                        "master");
 
                 await this.updater.PerformUpdate(this);
 

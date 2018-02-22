@@ -1,0 +1,8 @@
+﻿{
+  "ProgramVersion": 1,
+  "ResponsesVersion": 1,
+  "ProgramURL": "https://pimaker.github.io/MonikAI/MonikAI.exe",
+  "ResponseURLs": [
+    "https://pimaker.github.io/MonikAI/test.csv"
+  ]
+}

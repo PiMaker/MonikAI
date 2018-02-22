@@ -27,6 +27,11 @@ namespace MonikAI
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            if (MonikaiSettings.Default.FirstLaunch)
+            {
+                MonikaiSettings.Default.AutoUpdate = true;
+            }
+
             // Settings window initialization code
             this.textBoxName.Text = string.IsNullOrWhiteSpace(MonikaiSettings.Default.UserName)
                 ? Environment.UserName
@@ -127,7 +132,7 @@ namespace MonikAI
 
         private async Task HotkeySetTask(TextBlock output, Action callback)
         {
-            output.Dispatcher.Invoke(() => output.Text = "Press and hold any key combination...");
+            output.Dispatcher.Invoke(() => output.Text = "Press and HOLD any key combination...");
 
             await this.WaitForKeyChange();
 
@@ -207,6 +212,11 @@ namespace MonikAI
                 var key = (Key) Enum.Parse(typeof(Key), x);
                 return new Tuple<string, bool>(x, key != Key.None && Keyboard.IsKeyDown(key));
             });
+        }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            // Set DPI awareness or something
         }
     }
 }
