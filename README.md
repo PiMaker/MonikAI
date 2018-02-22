@@ -36,7 +36,7 @@ Always appreciated, although I can't give you a tutorial on this, you'll have to
 
 # License
 
-The code in this repository is licensed by me, PiMaker, under the terms of the MIT License. You can find a copy of the full license text in the `LICENSE` file.
+The code in this repository is available under the terms of the MIT License. You can find a copy of the full license text in the `LICENSE` file.
 
 The art assets have not been created by me, but by Team Salvato. Usage is according to Team Salvato's [IP Guidelines](http://teamsalvato.com/ip-guidelines/).
 
