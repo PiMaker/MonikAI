@@ -37,6 +37,7 @@ namespace MonikAI
                 return;
             }
             
+            // You could also use a WebClient here but I'm too lazy to change it back after doing some debugging. Eh, it works.
             var client = new HttpClient();
 
             // Perform config download
@@ -130,6 +131,10 @@ namespace MonikAI
                     Process.Start(Path.Combine(Updater.StatePath, "MonikAI.exe"),
                         "/update " + Assembly.GetExecutingAssembly().Location);
                     closed = true;
+
+                    MonikaiSettings.Default.IsColdShutdown = false;
+                    MonikaiSettings.Default.Save();
+
                     Environment.Exit(0);
                 };
                 window.Say(new[]

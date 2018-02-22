@@ -1,63 +1,43 @@
-﻿using MonikAI.Parsers;
-using MonikAI.Parsers.Models;
+// File: ApplicationBehaviour.cs
+// Created: 20.02.2018
+// 
+// See <summary> tags for more information.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Management;
 using System.Windows;
-using ResponseTuple = System.Tuple<System.Collections.Generic.List<MonikAI.Expression[]>, System.Func<bool>, System.TimeSpan, System.DateTime>;
+using MonikAI.Parsers;
+using MonikAI.Parsers.Models;
+using ResponseTuple =
+    System.Tuple<System.Collections.Generic.List<MonikAI.Expression[]>, System.Func<bool>, System.TimeSpan,
+        System.DateTime>;
 
 namespace MonikAI.Behaviours
 {
     public class ApplicationBehaviour : IBehaviour
     {
-        /*
-         * 
-         * 
-         * WANT TO ADD RESPONSES? LOOK NO FURTHER!
-         * The table below specified responses to be said by Monika when certain applications are launched.
-         * 
-         * The format is as follows:
-         * 
-                {
-                    new[] {"EXECUTABLE_TO_WAIT_FOR.exe"},
-                    new ResponseTuple(new List<Expression[]>
-                    {
-                        new[]
-                        {
-                            new Expression("TEXT TO BE SAID", "FACE TO BE SHOWN"),
-                            new Expression("SECOND LINE OF TEXT IN ONE RESPONSE", "FACE TO BE SHOWN"),
-                        },
-                        new[] { new Expression("JUST A SINGLE LINE OF TEXT TO BE SHOWN", "FACE TO BE SHOWN") }
-                    }, () => true, TimeSpan.FromMinutes(NUMBER OF MINUTES TO WAIT BEFORE SHOWING THIS AGAIN AT MINIMUM - PREVENT RESPONSE TO BE SPAMMED), DateTime.MinValue)
-                }
-         * 
-         * NOTE: For faces you can use look in the "monika" folder full of images of her. Only specify the letter, never the -n at the end, that is added automatically! Also, 1.png and derivatives are exceptions that cannot be used!
-         * 
-         * If you really know what you are doing, you can change "() => true" to a function/lambda that has to return true to allow this reponse to be said.
-         * This can be used for arbitrary conditions.
-         * 
-         * 
-         */
-        private readonly Dictionary<string[], ResponseTuple> responseTable = new Dictionary<string[], ResponseTuple>(new TriggerComparer());
+        private readonly CSVParser parser = new CSVParser();
+
+        private readonly Dictionary<string[], ResponseTuple> responseTable =
+            new Dictionary<string[], ResponseTuple>(new TriggerComparer());
 
         private readonly object toSayLock = new object();
 
         private Expression[] toSay;
         private ManagementEventWatcher w;
 
-        private CSVParser parser = new CSVParser();
-
         public void Init(MainWindow window)
         {
-            //// Process start
+            // Process start
             WqlEventQuery q;
             try
             {
                 // Parse the CSV file
-                string csvFile = parser.GetData("dialogue");
-                PopulateResponseTable(parser.ParseData(csvFile));
+                var csvFile = this.parser.GetData("application");
+                this.PopulateResponseTable(this.parser.ParseData(csvFile));
 
                 q = new WqlEventQuery {EventClassName = "Win32_ProcessStartTrace"};
                 this.w = new ManagementEventWatcher(q);
@@ -110,7 +90,8 @@ namespace MonikAI.Behaviours
                             }
 
                             // Update last executed time
-                            this.responseTable[pair.Key] = new ResponseTuple(pair.Value.Item1, pair.Value.Item2, pair.Value.Item3, DateTime.Now);
+                            this.responseTable[pair.Key] = new ResponseTuple(pair.Value.Item1, pair.Value.Item2,
+                                pair.Value.Item3, DateTime.Now);
                         }
 
                         break;
@@ -120,31 +101,41 @@ namespace MonikAI.Behaviours
         }
 
         /// <summary>
-        /// Fills the response table with the currently selected character's triggers and responses from the csv.
+        ///     Fills the response table with the currently selected character's triggers and responses from the csv.
         /// </summary>
         /// <param name="characterResponses">A list containing all of the triggers and responses of the current character.</param>
         private void PopulateResponseTable(List<DokiResponse> characterResponses)
         {
-            for (int res = 0; res < characterResponses.Count; res++)
+            foreach (var response in characterResponses)
             {
                 // Convert triggers to array to use as a key for the dictionary
-                string[] triggers = characterResponses[res].ResponseTriggers.ToArray();
+                var triggers = response.ResponseTriggers.ToArray();
 
                 // Add every response to the current trigger into a new array to use as a value in the dictionary
-                Expression[] responseChain = new Expression[characterResponses[res].ResponseChain.Count];
-                for (int chain = 0; chain < characterResponses[res].ResponseChain.Count; chain++)
+                var responseChain = new Expression[response.ResponseChain.Count];
+                for (var chain = 0; chain < response.ResponseChain.Count; chain++)
                 {
-                    responseChain[chain] = characterResponses[res].ResponseChain[chain];
+                    responseChain[chain] = response.ResponseChain[chain];
                 }
 
+                Func<bool> triggerFunc = () => true;
+
                 // Determine if the trigger is a browser
-                bool isBrowserProcess = false;
-                for (int i = 0; i < triggers.Length; i++)
+                for (var i = 0; i < triggers.Length; i++)
                 {
                     // If trigger is a browser, only respond if the user recently launched the browser
-                    if (triggers[i].Contains("firefox") || triggers[i].Contains("chrome") || triggers[i].Contains("opera"))
+                    if (triggers[i].Contains("firefox") || triggers[i].Contains("chrome") ||
+                        triggers[i].Contains("opera"))
                     {
-                        isBrowserProcess = true;
+                        triggerFunc = () =>
+                        {
+                            return Process.GetProcesses()
+                                          .Where(p => p.ProcessName.ToLower().Contains("firefox") ||
+                                                      p.ProcessName.ToLower().Contains("chrome") ||
+                                                      p.ProcessName.ToLower().Contains("opera"))
+                                          .ToList()
+                                          .All(p => (DateTime.Now - p.StartTime).TotalSeconds < 4);
+                        };
                     }
                 }
 
@@ -160,31 +151,19 @@ namespace MonikAI.Behaviours
 
                 // If key already exists in the table, append the new response chain
                 List<Expression[]> triggerResponses;
-                if (responseTable.ContainsKey(triggers))
+                if (this.responseTable.ContainsKey(triggers))
                 {
-                    triggerResponses = responseTable[triggers].Item1;
+                    triggerResponses = this.responseTable[triggers].Item1;
                     triggerResponses.Add(responseChain);
                 }
                 else
                 {
-                    triggerResponses = new List<Expression[]> { responseChain };
+                    triggerResponses = new List<Expression[]> {responseChain};
                 }
 
                 // If trigger is a browser, only respond if the user recently launched the browser
-                if (isBrowserProcess)
-                {
-                    responseTable[triggers] = new ResponseTuple(triggerResponses, () =>
-                    {
-                        return Process.GetProcesses()
-                        .Where(p => p.ProcessName.ToLower().Contains("firefox") || p.ProcessName.ToLower().Contains("chrome") || p.ProcessName.ToLower().Contains("opera"))
-                        .ToList()
-                        .All(p => (DateTime.Now - p.StartTime).TotalSeconds < 4);
-                    }, TimeSpan.FromMinutes(5), DateTime.MinValue);
-                }
-                else
-                {
-                    responseTable[triggers] = new ResponseTuple(triggerResponses, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue);
-                }
+                this.responseTable[triggers] = new ResponseTuple(triggerResponses, triggerFunc,
+                    TimeSpan.FromMinutes(5), DateTime.MinValue);
             }
         }
     }

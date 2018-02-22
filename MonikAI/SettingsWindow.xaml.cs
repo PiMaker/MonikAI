@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -61,6 +61,10 @@ namespace MonikAI
                 }
                 index++;
             }
+
+            // Focus window
+            this.Focus();
+            this.Activate();
         }
 
         private void comboBoxScreen_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -217,6 +221,14 @@ namespace MonikAI
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
             // Set DPI awareness or something
+            MessageBox.Show("Well, that sucks. (Sorry, this feature will be implemented shortly)");
+        }
+
+        private void sliderScale_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            // Scale modifier
+            MonikaiSettings.Default.ScaleModifier = this.sliderScale.Value;
+            this.mainWindow.SetupScale();
         }
     }
 }

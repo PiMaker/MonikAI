@@ -1,20 +1,27 @@
-﻿using MonikAI.Parsers.Models;
+// File: CSVParser.cs
+// Created: 22.02.2018
+// 
+// See <summary> tags for more information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using MonikAI.Parsers.Models;
 
 namespace MonikAI.Parsers
 {
-    class CSVParser : IParser
+    internal class CSVParser : IParser
     {
         /// <summary>
-        /// Retrieves the csv data containing Monika's responses and triggers.
+        ///     Retrieves the csv data containing Monika's responses and triggers.
         /// </summary>
         /// <param name="csvFileName">Name of the csv file to be parsed.</param>
         /// <returns>A string containing the path to the csv data or null if there is no csv file to load.</returns>
         public string GetData(string csvFileName)
         {
-            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "MonikAI\\" + csvFileName + ".csv");
+            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "MonikAI\\" + csvFileName + ".csv");
 
             if (!File.Exists(path))
             {
@@ -25,7 +32,7 @@ namespace MonikAI.Parsers
         }
 
         /// <summary>
-        /// Traverses a csv file delimited by semi-colons and populates a list of responses and their triggers.
+        ///     Traverses a csv file delimited by semi-colons and populates a list of responses and their triggers.
         /// </summary>
         /// <param name="csvPath">The full path to the csv file.</param>
         /// <returns>A list of DokiResponses which contain a character's expressions and the triggers to those expressions</returns>
@@ -33,43 +40,59 @@ namespace MonikAI.Parsers
         {
             if (string.IsNullOrWhiteSpace(csvPath))
             {
-                return null;
+                return new List<DokiResponse>();
             }
 
             using (var reader = new StreamReader(csvPath))
             {
-                reader.ReadLine(); // Skip first line with instructions
-
-                List<DokiResponse> characterResponses = new List<DokiResponse>();
-
-                List<string> numColumns = new List<string>(); // A list containing all of the columns in the process sheet
-
-                // Parse all csv column headings
-                var headings = reader.ReadLine().Split(';');
-
-                foreach (string heading in headings)
-                {
-                    if (!string.IsNullOrWhiteSpace(heading))
-                    {
-                        numColumns.Add(heading);
-                    }
-                }
-
-                List<string> processResponses = new List<string>();
+                var characterResponses = new List<DokiResponse>();
 
                 // Parse process responses
                 while (!reader.EndOfStream)
                 {
-                    DokiResponse res = new DokiResponse();
+                    var res = new DokiResponse();
 
                     var row = reader.ReadLine();
-                    var columns = row.Split(';');
 
-                    // Skip columns[0] because it only contains the editing notes
+                    if (row.StartsWith("#"))
+                    {
+                        continue;
+                    }
+
+                    var columns = new List<StringBuilder>();
+
+                    // Read columns seperated by ",", but also consider verbose entries in quotation marks
+                    var currentIndex = 0;
+                    var quotationCount = 0;
+                    columns.Add(new StringBuilder());
+                    foreach (var c in row)
+                    {
+                        if (quotationCount % 2 == 0 && c == ',')
+                        {
+                            quotationCount = 0;
+                            currentIndex++;
+                            columns.Add(new StringBuilder());
+                            continue;
+                        }
+
+                        if (c == '"')
+                        {
+                            quotationCount++;
+
+                            if (quotationCount % 2 == 1 && quotationCount > 1)
+                            {
+                                columns[currentIndex].Append(c);
+                            }
+
+                            continue;
+                        }
+
+                        columns[currentIndex].Append(c);
+                    }
 
                     // Separate response triggers by comma in case there are multiple triggers to the current response
-                    var responseTriggers = columns[1].Split(',');
-                    foreach (string trigger in responseTriggers)
+                    var responseTriggers = columns[1].ToString().Split(',');
+                    foreach (var trigger in responseTriggers)
                     {
                         if (!string.IsNullOrWhiteSpace(trigger))
                         {
@@ -78,11 +101,12 @@ namespace MonikAI.Parsers
                     }
 
                     // Get text/face pairs
-                    for (int textCell = 2; textCell < columns.Length - 1; textCell += 2)
+                    for (var textCell = 2; textCell < columns.Count - 1; textCell += 2)
                     {
-                        if (!string.IsNullOrWhiteSpace(columns[textCell]))
+                        if (!string.IsNullOrWhiteSpace(columns[textCell].ToString()))
                         {
-                            res.ResponseChain.Add(new Expression(columns[textCell], columns[textCell + 1]));
+                            // "a" face is default
+                            res.ResponseChain.Add(new Expression(columns[textCell].ToString(), string.IsNullOrWhiteSpace(columns[textCell + 1].ToString()) ? "a" : columns[textCell + 1].ToString()));
                         }
                     }
 

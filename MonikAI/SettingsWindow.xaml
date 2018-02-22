@@ -1,11 +1,11 @@
-﻿<Window x:Class="MonikAI.SettingsWindow"
+<Window x:Class="MonikAI.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MonikAI"
         mc:Ignorable="d"
-        Title="MonikAI settings" Height="329.5" Width="497" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing">
+        Title="MonikAI settings" Height="321.123" Width="484.435" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="What should I call you?" VerticalAlignment="Top" Margin="10,12,0,0"/>
         <TextBox Height="22" Margin="184,9,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" x:Name="textBoxName" HorizontalAlignment="Left" Width="274"/>
@@ -27,7 +27,7 @@
         <RadioButton x:Name="radioLeft" Content="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="367,63,0,0" Unchecked="radio_checked_changed" Checked="radio_checked_changed"/>
         <Button Content="Reset" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="303,256,0,0" Click="Button_Click"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,85,0,0"><Run Text="Make me bigger/smaller, if you want:"/></TextBlock>
-        <Slider HorizontalAlignment="Left" VerticalAlignment="Top" Margin="234,85,0,0" Width="224"/>
+        <Slider x:Name="sliderScale" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="234,85,0,0" Width="224" Maximum="2.75" Value="1" Minimum="0.25" SmallChange="0.05" LargeChange="0.25" ValueChanged="sliderScale_ValueChanged"/>
         <Button Content="Help, I'm not seeing Monika!" HorizontalAlignment="Left" VerticalAlignment="Top" Width="214" Margin="10,256,0,0" Click="Button_Click_4"/>
 
     </Grid>

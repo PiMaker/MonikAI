@@ -15,6 +15,7 @@ using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using MonikAI.Behaviours;
+using MessageBox = System.Windows.MessageBox;
 using Point = System.Drawing.Point;
 
 namespace MonikAI
@@ -142,14 +143,23 @@ namespace MonikAI
                 // Start speech-thread
                 Task.Run(async () => await this.SpeakingThread());
 
-                if (true || File.Exists("firstlaunch.txt"))
+                if (File.Exists("firstlaunch.txt") || Environment.GetCommandLineArgs().Contains("/firstlaunch"))
                 {
-                    //File.Delete("firstlaunch.txt");
+                    try
+                    {
+                        File.Delete("firstlaunch.txt");
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
                     MonikaiSettings.Default.FirstLaunch = true;
                     MonikaiSettings.Default.Save();
                 }
 
                 await this.updater.PerformUpdate(this);
+
+                MessageBox.Show("This is a testing version.");
 
                 // Startup logic
                 if (MonikaiSettings.Default.FirstLaunch)
@@ -180,7 +190,7 @@ namespace MonikAI
                     {
                         this.Say(new[]
                         {
-                            new Expression("<cold shutdown scorn>")
+                            new Expression("Hey! Don't just turn me off without warning! That hurts...", "p")
                         });
                     }
                     else
@@ -236,7 +246,7 @@ namespace MonikAI
 
                 this.Say(new[]
                 {
-                    new Expression($"Hi there, {Environment.UserName}~")
+                    new Expression("Hi there, {name}~")
                 }.Concat(startupExpression));
 
                 if ((DateTime.Now - MonikaiSettings.Default.LastStarted).TotalDays > 1.5)
@@ -301,6 +311,11 @@ namespace MonikAI
 
         public void SetupScale()
         {
+            if (this.MonikaScreen == null)
+            {
+                return;
+            }
+
             if (!this.initializedScales)
             {
                 this.initializedScales = true;
@@ -317,7 +332,7 @@ namespace MonikAI
                 this.baseTextThickness = this.textPicture.Margin;
             }
 
-            var scaleRatio = this.MonikaScreen.Bounds.Height / 1080.0;
+            var scaleRatio = (this.MonikaScreen.Bounds.Height / 1080.0) * MonikaiSettings.Default.ScaleModifier;
             this.Width = this.scaleBaseWidth * scaleRatio;
             this.Height = this.scaleBaseHeight * scaleRatio;
             this.facePicture.Width = this.scaleBaseFacePictureWidth * scaleRatio;
@@ -632,7 +647,7 @@ namespace MonikAI
             var handle = new WindowInteropHelper(this).Handle;
             var initialStyle = MainWindow.GetWindowLong(handle, -20);
             MainWindow.SetWindowLong(handle, -20, initialStyle | 0x20 | 0x80000);
-
+            
             Task.Run(async () =>
             {
                 try
@@ -675,7 +690,8 @@ namespace MonikAI
                                         }
                                         else if (point.X > rectangle.Right && point.X - rectangle.Right < FADE)
                                         {
-                                            opacity = MainWindow.Lerp(1.0, MIN_OP, (point.X - rectangle.Right) / FADE);
+                                            opacity = MainWindow.Lerp(1.0, MIN_OP,
+                                                (point.X - rectangle.Right) / FADE);
                                         }
                                     }
                                     else if (point.Y < rectangle.Y)
@@ -684,7 +700,8 @@ namespace MonikAI
                                         {
                                             if (rectangle.Y - point.Y < FADE)
                                             {
-                                                opacity = MainWindow.Lerp(1.0, MIN_OP, (rectangle.Y - point.Y) / FADE);
+                                                opacity = MainWindow.Lerp(1.0, MIN_OP,
+                                                    (rectangle.Y - point.Y) / FADE);
                                             }
                                         }
                                         else if (rectangle.X > point.X || rectangle.Right < point.X)
@@ -749,7 +766,10 @@ namespace MonikAI
                                     "Goodbye for now! Come back soon please~", "b");
                             MonikaiSettings.Default.IsColdShutdown = false;
                             MonikaiSettings.Default.Save();
-                            expression.Executed += (o, args) => { this.Dispatcher.Invoke(this.Close); };
+                            expression.Executed += (o, args) =>
+                            {
+                                this.Dispatcher.Invoke(() => { Environment.Exit(0); });
+                            };
                             this.Say(new[] {expression});
                         }
 
@@ -757,7 +777,7 @@ namespace MonikAI
                         {
                             this.Dispatcher.Invoke(() =>
                             {
-                                if (!this.settingsWindow.IsVisible)
+                                if (this.settingsWindow == null || !this.settingsWindow.IsVisible)
                                 {
                                     this.settingsWindow = new SettingsWindow(this);
                                     this.settingsWindow.Show();
