@@ -18,7 +18,7 @@ namespace MonikAI.Behaviours
     public class WebBrowserBehaviour : IBehaviour
     {
         // Minimum time that has to elapse before a web page response is shown again
-        private readonly TimeSpan minimumElapsedTime = new TimeSpan(0, 15, 0);
+        private readonly TimeSpan minimumElapsedTime = new TimeSpan(0, 12, 0);
         private readonly Random random = new Random();
 
         // Sorry, couldn't resist. Regex is just too good.
@@ -50,6 +50,23 @@ namespace MonikAI.Behaviours
             foreach (var response in characterResponses)
             {
                 var trigger = response.ResponseTriggers.First();
+                trigger = trigger.ToLower().Trim().TrimEnd('/');
+
+                if (trigger.StartsWith("http://"))
+                {
+                    trigger = trigger.Substring(7);
+                }
+
+                if (trigger.StartsWith("https://"))
+                {
+                    trigger = trigger.Substring(8);
+                }
+
+                if (trigger.StartsWith("www."))
+                {
+                    trigger = trigger.Substring(4);
+                }
+
                 if (this.responseTable.ContainsKey(trigger))
                 {
                     var entry = this.responseTable[trigger];
@@ -67,7 +84,7 @@ namespace MonikAI.Behaviours
             foreach (var response in characterResponses)
             {
                 // Convert triggers to array to use as a key for the dictionary
-                var triggers = response.ResponseTriggers.ToArray();
+                var triggers = response.ResponseTriggers.Select(x => x.ToLower().Trim()).ToArray();
 
                 // Add every response to the current trigger into a new array to use as a value in the dictionary
                 var responseChain = new Expression[response.ResponseChain.Count];
@@ -112,7 +129,7 @@ namespace MonikAI.Behaviours
                     changed = true;
                 }
 
-                this.lastUrl = firefox;
+                this.lastUrl = firefox.ToLower().Trim();
             }
             else
             {
@@ -124,7 +141,7 @@ namespace MonikAI.Behaviours
                         changed = true;
                     }
 
-                    this.lastUrl = chrome;
+                    this.lastUrl = chrome.ToLower().Trim();
                 }
             }
 
@@ -136,7 +153,7 @@ namespace MonikAI.Behaviours
                     var search = HttpUtility.UrlDecode(googleMatch.Groups[1].ToString()).Trim();
                     foreach (var resp in this.responseTableGoogle)
                     {
-                        if (resp.Key.Contains(search))
+                        if (resp.Key.Contains(search.ToLower().Trim()))
                         {
                             if ((DateTime.Now - resp.Value.Item2) > this.minimumElapsedTime)
                             {
@@ -151,7 +168,7 @@ namespace MonikAI.Behaviours
                 }
                 
                 //Holds all responses to be weighted
-                List<Match> matches = new List<Match>();
+                var matches = new List<Match>();
                 // Url changed, respond accordingly
                 foreach (var pair in this.responseTable)
                 {
@@ -175,8 +192,8 @@ namespace MonikAI.Behaviours
                 }
 
                 //Choose, by weight, for more than 1 match
-                int maxWeight = matches.Sum(x => x.weight);
-                int rand = this.random.Next(0, maxWeight);
+                var maxWeight = matches.Sum(x => x.weight);
+                var rand = this.random.Next(0, maxWeight);
 
                 //Shuffles the matches before we start 
                 matches.Shuffle();

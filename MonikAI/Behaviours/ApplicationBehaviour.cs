@@ -80,7 +80,7 @@ namespace MonikAI.Behaviours
             {
                 foreach (var pair in this.responseTable)
                 {
-                    if (pair.Key.Contains(processName))
+                    if (pair.Key.Contains(processName.ToLower().Trim()))
                     {
                         if (DateTime.Now - pair.Value.Item4 > pair.Value.Item3 && pair.Value.Item2())
                         {
@@ -109,7 +109,7 @@ namespace MonikAI.Behaviours
             foreach (var response in characterResponses)
             {
                 // Convert triggers to array to use as a key for the dictionary
-                var triggers = response.ResponseTriggers.ToArray();
+                var triggers = response.ResponseTriggers.Select(x => x.ToLower().Trim()).ToArray();
 
                 // Add every response to the current trigger into a new array to use as a value in the dictionary
                 var responseChain = new Expression[response.ResponseChain.Count];
@@ -121,6 +121,7 @@ namespace MonikAI.Behaviours
                 Func<bool> triggerFunc = () => true;
 
                 // Determine if the trigger is a browser
+                // Opera isn't really supported, but alright
                 for (var i = 0; i < triggers.Length; i++)
                 {
                     // If trigger is a browser, only respond if the user recently launched the browser
