@@ -33,6 +33,7 @@ namespace MonikAI
         private readonly Queue<IEnumerable<Expression>> saying = new Queue<IEnumerable<Expression>>();
         private bool applicationRunning = true;
         private Thickness basePictureThickness, baseTextThickness;
+        private IBehaviour idleBehaviour;
 
         private readonly Dictionary<string, Func<string>> placeholders = new Dictionary<string, Func<string>>()
         {
