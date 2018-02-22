@@ -1,109 +1,33 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Web;
 using System.Windows.Automation;
+using MonikAI.Parsers;
+using MonikAI.Parsers.Models;
 using ResponseTuple = System.Tuple<System.Collections.Generic.List<MonikAI.Expression[]>, System.DateTime>;
 
 namespace MonikAI.Behaviours
 {
+    /// <summary>
+    /// Manages responses to web sites being opened.
+    /// Includes Google Search Behaviour!
+    /// </summary>
     public class WebBrowserBehaviour : IBehaviour
     {
         // Minimum time that has to elapse before a web page response is shown again
-        private readonly TimeSpan minimumElapsedTime = new TimeSpan(0, 10, 0);
-        private readonly Random _random = new Random();
+        private readonly TimeSpan minimumElapsedTime = new TimeSpan(0, 12, 0);
+        private readonly Random random = new Random();
 
-        /*
-         * 
-         * 
-         * WANT TO ADD RESPONSES? LOOK RIGHT HERE!
-         * 
-         * Add entries to the table below to allow monika to respond to web pages being loaded (e.g. you visiting a website).
-         * 
-         * FORMAT:
-         * 
-           {
-                "WEB_PAGE (YOU CAN INCLUDE ANY DOMAIN NOW. BASE OR OTHERWISE. IF YOU INCLUDE THE BASE AND SPECIFIC DOMAINS IT'LL RANDOMLY CHOOSE (VIA WEIGHTING) - SUBDOMAINS ARE SUPPORTED (np.reddit.com vs reddit.com)", new ResponseTuple(new List<Expression[]>
-                {
-                    new[]
-                    {
-                        new Expression("TEXT TO BE SAID", "FACE TO BE SHOWN"),
-                        new Expression("SECOND LINE OF TEXT IN ONE RESPONSE", "FACE TO BE SHOWN"),
-                    },
-                    new[] { new Expression("JUST A SINGLE LINE OF TEXT TO BE SHOWN", "FACE TO BE SHOWN") }
-                }, DateTime.MinValue)
-            }
-         * 
-         * NOTE: For faces you can use look in the "monika" folder full of images of her. Only specify the letter, never the -n at the end, that is added automatically! Also, 1.png and derivatives are exceptions that cannot be used!
-         * 
-         * Responses will only be shown once the URL changes! So far, only Firefox and Chrome are supported, feel free to add more supported browsers!
-         * 
-         * 
-         */
-        private readonly Dictionary<string, ResponseTuple> responseTable = new Dictionary<string, ResponseTuple>
-        {
-            {
-                "reddit.com", new ResponseTuple(new List<Expression[]>
-                {
-                    new[]
-                    {
-                        new Expression("Hey, do you know /r/DDLC?", "b"),
-                        new Expression("They have some nice fanart of me...", "n")
-                    },
-                    new[]
-                    {
-                        new Expression("Reddit is one of the few things keeping me sane in my reality...", "r")
-                    }
-                }, DateTime.MinValue)
-            },
-            {
-                "twitter.com", new ResponseTuple(new List<Expression[]>
-                {
-                    new[]
-                    {
-                        new Expression("Did you know I have a real Twitter account?", "b"),
-                        new Expression("It's called @lilmonix3, check it out if you want!", "k")
-                    }
-                }, DateTime.MinValue)
-            },
-            {
-                "facebook.com", new ResponseTuple(new List<Expression[]>
-                {
-                    new[]
-                    {
-                        new Expression("Facebook, huh?", "b")
-                    }
-                }, DateTime.MinValue)
-            },
-            {
-                "youtube.com", new ResponseTuple(new List<Expression[]>
-                {
-                    new[]
-                    {
-                        new Expression("What are we watching, {name}?")
-                    }
-                }, DateTime.MinValue)
-            },
-            {
-                "youtube.com/watch?v=fKNP09P48ew", new ResponseTuple(new List<Expression[]>
-                {
-                    new[]
-                    {
-                        new Expression("10 hours? I'm flattered..", "j")
-                    }
-                }, DateTime.MinValue)
-            },
-            {
-                "youtube.com/user/Vsauce", new ResponseTuple(new List<Expression[]>
-                {
-                    new[]
-                    {
-                        new Expression("Science videos? Expanding knowledge is always the way to go...")
-                    }
-                }, DateTime.MinValue)
-            }
-        };
+        // Sorry, couldn't resist. Regex is just too good.
+        private const string GOOGLE_REGEX = ".*\\.?google\\..{2,3}.*q\\=(.*?)($|&)";
+
+        private readonly CSVParser parser = new CSVParser();
+
+        private readonly Dictionary<string, ResponseTuple> responseTable = new Dictionary<string, ResponseTuple>();
+        private readonly Dictionary<string[], ResponseTuple> responseTableGoogle = new Dictionary<string[], ResponseTuple>(new TriggerComparer());
 
         private string lastUrl = string.Empty;
 
@@ -112,8 +36,78 @@ namespace MonikAI.Behaviours
 
         public void Init(MainWindow window)
         {
+            // Parse the CSV file
+            var csvFile = this.parser.GetData("website");
+            this.PopulateResponseTable(this.parser.ParseData(csvFile));
+
+            // Add google search CSV
+            var googleCsvFile = this.parser.GetData("google");
+            this.PopulateGoogleResponseTable(this.parser.ParseData(googleCsvFile));
         }
 
+        private void PopulateResponseTable(IEnumerable<DokiResponse> characterResponses)
+        {
+            foreach (var response in characterResponses)
+            {
+                var trigger = response.ResponseTriggers.First();
+                trigger = trigger.ToLower().Trim().TrimEnd('/');
+
+                if (trigger.StartsWith("http://"))
+                {
+                    trigger = trigger.Substring(7);
+                }
+
+                if (trigger.StartsWith("https://"))
+                {
+                    trigger = trigger.Substring(8);
+                }
+
+                if (trigger.StartsWith("www."))
+                {
+                    trigger = trigger.Substring(4);
+                }
+
+                if (this.responseTable.ContainsKey(trigger))
+                {
+                    var entry = this.responseTable[trigger];
+                    this.responseTable[trigger] = new ResponseTuple(entry.Item1.Concat(new[]{response.ResponseChain.ToArray()}).ToList(), entry.Item2);
+                }
+                else
+                {
+                    this.responseTable.Add(trigger, new ResponseTuple(new List<Expression[]>{response.ResponseChain.ToArray()}, DateTime.MinValue));
+                }
+            }
+        }
+
+        private void PopulateGoogleResponseTable(IEnumerable<DokiResponse> characterResponses)
+        {
+            foreach (var response in characterResponses)
+            {
+                // Convert triggers to array to use as a key for the dictionary
+                var triggers = response.ResponseTriggers.Select(x => x.ToLower().Trim()).ToArray();
+
+                // Add every response to the current trigger into a new array to use as a value in the dictionary
+                var responseChain = new Expression[response.ResponseChain.Count];
+                for (var chain = 0; chain < response.ResponseChain.Count; chain++)
+                {
+                    responseChain[chain] = response.ResponseChain[chain];
+                }
+
+                List<Expression[]> triggerResponses;
+                if (this.responseTableGoogle.ContainsKey(triggers))
+                {
+                    triggerResponses = this.responseTableGoogle[triggers].Item1;
+                    triggerResponses.Add(responseChain);
+                }
+                else
+                {
+                    triggerResponses = new List<Expression[]> { responseChain };
+                }
+
+                // If trigger is a browser, only respond if the user recently launched the browser
+                this.responseTableGoogle[triggers] = new ResponseTuple(triggerResponses, DateTime.MinValue);
+            }
+        }
 
         public void Update(MainWindow window)
         {
@@ -135,7 +129,7 @@ namespace MonikAI.Behaviours
                     changed = true;
                 }
 
-                this.lastUrl = firefox;
+                this.lastUrl = firefox.ToLower().Trim();
             }
             else
             {
@@ -147,22 +141,42 @@ namespace MonikAI.Behaviours
                         changed = true;
                     }
 
-                    this.lastUrl = chrome;
+                    this.lastUrl = chrome.ToLower().Trim();
                 }
             }
 
             if (changed)
             {
+                var googleMatch = Regex.Match(this.lastUrl, WebBrowserBehaviour.GOOGLE_REGEX, RegexOptions.Compiled);
+                if (googleMatch.Success)
+                {
+                    var search = HttpUtility.UrlDecode(googleMatch.Groups[1].ToString()).Trim();
+                    foreach (var resp in this.responseTableGoogle)
+                    {
+                        if (resp.Key.Contains(search.ToLower().Trim()))
+                        {
+                            if ((DateTime.Now - resp.Value.Item2) > this.minimumElapsedTime)
+                            {
+                                window.Say(resp.Value.Item1.Sample());
+                                this.responseTableGoogle[resp.Key] = new ResponseTuple(resp.Value.Item1, DateTime.Now);
+                            }
+
+                            break;
+                        }
+                    }
+                    return;
+                }
+                
                 //Holds all responses to be weighted
-                List<Match> matches = new List<Match>();
+                var matches = new List<Match>();
                 // Url changed, respond accordingly
                 foreach (var pair in this.responseTable)
                 {
                     if (this.lastUrl.Contains(pair.Key) &&
                         DateTime.Now - pair.Value.Item2 > this.minimumElapsedTime)
                     {
-                        // +1 stops it from having 0 sa a weight, *10 to make the fallback more likely to happen
-                        matches.Add(new Match(pair.Value, (pair.Key.Count(x => x == '/') + 1) * 10, pair.Key));
+                        // +1 stops it from having 0 sa a weight, *5 to make the fallback more likely to happen
+                        matches.Add(new Match(pair.Value, (pair.Key.Count(x => x == '/') + 1) * 5, pair.Key));
                     }
                 }
 
@@ -178,8 +192,8 @@ namespace MonikAI.Behaviours
                 }
 
                 //Choose, by weight, for more than 1 match
-                int maxWeight = matches.Sum(x => x.weight);
-                int rand = _random.Next(0, maxWeight);
+                var maxWeight = matches.Sum(x => x.weight);
+                var rand = this.random.Next(0, maxWeight);
 
                 //Shuffles the matches before we start 
                 matches.Shuffle();

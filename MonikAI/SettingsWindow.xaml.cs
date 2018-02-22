@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -48,6 +48,11 @@ namespace MonikAI
                 this.radioRight.IsChecked = true;
             }
 
+            if (MonikaiSettings.Default.DpiWorkaround)
+            {
+                this.buttonWorkaround.Content = "Disable DPI Workaround";
+            }
+
             var index = 0;
             this.comboBoxScreen.Items.Clear();
             foreach (var screen in Screen.AllScreens)
@@ -61,6 +66,10 @@ namespace MonikAI
                 }
                 index++;
             }
+
+            // Focus window
+            this.Focus();
+            this.Activate();
         }
 
         private void comboBoxScreen_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -217,6 +226,32 @@ namespace MonikAI
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
             // Set DPI awareness or something
+            if (MonikaiSettings.Default.DpiWorkaround)
+            {
+                MessageBox.Show("Workaround has been disabled! MonikAI will now exit, please restart it manually.", "Workaround");
+                MonikaiSettings.Default.DpiWorkaround = false;
+                MonikaiSettings.Default.Save();
+                Environment.Exit(0);
+            }
+            else
+            {
+                if (MessageBox.Show(
+                        "If you don't see Monika on one of your screens right now, MonikAI can activate a workaround that *might* fix your issue - your milage may vary however. Do you want to try the fix?",
+                        "Workaround", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    MonikaiSettings.Default.DpiWorkaround = true;
+                    MonikaiSettings.Default.Save();
+                    MessageBox.Show("Workaround enabled. MonikAI will now exit, please restart it manually.", "Workaround");
+                    Environment.Exit(0);
+                }
+            }
+        }
+
+        private void sliderScale_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            // Scale modifier
+            MonikaiSettings.Default.ScaleModifier = this.sliderScale.Value;
+            this.mainWindow.SetupScale();
         }
     }
 }
