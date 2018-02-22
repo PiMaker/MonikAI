@@ -137,17 +137,14 @@ namespace MonikAI.Behaviours
                     responseChain[chain] = characterResponses[res].ResponseChain[chain];
                 }
 
-                // Do not respond to new processes if a browser is already open
-                bool respond = true;
+                // Determine if the trigger is a browser
+                bool isBrowserProcess = false;
                 for (int i = 0; i < triggers.Length; i++)
                 {
                     // If trigger is a browser, only respond if the user recently launched the browser
                     if (triggers[i].Contains("firefox") || triggers[i].Contains("chrome") || triggers[i].Contains("opera"))
                     {
-                        respond = Process.GetProcesses()
-                            .Where(p => p.ProcessName.ToLower().Contains("firefox") || p.ProcessName.ToLower().Contains("chrome") || p.ProcessName.ToLower().Contains("opera"))
-                            .ToList()
-                            .All(p => (DateTime.Now - p.StartTime).TotalSeconds < 4);
+                        isBrowserProcess = true;
                     }
                 }
 
@@ -162,16 +159,31 @@ namespace MonikAI.Behaviours
                 */
 
                 // If key already exists in the table, append the new response chain
+                List<Expression[]> triggerResponses;
                 if (responseTable.ContainsKey(triggers))
                 {
-                    List<Expression[]> existingResponses = responseTable[triggers].Item1;
-                    existingResponses.Add(responseChain);
-
-                    responseTable[triggers] = new ResponseTuple(existingResponses, () => respond, TimeSpan.FromMinutes(5), DateTime.MinValue);
+                    triggerResponses = responseTable[triggers].Item1;
+                    triggerResponses.Add(responseChain);
                 }
                 else
                 {
-                    responseTable[triggers] = new ResponseTuple(new List<Expression[]> { responseChain }, () => respond, TimeSpan.FromMinutes(5), DateTime.MinValue);
+                    triggerResponses = new List<Expression[]> { responseChain };
+                }
+
+                // If trigger is a browser, only respond if the user recently launched the browser
+                if (isBrowserProcess)
+                {
+                    responseTable[triggers] = new ResponseTuple(triggerResponses, () =>
+                    {
+                        return Process.GetProcesses()
+                        .Where(p => p.ProcessName.ToLower().Contains("firefox") || p.ProcessName.ToLower().Contains("chrome") || p.ProcessName.ToLower().Contains("opera"))
+                        .ToList()
+                        .All(p => (DateTime.Now - p.StartTime).TotalSeconds < 4);
+                    }, TimeSpan.FromMinutes(5), DateTime.MinValue);
+                }
+                else
+                {
+                    responseTable[triggers] = new ResponseTuple(triggerResponses, () => true, TimeSpan.FromMinutes(5), DateTime.MinValue);
                 }
             }
         }
