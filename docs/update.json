@@ -5,6 +5,7 @@
   "ResponseURLs": [
     "https://pimaker.github.io/MonikAI/application.csv",
     "https://pimaker.github.io/MonikAI/google.csv",
+    "https://pimaker.github.io/MonikAI/startup.csv",
     "https://pimaker.github.io/MonikAI/website.csv"
   ]
 }

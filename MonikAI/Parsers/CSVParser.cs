@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using MonikAI.Parsers.Models;
 
@@ -54,7 +55,7 @@ namespace MonikAI.Parsers
 
                     var row = reader.ReadLine();
 
-                    if (row.StartsWith("#"))
+                    if (row.StartsWith("#") || row.StartsWith("\"#") || string.IsNullOrWhiteSpace(row) || row.All(x => x == ','))
                     {
                         continue;
                     }

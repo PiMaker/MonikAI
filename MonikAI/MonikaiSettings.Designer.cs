@@ -190,5 +190,17 @@ namespace MonikAI {
                 this["ScaleModifier"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DpiWorkaround {
+            get {
+                return ((bool)(this["DpiWorkaround"]));
+            }
+            set {
+                this["DpiWorkaround"] = value;
+            }
+        }
     }
 }

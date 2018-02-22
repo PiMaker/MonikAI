@@ -15,6 +15,7 @@ using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using MonikAI.Behaviours;
+using MonikAI.Parsers;
 using MessageBox = System.Windows.MessageBox;
 using Point = System.Drawing.Point;
 
@@ -204,42 +205,48 @@ namespace MonikAI
                         this.Say(new[]
                         {
                             new Expression(
-                                "Don't forget, if you want me to leave just press CTRL-SHIFT-F12!", "i"),
+                                "Don't forget, if you want me to leave just press " + MonikaiSettings.Default.HotkeyExit + "!", "i"),
                             new Expression("But you're not going to do that, right?", "o")
                         });
                     }
                 }
 
-                var startupExpression = new[]
-                {
-                    new[]
-                    {
-                        new Expression("♫ ... and in your reality ... ♫", "r")
-                    },
-                    new[]
-                    {
-                        new Expression("How are you today?", "d"),
-                        new Expression("I'm doing fine, now that you are here~", "b")
-                    },
-                    new[]
-                    {
-                        new Expression("Is everything ok?", "d"),
-                        new Expression("Do you want to talk about something?", "c"),
-                        new Expression("I'm always here for you~", "e")
-                    },
-                    new[]
-                    {
-                        new Expression("Thank you for letting me be on your screen!", "k")
-                    },
-                    new[]
-                    {
-                        new Expression("You know I love you, right?", "d")
-                    },
-                    new[]
-                    {
-                        new Expression("I'm so happy to be here, together with you! Ahaha~", "b")
-                    }
-                }.Sample();
+                // Parse startup CSV
+                var parser = new CSVParser();
+                var csv = parser.GetData("startup");
+                var parsed = parser.ParseData(csv);
+                var startupExpression = parsed.Sample().ResponseChain.ToArray();
+
+                //var startupExpressionFallback = new[]
+                //{
+                //    new[]
+                //    {
+                //        new Expression("♫ ... and in your reality ... ♫", "r")
+                //    },
+                //    new[]
+                //    {
+                //        new Expression("How are you today?", "d"),
+                //        new Expression("I'm doing fine, now that you are here~", "b")
+                //    },
+                //    new[]
+                //    {
+                //        new Expression("Is everything ok?", "d"),
+                //        new Expression("Do you want to talk about something?", "c"),
+                //        new Expression("I'm always here for you~", "e")
+                //    },
+                //    new[]
+                //    {
+                //        new Expression("Thank you for letting me be on your screen!", "k")
+                //    },
+                //    new[]
+                //    {
+                //        new Expression("You know I love you, right?", "d")
+                //    },
+                //    new[]
+                //    {
+                //        new Expression("I'm so happy to be here, together with you! Ahaha~", "b")
+                //    }
+                //}.Sample();
 
                 var lastStartupExpression = startupExpression.Last();
                 lastStartupExpression.Executed += this.RegisterBehaviours;

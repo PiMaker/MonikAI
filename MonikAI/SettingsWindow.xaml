@@ -28,7 +28,7 @@
         <Button Content="Reset" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="303,256,0,0" Click="Button_Click"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,85,0,0"><Run Text="Make me bigger/smaller, if you want:"/></TextBlock>
         <Slider x:Name="sliderScale" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="234,85,0,0" Width="224" Maximum="2.75" Value="1" Minimum="0.25" SmallChange="0.05" LargeChange="0.25" ValueChanged="sliderScale_ValueChanged"/>
-        <Button Content="Help, I'm not seeing Monika!" HorizontalAlignment="Left" VerticalAlignment="Top" Width="214" Margin="10,256,0,0" Click="Button_Click_4"/>
+        <Button x:Name="buttonWorkaround" Content="Help, I'm not seeing Monika!" HorizontalAlignment="Left" VerticalAlignment="Top" Width="214" Margin="10,256,0,0" Click="Button_Click_4"/>
 
     </Grid>
 </Window>
