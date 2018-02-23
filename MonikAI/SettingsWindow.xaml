@@ -32,11 +32,12 @@
         <Button x:Name="buttonWorkaround" Content="Help, I'm not seeing Monika!" HorizontalAlignment="Left" VerticalAlignment="Top" Width="214" Margin="10,283,0,0" Click="Button_Click_4"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,115,0,0"><Run Text="Wait time between idle dialogue?"/></TextBlock>
         <ComboBox x:Name="comboBoxIdle" Margin="234,113,0,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Left" Width="224" SelectionChanged="comboBoxIdle_SelectionChanged">
-            <System:String>Very Slow</System:String>
-            <System:String>Slow</System:String>
+            <System:String>Very Long</System:String>
+            <System:String>Long</System:String>
             <System:String>Regular</System:String>
             <System:String>Short</System:String>
             <System:String>Very Short</System:String>
+            <System:String>Off</System:String>
         </ComboBox>
 
     </Grid>

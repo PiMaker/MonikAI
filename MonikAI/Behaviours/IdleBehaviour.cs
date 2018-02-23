@@ -90,6 +90,9 @@ namespace MonikAI.Behaviours
 
         public void Update(MainWindow window)
         {
+            //Just return before doing anything if the idle setting is off
+            if (MonikaiSettings.Default.IdleWait.ToLower() == "off") return;
+
             //Check if it's time to idle again
             if (DateTime.Now - idleTimeout > lastIdleUsage)
             {
