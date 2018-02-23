@@ -29,10 +29,10 @@ namespace MonikAI.Behaviours
         private List<KeyValuePair<string, (int, int)>> timeoutSpeeds = new List<KeyValuePair<string, (int, int)>>()
         {
             new KeyValuePair<string, (int, int)>("very short", (30, 120)),
-            new KeyValuePair<string, (int, int)>("short", (1, 3)),
-            new KeyValuePair<string, (int, int)>("regular", (2, 5)),
-            new KeyValuePair<string, (int, int)>("long", (3, 8)),
-            new KeyValuePair<string, (int, int)>("very long", (4, 10))
+            new KeyValuePair<string, (int, int)>("short", (60, 180)),
+            new KeyValuePair<string, (int, int)>("regular", (120, 300)),
+            new KeyValuePair<string, (int, int)>("long", (180, 480)),
+            new KeyValuePair<string, (int, int)>("very long", (240, 600))
         };
 
         public void Init(MainWindow window)
@@ -56,10 +56,7 @@ namespace MonikAI.Behaviours
         private void SetTimeOut()
         {
             var speed = timeoutSpeeds.Where(x => x.Key == MonikaiSettings.Default.IdleWait.ToLower()).FirstOrDefault();
-            if (speed.Key == "very short")
-                idleTimeout = new TimeSpan(0, 0, random.Next(speed.Value.Item1, speed.Value.Item2 + 1));
-            else
-                idleTimeout = new TimeSpan(0, random.Next(speed.Value.Item1, speed.Value.Item2 + 1), 0);
+            idleTimeout = TimeSpan.FromSeconds(random.Next(speed.Value.Item1, speed.Value.Item2 + 1));
         }
 
         /// <summary>
