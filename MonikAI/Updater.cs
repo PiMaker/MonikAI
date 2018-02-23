@@ -9,9 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Net.Security;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Newtonsoft.Json;
@@ -31,12 +29,19 @@ namespace MonikAI
         {
             var dirExisted = Directory.Exists(Updater.StatePath);
 
+            // If response data is invalid then re-download it
+            if (!ValidResponseData())
+            {
+                MonikaiSettings.Default.FirstTimeWithUpdater = true;
+            }
+
             if (MonikaiSettings.Default.FirstTimeWithUpdater && dirExisted)
             {
                 // Delete StatePath from older releases without updater
                 Directory.Delete(Updater.StatePath, true);
                 MonikaiSettings.Default.FirstTimeWithUpdater = false;
                 MonikaiSettings.Default.Save();
+                dirExisted = false;
             }
 
             Directory.CreateDirectory(Updater.StatePath);
@@ -217,6 +222,33 @@ namespace MonikAI
 
             Process.Start(updatePath, "/postupdate");
             Environment.Exit(0);
+        }
+
+        /// <summary>
+        ///     Checks to make sure the character csv files exist and are valid otherwise they are re-downloaded.
+        /// </summary>
+        /// <returns>A boolean flag that determines if the responses are valid or not.</returns>
+        private bool ValidResponseData()
+        {
+            // NOTE: change to a directory search once multi-character support is finished
+            var appCsv = new FileInfo(Updater.StatePath + "\\application.csv");
+            var googleCsv = new FileInfo(Updater.StatePath + "\\google.csv");
+            var startCsv = new FileInfo(Updater.StatePath + "\\startup.csv");
+            var siteCsv = new FileInfo(Updater.StatePath + "\\website.csv");
+
+            // Check to see if required character response data exists
+            if (!appCsv.Exists || !googleCsv.Exists || !startCsv.Exists || !siteCsv.Exists)
+            {
+                return false;
+            }
+
+            // Check to see if required character response data is at least 2 bytes in size (although valid data would be larger)
+            if (appCsv.Length <= 2 || googleCsv.Length <= 2 || startCsv.Length <= 2 || siteCsv.Length <= 2)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
