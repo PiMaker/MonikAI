@@ -235,15 +235,16 @@ namespace MonikAI
             var googleCsv = new FileInfo(Updater.StatePath + "\\google.csv");
             var startCsv = new FileInfo(Updater.StatePath + "\\startup.csv");
             var siteCsv = new FileInfo(Updater.StatePath + "\\website.csv");
+            var idleCsv = new FileInfo(Updater.StatePath + "\\idle_dialogue.csv");
 
             // Check to see if required character response data exists
-            if (!appCsv.Exists || !googleCsv.Exists || !startCsv.Exists || !siteCsv.Exists)
+            if (!appCsv.Exists || !googleCsv.Exists || !startCsv.Exists || !siteCsv.Exists || !idleCsv.Exists)
             {
                 return false;
             }
 
             // Check to see if required character response data is at least 2 bytes in size (although valid data would be larger)
-            if (appCsv.Length <= 2 || googleCsv.Length <= 2 || startCsv.Length <= 2 || siteCsv.Length <= 2)
+            if (appCsv.Length <= 2 || googleCsv.Length <= 2 || startCsv.Length <= 2 || siteCsv.Length <= 2 || idleCsv.Length <= 2)
             {
                 return false;
             }
