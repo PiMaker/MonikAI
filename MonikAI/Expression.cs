@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace MonikAI
 {
@@ -12,6 +13,11 @@ namespace MonikAI
         public Expression(string text, string face)
         {
             if (string.IsNullOrWhiteSpace(face))
+            {
+                face = "a";
+            }
+
+            if (face.Length > 1 || !Regex.IsMatch(face, @"[a-s]"))
             {
                 face = "a";
             }

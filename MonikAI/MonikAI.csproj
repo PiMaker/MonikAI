@@ -95,6 +95,7 @@
     </ApplicationDefinition>
     <Compile Include="Behaviours\ApplicationBehaviour.cs" />
     <Compile Include="Behaviours\IBehaviour.cs" />
+    <Compile Include="Behaviours\IdleBehaviour.cs" />
     <Compile Include="Behaviours\TriggerComparer.cs" />
     <Compile Include="Behaviours\WebBrowserBehaviour.cs" />
     <Compile Include="ExtensionMethods.cs" />
