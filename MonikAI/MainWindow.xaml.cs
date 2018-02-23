@@ -161,7 +161,9 @@ namespace MonikAI
                 this.updaterInitTask?.Wait();
                 await this.updater.PerformUpdate(this);
 
+#if DEBUG
                 MessageBox.Show("This is a testing build, please do me the favor and don't distribute it right now.");
+#endif
 
                 // Startup logic
                 if (MonikaiSettings.Default.FirstLaunch)
