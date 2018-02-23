@@ -42,6 +42,7 @@ namespace MonikAI
                 MonikaiSettings.Default.FirstTimeWithUpdater = false;
                 MonikaiSettings.Default.Save();
                 dirExisted = false;
+                
             }
 
             Directory.CreateDirectory(Updater.StatePath);
@@ -230,23 +231,26 @@ namespace MonikAI
         /// <returns>A boolean flag that determines if the responses are valid or not.</returns>
         private bool ValidResponseData()
         {
-            // NOTE: change to a directory search once multi-character support is finished
-            var appCsv = new FileInfo(Updater.StatePath + "\\application.csv");
-            var googleCsv = new FileInfo(Updater.StatePath + "\\google.csv");
-            var startCsv = new FileInfo(Updater.StatePath + "\\startup.csv");
-            var siteCsv = new FileInfo(Updater.StatePath + "\\website.csv");
-            var idleCsv = new FileInfo(Updater.StatePath + "\\idle_dialogue.csv");
-
-            // Check to see if required character response data exists
-            if (!appCsv.Exists || !googleCsv.Exists || !startCsv.Exists || !siteCsv.Exists || !idleCsv.Exists)
+            // Check the config to see which csv files need to be validated
+            if (string.IsNullOrWhiteSpace(MonikaiSettings.Default.LastUpdateConfig))
             {
                 return false;
             }
 
-            // Check to see if required character response data is at least 2 bytes in size (although valid data would be larger)
-            if (appCsv.Length <= 2 || googleCsv.Length <= 2 || startCsv.Length <= 2 || siteCsv.Length <= 2 || idleCsv.Length <= 2)
+            var lastConfig = JsonConvert.DeserializeObject<UpdateConfig>(MonikaiSettings.Default.LastUpdateConfig);
+
+            // Check to make sure every required csv file exists and has data
+            // NOTE: change to a directory search once multi-character support is finished
+            foreach (string csvFile in lastConfig.ResponseURLs)
             {
-                return false;
+                var splitPath = csvFile.Split('/');
+                var fileName = splitPath[splitPath.Length - 1];
+                var fileDetails = new FileInfo(Updater.StatePath + "\\" + fileName);
+
+                if (!fileDetails.Exists || fileDetails.Length <= 2)
+                {
+                    return false;
+                }
             }
 
             return true;
