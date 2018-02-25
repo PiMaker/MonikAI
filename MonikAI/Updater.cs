@@ -87,12 +87,8 @@ namespace MonikAI
                 {
                     this.updateProgram = true;
                     var path = Path.Combine(Updater.StatePath, "MonikAI.exe");
-                    var stream = await client.GetStreamAsync(onlineConfig.ProgramURL);
-                    using (var fs = new FileStream(path, FileMode.Create))
-                    {
-                        await stream.CopyToAsync(fs);
-                    }
-                    stream.Dispose();
+                    var c = new WebClient();
+                    await c.DownloadFileTaskAsync(onlineConfig.ProgramURL, path);
                 }));
             }
 
