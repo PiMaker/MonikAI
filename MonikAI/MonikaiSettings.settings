@@ -32,9 +32,6 @@
     <Setting Name="HotkeyExit" Type="System.String" Scope="User">
       <Value Profile="(Default)">CTRL-SHIFT-F12</Value>
     </Setting>
-    <Setting Name="AutoStart" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="IsColdShutdown" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
@@ -52,6 +49,18 @@
     </Setting>
     <Setting Name="IdleWait" Type="System.String" Scope="User">
       <Value Profile="(Default)">Regular</Value>
+    </Setting>
+    <Setting Name="ManualPosition" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ManualPositionX" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="ManualPositionY" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="AutoStartTask" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

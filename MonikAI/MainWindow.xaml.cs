@@ -19,6 +19,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using Microsoft.Win32;
 using MonikAI.Behaviours;
 using MonikAI.Parsers;
 using MessageBox = System.Windows.MessageBox;
@@ -86,18 +87,16 @@ namespace MonikAI
             this.settingsWindow = new SettingsWindow(this);
 
             // Screen size and positioning init
-            this.MonikaScreen = Screen.PrimaryScreen;
-            foreach (var screen in Screen.AllScreens)
-            {
-                if (screen.DeviceName == MonikaiSettings.Default.Screen)
-                {
-                    this.MonikaScreen = screen;
-                    break;
-                }
-            }
-
+            this.UpdateMonikaScreen();
             this.SetupScale();
-            this.SetPositionBottomRight(this.MonikaScreen);
+            this.SetPosition(this.MonikaScreen);
+
+            // Hook shutdown event
+            SystemEvents.SessionEnding += (sender, args) =>
+            {
+                MonikaiSettings.Default.IsColdShutdown = false;
+                MonikaiSettings.Default.Save();
+            };
 
             // Init background images
             this.backgroundDay = new BitmapImage();
@@ -161,8 +160,10 @@ namespace MonikAI
                 this.updaterInitTask?.Wait();
                 await this.updater.PerformUpdate(this);
 
+                this.UpdateMonikaScreen();
+
 #if DEBUG
-                MessageBox.Show("This is a testing build, please do me the favor and don't distribute it right now.");
+                MessageBox.Show("This is a testing build, please do me the favor and don't distribute it.");
 #endif
 
                 // Startup logic
@@ -312,6 +313,19 @@ namespace MonikAI
             this.backgroundPicture.BeginAnimation(UIElement.OpacityProperty, animationLogo);
         }
 
+        private void UpdateMonikaScreen()
+        {
+            this.MonikaScreen = Screen.PrimaryScreen;
+            foreach (var screen in Screen.AllScreens)
+            {
+                if (screen.DeviceName == MonikaiSettings.Default.Screen)
+                {
+                    this.MonikaScreen = screen;
+                    break;
+                }
+            }
+        }
+
         // Roughly estimating night time
         public static bool IsNight => DateTime.Now.Hour > 20 || DateTime.Now.Hour < 7;
 
@@ -375,8 +389,16 @@ namespace MonikAI
         }
 
         // Sets the correct position of Monika depending on taskbar position and visibility
-        public void SetPositionBottomRight(Screen screen)
+        public void SetPosition(Screen screen)
         {
+            // Override position if necessary
+            if (MonikaiSettings.Default.ManualPosition)
+            {
+                this.Top = MonikaiSettings.Default.ManualPositionY;
+                this.Left = MonikaiSettings.Default.ManualPositionX;
+                return;
+            }
+
             var position = new System.Windows.Point(screen.Bounds.X + screen.Bounds.Width - this.Width,
                 screen.Bounds.Y + screen.Bounds.Height - this.Height);
 
@@ -695,47 +717,50 @@ namespace MonikAI
                             const double MIN_OP = 0.125;
                             const double FADE = 175;
 
-                            if (rectangle.Contains(point))
+                            if (this.settingsWindow == null || !this.settingsWindow.IsPositioning)
                             {
-                                opacity = MIN_OP;
-                            }
-                            else
-                            {
-                                if (point.Y <= rectangle.Bottom)
+                                if (rectangle.Contains(point))
                                 {
-                                    if (point.Y >= rectangle.Y)
+                                    opacity = MIN_OP;
+                                }
+                                else
+                                {
+                                    if (point.Y <= rectangle.Bottom)
                                     {
-                                        if (point.X < rectangle.X && rectangle.X - point.X < FADE)
+                                        if (point.Y >= rectangle.Y)
                                         {
-                                            opacity = MainWindow.Lerp(1.0, MIN_OP, (rectangle.X - point.X) / FADE);
-                                        }
-                                        else if (point.X > rectangle.Right && point.X - rectangle.Right < FADE)
-                                        {
-                                            opacity = MainWindow.Lerp(1.0, MIN_OP,
-                                                (point.X - rectangle.Right) / FADE);
-                                        }
-                                    }
-                                    else if (point.Y < rectangle.Y)
-                                    {
-                                        if (point.X >= rectangle.X && point.X <= rectangle.Right)
-                                        {
-                                            if (rectangle.Y - point.Y < FADE)
+                                            if (point.X < rectangle.X && rectangle.X - point.X < FADE)
+                                            {
+                                                opacity = MainWindow.Lerp(1.0, MIN_OP, (rectangle.X - point.X) / FADE);
+                                            }
+                                            else if (point.X > rectangle.Right && point.X - rectangle.Right < FADE)
                                             {
                                                 opacity = MainWindow.Lerp(1.0, MIN_OP,
-                                                    (rectangle.Y - point.Y) / FADE);
+                                                    (point.X - rectangle.Right) / FADE);
                                             }
                                         }
-                                        else if (rectangle.X > point.X || rectangle.Right < point.X)
+                                        else if (point.Y < rectangle.Y)
                                         {
-                                            var distance =
-                                                Math.Sqrt(
-                                                    Math.Pow(
-                                                        (point.X < rectangle.X ? rectangle.X : rectangle.Right) -
-                                                        point.X, 2) +
-                                                    Math.Pow(rectangle.Y - point.Y, 2));
-                                            if (distance < FADE)
+                                            if (point.X >= rectangle.X && point.X <= rectangle.Right)
                                             {
-                                                opacity = MainWindow.Lerp(1.0, MIN_OP, distance / FADE);
+                                                if (rectangle.Y - point.Y < FADE)
+                                                {
+                                                    opacity = MainWindow.Lerp(1.0, MIN_OP,
+                                                        (rectangle.Y - point.Y) / FADE);
+                                                }
+                                            }
+                                            else if (rectangle.X > point.X || rectangle.Right < point.X)
+                                            {
+                                                var distance =
+                                                    Math.Sqrt(
+                                                        Math.Pow(
+                                                            (point.X < rectangle.X ? rectangle.X : rectangle.Right) -
+                                                            point.X, 2) +
+                                                        Math.Pow(rectangle.Y - point.Y, 2));
+                                                if (distance < FADE)
+                                                {
+                                                    opacity = MainWindow.Lerp(1.0, MIN_OP, distance / FADE);
+                                                }
                                             }
                                         }
                                     }
@@ -751,9 +776,12 @@ namespace MonikAI
                         // Set position anew to correct for fullscreen apps hiding taskbar
                         this.Dispatcher.Invoke(() =>
                         {
-                            this.SetPositionBottomRight(this.MonikaScreen);
+
+
+                            this.SetPosition(this.MonikaScreen);
                             rectangle = new Rectangle((int) this.Left, (int) this.Top, (int) this.Width,
                                 (int) this.Height);
+
                             // Detect exit key combo
                             hidePressed = this.AreKeysPressed(MonikaiSettings.Default.HotkeyHide);
                             exitPressed = this.AreKeysPressed(MonikaiSettings.Default.HotkeyExit);

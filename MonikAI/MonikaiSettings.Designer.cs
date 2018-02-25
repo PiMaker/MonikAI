@@ -146,18 +146,6 @@ namespace MonikAI {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool AutoStart {
-            get {
-                return ((bool)(this["AutoStart"]));
-            }
-            set {
-                this["AutoStart"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool IsColdShutdown {
             get {
                 return ((bool)(this["IsColdShutdown"]));
@@ -224,6 +212,54 @@ namespace MonikAI {
             }
             set {
                 this["IdleWait"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ManualPosition {
+            get {
+                return ((bool)(this["ManualPosition"]));
+            }
+            set {
+                this["ManualPosition"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double ManualPositionX {
+            get {
+                return ((double)(this["ManualPositionX"]));
+            }
+            set {
+                this["ManualPositionX"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double ManualPositionY {
+            get {
+                return ((double)(this["ManualPositionY"]));
+            }
+            set {
+                this["ManualPositionY"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AutoStartTask {
+            get {
+                return ((string)(this["AutoStartTask"]));
+            }
+            set {
+                this["AutoStartTask"] = value;
             }
         }
     }

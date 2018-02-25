@@ -25,11 +25,11 @@
         <Button Content="Set" HorizontalAlignment="Left" VerticalAlignment="Top" Width="68" Margin="184,223,0,0" Click="Button_Click_2"/>
         <Button Content="Set" HorizontalAlignment="Left" VerticalAlignment="Top" Width="68" Margin="184,245,0,0" Click="Button_Click_3"/>
         <RadioButton x:Name="radioRight" Content="Right" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="411,63,0,0" Checked="radio_checked_changed" Unchecked="radio_checked_changed"/>
-        <RadioButton x:Name="radioLeft" Content="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="367,63,0,0" Unchecked="radio_checked_changed" Checked="radio_checked_changed"/>
+        <RadioButton x:Name="radioLeft" Content="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="299,63,0,0" Unchecked="radio_checked_changed" Checked="radio_checked_changed" Width="42"/>
         <Button Content="Reset" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="303,283,0,0" Click="Button_Click"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,85,0,0"><Run Text="Make me bigger/smaller, if you want:"/></TextBlock>
         <Slider x:Name="sliderScale" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="234,85,0,0" Width="224" Maximum="2.75" Value="1" Minimum="0.25" SmallChange="0.05" LargeChange="0.25" ValueChanged="sliderScale_ValueChanged"/>
-        <Button x:Name="buttonWorkaround" Content="Help, I'm not seeing Monika!" HorizontalAlignment="Left" VerticalAlignment="Top" Width="214" Margin="10,283,0,0" Click="Button_Click_4"/>
+        <Button x:Name="buttonAutostart" Content="Start with Windows!" HorizontalAlignment="Left" VerticalAlignment="Top" Width="214" Margin="10,283,0,0" Click="Button_Autostart_Click"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,115,0,0"><Run Text="Wait time between idle dialogue?"/></TextBlock>
         <ComboBox x:Name="comboBoxIdle" Margin="234,113,0,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Left" Width="224" SelectionChanged="comboBoxIdle_SelectionChanged">
             <System:String>Very Long</System:String>
@@ -39,6 +39,7 @@
             <System:String>Very Short</System:String>
             <System:String>Off</System:String>
         </ComboBox>
+        <RadioButton x:Name="radioManual" Content="Manual" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="346,63,0,0" Unchecked="radio_checked_changed" Checked="radio_checked_changed" Width="60"/>
 
     </Grid>
 </Window>
