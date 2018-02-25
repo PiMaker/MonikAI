@@ -106,8 +106,30 @@ namespace MonikAI.Parsers
                     {
                         if (!string.IsNullOrWhiteSpace(columns[textCell].ToString()))
                         {
-                            // "a" face is default
-                            res.ResponseChain.Add(new Expression(columns[textCell].ToString(), string.IsNullOrWhiteSpace(columns[textCell + 1].ToString()) ? "a" : columns[textCell + 1].ToString()));
+                            var resText = columns[textCell].ToString();
+                            var responseLength = resText.Length;
+                            var face = string.IsNullOrWhiteSpace(columns[textCell + 1].ToString()) ? "a" : columns[textCell + 1].ToString(); // "a" face is default
+
+                            // If text can fit in a single box then add it to the response chain, otherwise break it up.
+                            while (responseLength > 0)
+                            {
+                                // The dialogue box capacity differs based on character width.
+                                // From some testing it seems like a max of 90 works fine in a lot of cases but this isn't a perfect solution.
+                                if (responseLength <= 90)
+                                {
+                                    res.ResponseChain.Add(new Expression(resText, face));
+                                    break;
+                                }
+                                else
+                                {
+                                    // Get next response segment and update remaining response
+                                    var responseSegment = resText.Substring(0, 90);
+                                    resText = resText.Substring(90).Trim();
+                                    responseLength = resText.Length;
+
+                                    res.ResponseChain.Add(new Expression(responseSegment.Trim(), face));
+                                }
+                            }
                         }
                     }
 
