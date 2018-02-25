@@ -434,7 +434,7 @@ namespace MonikAI
             }
 
             // Only update screen ever so often, but necessary to avoid taskbar glitches
-            if (DateTime.Now.Second % 3 == 0)
+            if (DateTime.Now.Second % 3 == 0 && (this.settingsWindow == null || !this.settingsWindow.IsVisible))
             {
                 this.UpdateMonikaScreen();
             }
