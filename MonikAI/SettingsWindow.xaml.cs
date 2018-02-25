@@ -139,9 +139,12 @@ namespace MonikAI
             MonikaiSettings.Default.AutoUpdate = this.checkBoxAutoUpdate.IsChecked.GetValueOrDefault(true);
             MonikaiSettings.Default.PotatoPC = this.checkBoxPotatoPC.IsChecked.GetValueOrDefault(false);
             MonikaiSettings.Default.UserName = this.textBoxName.Text;
-            MonikaiSettings.Default.Screen =
-                Screen.AllScreens.First(x => this.comboBoxScreen.SelectedItem.ToString().Contains(x.DeviceName))
-                    .DeviceName;
+            if (this.comboBoxScreen.SelectedItem != null && Screen.AllScreens != null)
+            {
+                MonikaiSettings.Default.Screen =
+                    Screen.AllScreens.First(x => this.comboBoxScreen.SelectedItem.ToString().Contains(x.DeviceName))
+                        .DeviceName;
+            }
 
             MonikaiSettings.Default.Save();
         }

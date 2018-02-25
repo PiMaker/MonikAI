@@ -350,12 +350,15 @@ namespace MonikAI
         private void UpdateMonikaScreen()
         {
             this.MonikaScreen = Screen.PrimaryScreen;
-            foreach (var screen in Screen.AllScreens)
+            if (!string.IsNullOrEmpty(MonikaiSettings.Default.Screen))
             {
-                if (screen.DeviceName == MonikaiSettings.Default.Screen)
+                foreach (var screen in Screen.AllScreens)
                 {
-                    this.MonikaScreen = screen;
-                    break;
+                    if (screen.DeviceName == MonikaiSettings.Default.Screen)
+                    {
+                        this.MonikaScreen = screen;
+                        break;
+                    }
                 }
             }
         }
