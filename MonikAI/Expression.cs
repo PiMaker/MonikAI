@@ -16,6 +16,12 @@ namespace MonikAI
             {
                 face = "a";
             }
+            else
+            {
+                // Numbers are pretty common because people can't read instructions,
+                // let's remove them to at least use the face part of their expressions
+                face = Regex.Replace(face, @"[0-9]", "");
+            }
 
             if (face.Length > 1 || !Regex.IsMatch(face, @"[a-s]"))
             {
