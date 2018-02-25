@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -143,13 +144,12 @@ namespace MonikAI
                     Task.WaitAll(this.downloadTasks.ToArray());
 
                     Process.Start(Path.Combine(Updater.StatePath, "MonikAI.exe"),
-                        "/update " + Assembly.GetExecutingAssembly().Location);
-                    closed = true;
+                        "/update " + Assembly.GetEntryAssembly().Location);
 
                     MonikaiSettings.Default.IsColdShutdown = false;
                     MonikaiSettings.Default.Save();
 
-                    Environment.Exit(0);
+                    closed = true;
                 };
                 window.Say(new[]
                     {new Expression("Hey, I see there is an update available for my window.", "b"), lastExp});
@@ -158,6 +158,8 @@ namespace MonikAI
                 {
                     await Task.Delay(100);
                 }
+
+                Environment.Exit(0);
             }
             else
             {
@@ -180,27 +182,37 @@ namespace MonikAI
 
         public void PerformUpdatePost()
         {
-            var args = Environment.GetCommandLineArgs();
-
-            if (args.Length <= 1)
+            var args = Environment.GetCommandLineArgs().ToList();
+            
+            if (args.Count <= 1)
             {
                 return;
             }
 
-            if (args.Length > 1 && args[1] == "/postupdate" &&
+            if (args.Contains("/postupdate") &&
                 File.Exists(Path.Combine(Updater.StatePath, "MonikAI.exe")))
             {
                 File.Delete(Path.Combine(Updater.StatePath, "MonikAI.exe"));
                 return;
             }
 
-            if (args.Length > 1 && args[1] != "/update")
+            if (!args.Contains("/update"))
             {
                 return;
             }
 
-            var updatePath = Environment.GetCommandLineArgs()[2];
-            var thisPath = Assembly.GetExecutingAssembly().Location;
+            var updateIndex = args.IndexOf("/update");
+            if (args.Count < updateIndex + 2)
+            {
+                // Invalid command
+                return;
+            }
+
+            // Wait a bit for initial MonikAI to close down
+            Task.Delay(4000).Wait();
+
+            var updatePath = args[updateIndex + 1];
+            var thisPath = Assembly.GetEntryAssembly().Location;
 
             if (thisPath == updatePath)
             {
