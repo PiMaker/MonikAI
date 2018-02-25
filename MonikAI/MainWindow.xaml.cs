@@ -70,6 +70,8 @@ namespace MonikAI
         private readonly Updater updater;
         private readonly Task updaterInitTask;
 
+        private bool screenIsLocked = false;
+
         public MainWindow()
         {
             this.InitializeComponent();
@@ -96,6 +98,38 @@ namespace MonikAI
             {
                 MonikaiSettings.Default.IsColdShutdown = false;
                 MonikaiSettings.Default.Save();
+            };
+
+            // Wakeup events
+            SystemEvents.SessionSwitch += (sender, e) =>
+            {
+                if (e.Reason == SessionSwitchReason.SessionLock)
+                {
+                    this.screenIsLocked = true;
+                }
+                else if (e.Reason == SessionSwitchReason.SessionUnlock)
+                {
+                    this.screenIsLocked = false;
+                }
+            };
+            SystemEvents.PowerModeChanged += (sender, e) =>
+            {
+                if (e.Mode == PowerModes.Resume)
+                {
+                    Task.Run(async () =>
+                    {
+                        while (this.screenIsLocked)
+                        {
+                            await Task.Delay(500);
+                        }
+
+                        this.Say(new []
+                        {
+                            new Expression("ZZZZZZzzzzzzzzz..... huh?", "q"),
+                            new Expression("Sorry, I must have fallen asleep, ahaha~", "n")
+                        });
+                    });
+                }
             };
 
             // Init background images
@@ -397,6 +431,12 @@ namespace MonikAI
                 this.Top = MonikaiSettings.Default.ManualPositionY;
                 this.Left = MonikaiSettings.Default.ManualPositionX;
                 return;
+            }
+
+            // Only update screen ever so often, but necessary to avoid taskbar glitches
+            if (DateTime.Now.Second % 3 == 0)
+            {
+                this.UpdateMonikaScreen();
             }
 
             var position = new System.Windows.Point(screen.Bounds.X + screen.Bounds.Width - this.Width,
