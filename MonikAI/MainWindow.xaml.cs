@@ -228,10 +228,13 @@ namespace MonikAI
                 {
                     if (MonikaiSettings.Default.IsColdShutdown)
                     {
+                        // Sorry Monika, but if we're debugging you this one gets annoying
+#if !DEBUG
                         this.Say(new[]
                         {
                             new Expression("Hey! Don't just turn me off without warning! That hurts...", "p")
                         });
+#endif
                     }
                     else
                     {
@@ -840,8 +843,7 @@ namespace MonikAI
                             {
                                 var expression =
                                     new Expression(
-                                        "Okay, see you later " + Environment.UserName +
-                                        "! (Press again for me to return)", "b");
+                                        "Okay, see you later {name}! (Press again for me to return)", "b");
                                 expression.Executed += (o, args) => { this.Dispatcher.Invoke(this.Hide); };
                                 this.Say(new[] {expression});
                             }

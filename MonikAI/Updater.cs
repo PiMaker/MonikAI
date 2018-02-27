@@ -43,7 +43,6 @@ namespace MonikAI
                 MonikaiSettings.Default.FirstTimeWithUpdater = false;
                 MonikaiSettings.Default.Save();
                 dirExisted = false;
-                
             }
 
             Directory.CreateDirectory(Updater.StatePath);
@@ -83,6 +82,7 @@ namespace MonikAI
 
             if (localConfig.ProgramVersion < onlineConfig.ProgramVersion)
             {
+#if !DEBUG
                 // Program update
                 this.downloadTasks.Add(Task.Run(async () =>
                 {
@@ -91,6 +91,7 @@ namespace MonikAI
                     var c = new WebClient();
                     await c.DownloadFileTaskAsync(onlineConfig.ProgramURL, path);
                 }));
+#endif
             }
 
             // Note: CSV update also occurs when application is first launched or the data directory has been deleted
