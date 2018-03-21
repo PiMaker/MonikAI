@@ -78,25 +78,33 @@ namespace MonikAI.Behaviours
             // Process start has been detected
             if (processName != null)
             {
+                var pairsToSample = new List<KeyValuePair<string[],ResponseTuple>>();
                 foreach (var pair in this.responseTable)
                 {
                     if (pair.Key.Contains(processName.ToLower().Trim()))
                     {
                         if (DateTime.Now - pair.Value.Item4 > pair.Value.Item3 && pair.Value.Item2())
                         {
-                            lock (this.toSayLock)
-                            {
-                                this.toSay = pair.Value.Item1.Sample();
-                            }
-
-                            // Update last executed time
-                            this.responseTable[pair.Key] = new ResponseTuple(pair.Value.Item1, pair.Value.Item2,
-                                pair.Value.Item3, DateTime.Now);
+                            pairsToSample.Add(pair);
                         }
-
-                        break;
                     }
                 }
+
+                if (!pairsToSample.Any())
+                {
+                    return;
+                }
+
+                // Allow multiple multi-app responses to still apply to one single launched app
+                var val = pairsToSample.Sample();
+                lock (this.toSayLock)
+                {
+                    this.toSay = val.Value.Item1.Sample();
+                }
+
+                // Update last executed time
+                this.responseTable[val.Key] = new ResponseTuple(val.Value.Item1, val.Value.Item2,
+                    val.Value.Item3, DateTime.Now);
             }
         }
 

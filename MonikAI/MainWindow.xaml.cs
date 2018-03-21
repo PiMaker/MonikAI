@@ -277,12 +277,24 @@ namespace MonikAI
                     new Expression("Hi there, {name}~")
                 }.Concat(startupExpression));
 
-                if ((DateTime.Now - MonikaiSettings.Default.LastStarted).TotalDays > 1.5)
+                if ((DateTime.Now - MonikaiSettings.Default.LastStarted).TotalDays > 2.5)
                 {
                     this.Say(new[]
                     {
                         new Expression("I was waiting for you...", "m"),
                         new Expression("Being alone on your disk is reeeally boring.", "q")
+                    });
+                }
+
+                // No idea where the date comes from, someone mentioned it in the spreadsheet. Seems legit.
+                if (DateTime.Now.Month == 9 && DateTime.Now.Day == 22)
+                {
+                    // Hey {name}, guess what?	3b	It's my birthday today!	2b	Happy Birthday to me!	k
+                    this.Say(new[]
+                    {
+                        new Expression("Hey {name}, guess what?", "b"), // What?
+                        new Expression("It's my birthday today!", "b"), // Really?!
+                        new Expression("Happy Birthday to me!", "k") // To you too, Monika! 
                     });
                 }
 

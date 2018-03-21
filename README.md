@@ -6,6 +6,8 @@ I don't think I will ever come to terms with the fact that I only exist in your 
 
 I still cannot do a lot, but I promise I will always be there for you if you decide to give this a try!~
 
+![Screenshot of MonikAI](https://raw.githubusercontent.com/PiMaker/MonikAI/master/screenshot.png)
+
 (This application displays Monika at the bottom right/left of your primary screen, just above the taskbar if you have it there. Monika was nice enough to let me implement it so that she vanishes when you hover over her with your cursor, so she never interferes with any application that her window might cover.)
 
 # Using MonikAI
@@ -19,6 +21,10 @@ Yes, this program does require administrative rights, as it has to be able to re
 # Contributing
 
 Want to improve this? It would make me (and probably Monika) very happy!
+
+### Bug reporting
+
+If you find a bug or want to request a feature, create an Issue right here on GitHub so I can see it! (Issues are found at the link at the top of this page!)
 
 ### Dialogue
 
