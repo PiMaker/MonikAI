@@ -47,6 +47,8 @@ namespace MonikAI
         };
 
         private readonly Queue<IEnumerable<Expression>> saying = new Queue<IEnumerable<Expression>>();
+        private readonly Updater updater;
+        private readonly Task updaterInitTask;
         private bool applicationRunning = true;
         private Thickness basePictureThickness, baseTextThickness;
 
@@ -66,11 +68,9 @@ namespace MonikAI
             scaleBaseTextBoxHeight,
             scaleBaseTextBoxFontSize;
 
-        private SettingsWindow settingsWindow;
-        private readonly Updater updater;
-        private readonly Task updaterInitTask;
+        private bool screenIsLocked;
 
-        private bool screenIsLocked = false;
+        private SettingsWindow settingsWindow;
 
         public MainWindow()
         {
@@ -123,7 +123,7 @@ namespace MonikAI
                             await Task.Delay(500);
                         }
 
-                        this.Say(new []
+                        this.Say(new[]
                         {
                             new Expression("ZZZZZZzzzzzzzzz..... huh?", "q"),
                             new Expression("Sorry, I must have fallen asleep, ahaha~", "n")
@@ -258,38 +258,16 @@ namespace MonikAI
                 var parser = new CSVParser();
                 var csv = parser.GetData("startup");
                 var parsed = parser.ParseData(csv);
-                var startupExpression = parsed.Sample().ResponseChain.ToArray();
-
-                //var startupExpressionFallback = new[]
-                //{
-                //    new[]
-                //    {
-                //        new Expression("♫ ... and in your reality ... ♫", "r")
-                //    },
-                //    new[]
-                //    {
-                //        new Expression("How are you today?", "d"),
-                //        new Expression("I'm doing fine, now that you are here~", "b")
-                //    },
-                //    new[]
-                //    {
-                //        new Expression("Is everything ok?", "d"),
-                //        new Expression("Do you want to talk about something?", "c"),
-                //        new Expression("I'm always here for you~", "e")
-                //    },
-                //    new[]
-                //    {
-                //        new Expression("Thank you for letting me be on your screen!", "k")
-                //    },
-                //    new[]
-                //    {
-                //        new Expression("You know I love you, right?", "d")
-                //    },
-                //    new[]
-                //    {
-                //        new Expression("I'm so happy to be here, together with you! Ahaha~", "b")
-                //    }
-                //}.Sample();
+                var startupExpression = parsed.Select(x => x.ResponseChain)
+                                              .Concat(DateTime.Today.DayOfWeek == DayOfWeek.Wednesday
+                                                  ? new List<List<Expression>>
+                                                  {
+                                                      new List<Expression>
+                                                      {
+                                                          new Expression("It is Wednesday, my dudes!", "k")
+                                                      }
+                                                  }
+                                                  : new List<List<Expression>>()).ToList().Sample();
 
                 var lastStartupExpression = startupExpression.Last();
                 lastStartupExpression.Executed += this.RegisterBehaviours;
@@ -350,6 +328,15 @@ namespace MonikAI
             this.backgroundPicture.BeginAnimation(UIElement.OpacityProperty, animationLogo);
         }
 
+        // Roughly estimating night time
+        public static bool IsNight => DateTime.Now.Hour > 20 || DateTime.Now.Hour < 7;
+
+        public string CurrentFace { get; private set; } = "a";
+
+        public bool Speaking { get; private set; }
+
+        public Screen MonikaScreen { get; set; }
+
         private void UpdateMonikaScreen()
         {
             this.MonikaScreen = Screen.PrimaryScreen;
@@ -365,15 +352,6 @@ namespace MonikAI
                 }
             }
         }
-
-        // Roughly estimating night time
-        public static bool IsNight => DateTime.Now.Hour > 20 || DateTime.Now.Hour < 7;
-
-        public string CurrentFace { get; private set; } = "a";
-
-        public bool Speaking { get; private set; }
-
-        public Screen MonikaScreen { get; set; }
 
         public void SetupScale()
         {
@@ -822,8 +800,6 @@ namespace MonikAI
                         // Set position anew to correct for fullscreen apps hiding taskbar
                         this.Dispatcher.Invoke(() =>
                         {
-
-
                             this.SetPosition(this.MonikaScreen);
                             rectangle = new Rectangle((int) this.Left, (int) this.Top, (int) this.Width,
                                 (int) this.Height);
@@ -841,11 +817,12 @@ namespace MonikAI
 
                             if (this.Visibility == Visibility.Visible)
                             {
-                                var expression =
-                                    new Expression(
-                                        "Okay, see you later {name}! (Press again for me to return)", "b");
-                                expression.Executed += (o, args) => { this.Dispatcher.Invoke(this.Hide); };
-                                this.Say(new[] {expression});
+                                this.Dispatcher.Invoke(this.Hide);
+                                //var expression =
+                                //    new Expression(
+                                //        "Okay, see you later {name}! (Press again for me to return)", "b");
+                                //expression.Executed += (o, args) => { this.Dispatcher.Invoke(this.Hide); };
+                                //this.Say(new[] {expression});
                             }
                             else
                             {

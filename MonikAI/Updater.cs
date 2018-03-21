@@ -22,6 +22,8 @@ namespace MonikAI
         private static readonly string StatePath =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "MonikAI");
 
+        private static readonly Uri someBaseUri = new Uri("http://canbeanything");
+
         private readonly List<Task> downloadTasks = new List<Task>();
 
         private bool updateProgram;
@@ -31,7 +33,7 @@ namespace MonikAI
             var dirExisted = Directory.Exists(Updater.StatePath);
 
             // If response data is invalid then re-download it
-            if (!ValidResponseData())
+            if (!this.ValidResponseData())
             {
                 MonikaiSettings.Default.FirstTimeWithUpdater = true;
             }
@@ -51,7 +53,7 @@ namespace MonikAI
             {
                 return;
             }
-            
+
             // You could also use a WebClient here but I'm too lazy to change it back after doing some debugging. Eh, it works.
             var client = new HttpClient();
             client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
@@ -62,7 +64,9 @@ namespace MonikAI
             UpdateConfig onlineConfig;
             try
             {
-                onlineConfigRaw = await client.GetStringAsync("https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/update.json");
+                onlineConfigRaw =
+                    await client.GetStringAsync(
+                        "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/update.json");
                 onlineConfig = JsonConvert.DeserializeObject<UpdateConfig>(onlineConfigRaw);
             }
             catch (Exception e)
@@ -95,7 +99,8 @@ namespace MonikAI
             }
 
             // Note: CSV update also occurs when application is first launched or the data directory has been deleted
-            if (localConfig.ResponsesVersion < onlineConfig.ResponsesVersion || !dirExisted || MonikaiSettings.Default.FirstLaunch)
+            if (localConfig.ResponsesVersion < onlineConfig.ResponsesVersion || !dirExisted ||
+                MonikaiSettings.Default.FirstLaunch)
             {
                 // CSV update
                 this.downloadTasks.Add(this.DownloadCSV(onlineConfig));
@@ -113,7 +118,7 @@ namespace MonikAI
 
             foreach (var responseURL in config.ResponseURLs)
             {
-                var path = Path.Combine(Updater.StatePath, GetFileNameFromUrl(responseURL));
+                var path = Path.Combine(Updater.StatePath, Updater.GetFileNameFromUrl(responseURL));
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -122,13 +127,13 @@ namespace MonikAI
             }
         }
 
-        static readonly Uri someBaseUri = new Uri("http://canbeanything");
-
         // From: https://stackoverflow.com/a/40361205
-        static string GetFileNameFromUrl(string url)
+        private static string GetFileNameFromUrl(string url)
         {
-            if (!Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            {
                 uri = new Uri(Updater.someBaseUri, url);
+            }
 
             return Path.GetFileName(uri.LocalPath);
         }
@@ -166,7 +171,7 @@ namespace MonikAI
             {
                 Task.WaitAll(this.downloadTasks.ToArray());
             }
-            
+
             // Validate downloads have actually occured
             foreach (var file in Directory.GetFiles(Updater.StatePath))
             {
@@ -177,14 +182,16 @@ namespace MonikAI
             }
 
             // Invalid state detected, no responses available
-            MessageBox.Show("An error has occured loading MonikAI data. Are you connected to the internet? If you disable Auto-Update in the settings you don't need to be connected to the Internet when MonikAI launches. NOTE: If this is your first time launching MonikAI, you need to be connected to the internet regardless!", "Error");
+            MessageBox.Show(
+                "An error has occured loading MonikAI data. Are you connected to the internet? If you disable Auto-Update in the settings you don't need to be connected to the Internet when MonikAI launches. NOTE: If this is your first time launching MonikAI, you need to be connected to the internet regardless!",
+                "Error");
             Environment.Exit(1);
         }
 
         public void PerformUpdatePost()
         {
             var args = Environment.GetCommandLineArgs().ToList();
-            
+
             if (args.Count <= 1)
             {
                 return;
@@ -250,7 +257,7 @@ namespace MonikAI
 
             // Check to make sure every required csv file exists and has data
             // NOTE: change to a directory search once multi-character support is finished
-            foreach (string csvFile in lastConfig.ResponseURLs)
+            foreach (var csvFile in lastConfig.ResponseURLs)
             {
                 var splitPath = csvFile.Split('/');
                 var fileName = splitPath[splitPath.Length - 1];
