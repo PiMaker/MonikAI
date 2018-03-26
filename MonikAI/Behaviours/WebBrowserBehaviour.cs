@@ -17,6 +17,7 @@ namespace MonikAI.Behaviours
     /// </summary>
     public class WebBrowserBehaviour : IBehaviour
     {
+
         // Translation table for shortened URLs
         private readonly Dictionary<string,string> unshorteningDictionary = new Dictionary<string, string>
         {
