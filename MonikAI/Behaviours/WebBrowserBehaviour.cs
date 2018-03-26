@@ -275,26 +275,30 @@ namespace MonikAI.Behaviours
 
         private string GetFirefoxURL()
         {
-            try
-            {
-                var firefoxProcesses = Process.GetProcessesByName("firefox");
-                foreach (var firefoxProcess in firefoxProcesses.Where(x => x.MainWindowHandle != IntPtr.Zero))
-                {
-                    var element = AutomationElement.FromHandle(firefoxProcess.MainWindowHandle);
-                    element = element.FindFirst(TreeScope.Subtree,
-                        new AndCondition(
-                            new PropertyCondition(AutomationElement.NameProperty, "Search or enter address"),
-                            new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit)));
-                    var url = ((ValuePattern) element.GetCurrentPattern(ValuePattern.Pattern)).Current.Value;
-                    return url;
-                }
-                return "";
-            }
-            catch
-            {
-                return "";
-            }
-        }
+			 try
+			 {
+				 var firefoxProcesses = Process.GetProcessesByName("firefox");
+				 foreach (var firefoxProcess in firefoxProcesses.Where(x => x.MainWindowHandle != IntPtr.Zero))
+				 {
+					//Change find by name property because of people having different languages packs 
+					var element = AutomationElement.FromHandle(firefoxProcess.MainWindowHandle);
+					//element = element.FindFirst(TreeScope.Subtree,
+					//new AndCondition(
+					//new PropertyCondition(AutomationElement., "Search or enter address"),
+					//new PropertyCondition(AutomationElement.ControlTypeProperty, "UIA_ComboBoxControlTypeId"),
+					//new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit));
+					element = element.FindFirst(TreeScope.Subtree, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ComboBox));
+					element = element.FindFirst(TreeScope.Subtree, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit));
+					var url = ((ValuePattern) element.GetCurrentPattern(ValuePattern.Pattern)).Current.Value;
+					 return url;
+				 }
+				 return "";
+			 }
+			 catch
+			 {
+				 return "";
+			 }
+		}
 
         public string GetChromeURL()
         {
