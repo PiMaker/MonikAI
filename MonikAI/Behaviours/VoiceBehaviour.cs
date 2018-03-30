@@ -1,50 +1,58 @@
-﻿using MonikAI.Parsers;
-using MonikAI.Parsers.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Speech.Recognition;
 using System.Windows;
+using MonikAI.Parsers;
+using MonikAI.Parsers.Models;
 using ResponseTuple =
 	System.Tuple<System.Collections.Generic.List<MonikAI.Expression[]>, System.Func<bool>, System.TimeSpan,
 		System.DateTime>;
 
-
 namespace MonikAI.Behaviours
 {
-	class IdleBehaviour : IBehaviour
-	{
-		private readonly CSVParser parser = new CSVParser();
-		private readonly Random random = new Random();
-
-		private readonly Dictionary<string[], ResponseTuple> responseTable =
-			new Dictionary<string[], ResponseTuple>(new TriggerComparer());
-
+    /// <summary>
+    /// Manages responses to web sites being opened.
+    /// Includes Google Search Behaviour!
+    /// </summary>
+    public class VoiceBehaviour : IBehaviour
+    {
+        private readonly CSVParser parser = new CSVParser();
+		private readonly Dictionary<string[], ResponseTuple> responseTable = new Dictionary<string[], ResponseTuple>(new TriggerComparer());
+		Choices list = new Choices();
+		RecognizerInfo info;
+		SpeechRecognitionEngine rec;
 		private readonly object toSayLock = new object();
 		private Expression[] toSay;
 
-		private DateTime lastIdleUsage = DateTime.Now;
-		private TimeSpan idleTimeout = new TimeSpan(0, 0, 0);
-		private Expression[] lastIdleDialogue;
-
-		private List<KeyValuePair<string, (int, int)>> timeoutSpeeds = new List<KeyValuePair<string, (int, int)>>()
-		{
-			new KeyValuePair<string, (int, int)>("very short", (30, 120)),
-			new KeyValuePair<string, (int, int)>("short", (60, 180)),
-			new KeyValuePair<string, (int, int)>("regular", (120, 300)),
-			new KeyValuePair<string, (int, int)>("long", (180, 480)),
-			new KeyValuePair<string, (int, int)>("very long", (240, 600))
-		};
-
 		public void Init(MainWindow window)
-		{
-			//Get first random timeout
-			SetTimeOut();
-
+        {
 			try
 			{
 				// Parse the CSV file
-				var csvFile = this.parser.GetData("idle_dialogue");
+				var csvFile = this.parser.GetData("voice");
 				this.PopulateResponseTable(this.parser.ParseData(csvFile));
+				
+				info = null;
+				foreach (RecognizerInfo ri in SpeechRecognitionEngine.InstalledRecognizers())
+				{
+					if (ri.Culture.TwoLetterISOLanguageName.Equals("en"))
+					{
+						info = ri;
+						break;
+					}
+				}
+				var gb = new GrammarBuilder();
+				rec = new SpeechRecognitionEngine(info);
+				gb.Culture = info.Culture;
+
+				gb.Append(list);
+				Grammar gr = new Grammar(gb);
+				rec.RequestRecognizerUpdate();
+				rec.LoadGrammar(gr);
+				rec.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(Rec_SpeachRecognized);
+				rec.SetInputToDefaultAudioDevice();
+				rec.RecognizeAsync(RecognizeMode.Multiple);
 			}
 			catch (Exception ex)
 			{
@@ -53,71 +61,42 @@ namespace MonikAI.Behaviours
 			}
 		}
 
-		private void SetTimeOut()
+		private void Rec_SpeachRecognized(object sender, SpeechRecognizedEventArgs e)
 		{
-			var speed = timeoutSpeeds.Where(x => x.Key == MonikaiSettings.Default.IdleWait.ToLower()).FirstOrDefault();
-			idleTimeout = TimeSpan.FromSeconds(random.Next(speed.Value.Item1, speed.Value.Item2 + 1));
-		}
+			string processName = e.Result.Text;
 
-		/// <summary>
-		/// Call to select the idle.
-		/// </summary>
-		private void GetIdleChatter()
-		{
-			bool isSelected = false;
-			while (!isSelected)
+			// Process start has been detected
+			if (processName != null)
 			{
-				var selectedSample = this.responseTable.First().Value.Item1.Sample();
-
-				if (selectedSample != lastIdleDialogue)
+				var pairsToSample = new List<KeyValuePair<string[], ResponseTuple>>();
+				foreach (var pair in this.responseTable)
 				{
-					lock (this.toSayLock)
+					if (pair.Key.Contains(processName.ToLower().Trim()))
 					{
-						this.toSay = selectedSample;
+						if (DateTime.Now - pair.Value.Item4 > pair.Value.Item3 && pair.Value.Item2())
+						{
+							pairsToSample.Add(pair);
+						}
 					}
-
-					//Set this to be the last used idle dialogue
-					lastIdleDialogue = this.responseTable.First().Value.Item1.Sample();
-
-					//We've selected an item
-					isSelected = true;
-
-					//As all the idle dialogue is under a blank dictionary entry and the idle dialogue has its own timeout system
-					//There's no need to update the key with the last execution tiem like you would in all other behaviours
 				}
-			}
-		}
 
-		public void Update(MainWindow window)
-		{
-			//Just return before doing anything if the idle setting is off
-			if (MonikaiSettings.Default.IdleWait.ToLower() == "off") return;
-
-			//Check if it's time to idle again
-			if (DateTime.Now - idleTimeout > lastIdleUsage)
-			{
-				//Must roll a 1/20. This just adds an arbitrary extra step to add some random time to the idle wait (even if very little).
-				if (random.Next(0, 20) == 0)
+				if (!pairsToSample.Any())
 				{
-					//Set the last used time
-					lastIdleUsage = DateTime.Now;
-
-					//Select a random timeout from 2 to 4 minutes.
-					SetTimeOut();
-
-					//Select an idle dialogue
-					GetIdleChatter();
+					return;
 				}
-			}
 
-			lock (this.toSayLock)
-			{
-				if (this.toSay != null)
+				// Allow multiple multi-app responses to still apply to one single launched app
+				var val = pairsToSample.Sample();
+				lock (this.toSayLock)
 				{
-					window.Say(this.toSay);
-					this.toSay = null;
+					this.toSay = val.Value.Item1.Sample();
 				}
+
+				// Update last executed time
+				this.responseTable[val.Key] = new ResponseTuple(val.Value.Item1, val.Value.Item2,
+					val.Value.Item3, DateTime.Now);
 			}
+
 		}
 
 		/// <summary>
@@ -130,7 +109,7 @@ namespace MonikAI.Behaviours
 			{
 				// Convert triggers to array to use as a key for the dictionary
 				var triggers = response.ResponseTriggers.Select(x => x.ToLower().Trim()).ToArray();
-
+				list.Add(triggers[0]);
 				// Add every response to the current trigger into a new array to use as a value in the dictionary
 				var responseChain = new Expression[response.ResponseChain.Count];
 				for (var chain = 0; chain < response.ResponseChain.Count; chain++)
@@ -165,6 +144,18 @@ namespace MonikAI.Behaviours
 				// If trigger is a browser, only respond if the user recently launched the browser
 				this.responseTable[triggers] = new ResponseTuple(triggerResponses, triggerFunc,
 					TimeSpan.FromMinutes(5), DateTime.MinValue);
+			}
+		}
+
+		public void Update(MainWindow window)
+		{			
+			lock (this.toSayLock)
+			{
+				if (this.toSay != null)
+				{
+					window.Say(this.toSay);
+					this.toSay = null;
+				}
 			}
 		}
 	}

@@ -1,0 +1,3 @@
+﻿"#Voice command have to be specified,,you can use {name} and {date} as placeholders for obvious things,,,,,,,,,,,,,
+#Notes,Voice command,Text,Face,Text,Face,Text,Face,Text,Face,Text,Face,Text,Face,,
+Test,Hello,"Hello {name}",b,,,,,,,,,,,,

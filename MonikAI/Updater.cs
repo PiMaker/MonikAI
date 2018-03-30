@@ -26,7 +26,7 @@ namespace MonikAI
 
         private readonly List<Task> downloadTasks = new List<Task>();
 
-        private bool updateProgram;
+        private bool updateProgram = false;
 
         public async Task Init()
         {

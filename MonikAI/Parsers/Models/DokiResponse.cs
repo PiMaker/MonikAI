@@ -5,7 +5,7 @@ namespace MonikAI.Parsers.Models
     /// <summary>
     /// DokiResponses are objects populated from a parser that are used to populate behavior response tables.
     /// </summary>
-    class DokiResponse
+    public class DokiResponse
     {
         public List<string> ResponseTriggers { get; set; }
         public List<Expression> ResponseChain { get; set; }
