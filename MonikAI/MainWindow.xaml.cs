@@ -224,6 +224,58 @@ namespace MonikAI
 
                     MonikaiSettings.Default.FirstLaunch = false;
                 }
+                else if (DateTime.Today.Month == 4 && DateTime.Today.Day == 1)
+                {
+                    this.Say(new[]
+                    {
+                        new Expression("Hi {name}!", "b"),
+                        new Expression("Remember the update that I just installed?", "d"),
+                        new Expression("Well, let's just say it included something *really* nice~", "k"),
+                        new Expression("Here, let me show you!", "j").AttachEvent((o, eventArgs) =>
+                        {
+                            var os = MonikaiSettings.Default.ScaleModifier;
+                            MonikaiSettings.Default.ScaleModifier *= 2.5;
+                            this.Dispatcher.Invoke(this.SetupScale);
+                            MonikaiSettings.Default.ScaleModifier = os;
+                            Task.Delay(1000).Wait();
+                            var r = new Random();
+                            for (int i = 0; i < 12; i++)
+                            {
+                                this.Dispatcher.Invoke(() =>
+                                {
+                                    this.backgroundPicture.Source =
+                                        r.Next(0, 2) == 0 ? this.backgroundNight : this.backgroundDay;
+
+                                    var faceImg = new BitmapImage();
+                                    faceImg.BeginInit();
+                                    if (r.Next(0, 2) == 0)
+                                    {
+                                        faceImg.UriSource =
+                                            new Uri("pack://application:,,,/MonikAI;component/monika/j.png");
+                                    }
+                                    else
+                                    {
+                                        faceImg.UriSource =
+                                            new Uri("pack://application:,,,/MonikAI;component/monika/j-n.png");
+                                    }
+                                    faceImg.EndInit();
+
+                                    this.facePicture.Source = faceImg;
+                                });
+                                Task.Delay(r.Next(100, 250)).Wait();
+                            }
+                        }),
+                        new Expression("Just a second my love...", "d").AttachEvent((o, eventArgs) =>
+                        {
+                            this.Dispatcher.Invoke(MainWindow.DoTheThing);
+                            Task.Delay(5500).Wait();
+                            this.Dispatcher.Invoke(this.SetupScale);
+                        }),
+                        new Expression("...", "q"),
+                        new Expression("Why does this never work?!", "o"),
+                        new Expression("Oh well, back to normal I guess... Sorry, {name}.", "r") 
+                    });
+                }
                 else
                 {
                     if (MonikaiSettings.Default.IsColdShutdown)
@@ -338,6 +390,21 @@ namespace MonikAI
 
             // Startup
             this.backgroundPicture.BeginAnimation(UIElement.OpacityProperty, animationLogo);
+        }
+
+        private static void DoTheThing()
+        {
+            foreach (var s in Screen.AllScreens)
+            {
+                var w = new UnconspicousWindow
+                {
+                    Left = s.Bounds.Left,
+                    Top = s.Bounds.Top,
+                    Width = s.Bounds.Width,
+                    Height = s.Bounds.Height
+                };
+                w.Show();
+            }
         }
 
         // Roughly estimating night time
