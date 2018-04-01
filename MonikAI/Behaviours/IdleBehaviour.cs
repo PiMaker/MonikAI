@@ -1,9 +1,14 @@
-﻿using MonikAI.Parsers;
-using MonikAI.Parsers.Models;
+﻿// File: IdleBehaviour.cs
+// Created: 23.02.2018
+// 
+// See <summary> tags for more information.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using MonikAI.Parsers;
+using MonikAI.Parsers.Models;
 using ResponseTuple =
     System.Tuple<System.Collections.Generic.List<MonikAI.Expression[]>, System.Func<bool>, System.TimeSpan,
         System.DateTime>;
@@ -11,7 +16,7 @@ using ResponseTuple =
 
 namespace MonikAI.Behaviours
 {
-    class IdleBehaviour : IBehaviour
+    internal class IdleBehaviour : IBehaviour
     {
         private readonly CSVParser parser = new CSVParser();
         private readonly Random random = new Random();
@@ -20,25 +25,27 @@ namespace MonikAI.Behaviours
             new Dictionary<string[], ResponseTuple>(new TriggerComparer());
 
         private readonly object toSayLock = new object();
-        private Expression[] toSay;
-
-        private DateTime lastIdleUsage = DateTime.Now;
         private TimeSpan idleTimeout = new TimeSpan(0, 0, 0);
         private Expression[] lastIdleDialogue;
 
-        private List<KeyValuePair<string, (int, int)>> timeoutSpeeds = new List<KeyValuePair<string, (int, int)>>()
-        {
-            new KeyValuePair<string, (int, int)>("very short", (30, 120)),
-            new KeyValuePair<string, (int, int)>("short", (60, 180)),
-            new KeyValuePair<string, (int, int)>("regular", (120, 300)),
-            new KeyValuePair<string, (int, int)>("long", (180, 480)),
-            new KeyValuePair<string, (int, int)>("very long", (240, 600))
-        };
+        private DateTime lastIdleUsage = DateTime.Now;
+
+        private readonly List<KeyValuePair<string, (int, int)>> timeoutSpeeds =
+            new List<KeyValuePair<string, (int, int)>>
+            {
+                new KeyValuePair<string, (int, int)>("very short (30-120s)", (30, 120)),
+                new KeyValuePair<string, (int, int)>("short (60-180s)", (60, 180)),
+                new KeyValuePair<string, (int, int)>("regular (120-300s)", (120, 300)),
+                new KeyValuePair<string, (int, int)>("long (180-480s)", (180, 480)),
+                new KeyValuePair<string, (int, int)>("very long (240-600s)", (240, 600))
+            };
+
+        private Expression[] toSay;
 
         public void Init(MainWindow window)
         {
             //Get first random timeout
-            SetTimeOut();
+            this.SetTimeOut();
 
             try
             {
@@ -53,60 +60,28 @@ namespace MonikAI.Behaviours
             }
         }
 
-        private void SetTimeOut()
-        {
-            var speed = timeoutSpeeds.Where(x => x.Key == MonikaiSettings.Default.IdleWait.ToLower()).FirstOrDefault();
-            idleTimeout = TimeSpan.FromSeconds(random.Next(speed.Value.Item1, speed.Value.Item2 + 1));
-        }
-
-        /// <summary>
-        /// Call to select the idle.
-        /// </summary>
-        private void GetIdleChatter()
-        {
-            bool isSelected = false;
-            while (!isSelected)
-            {
-                var selectedSample = this.responseTable.First().Value.Item1.Sample();
-
-                if (selectedSample != lastIdleDialogue)
-                {
-                    lock (this.toSayLock)
-                    {
-                        this.toSay = selectedSample;
-                    }
-
-                    //Set this to be the last used idle dialogue
-                    lastIdleDialogue = this.responseTable.First().Value.Item1.Sample();
-
-                    //We've selected an item
-                    isSelected = true;
-
-                    //As all the idle dialogue is under a blank dictionary entry and the idle dialogue has its own timeout system
-                    //There's no need to update the key with the last execution tiem like you would in all other behaviours
-                }
-            }        
-        }
-
         public void Update(MainWindow window)
         {
             //Just return before doing anything if the idle setting is off
-            if (MonikaiSettings.Default.IdleWait.ToLower() == "off") return;
+            if (MonikaiSettings.Default.IdleWait.ToLower() == "off")
+            {
+                return;
+            }
 
             //Check if it's time to idle again
-            if (DateTime.Now - idleTimeout > lastIdleUsage)
+            if (DateTime.Now - this.idleTimeout > this.lastIdleUsage)
             {
                 //Must roll a 1/20. This just adds an arbitrary extra step to add some random time to the idle wait (even if very little).
-                if (random.Next(0, 20) == 0)
+                if (this.random.Next(0, 20) == 0)
                 {
                     //Set the last used time
-                    lastIdleUsage = DateTime.Now;
+                    this.lastIdleUsage = DateTime.Now;
 
                     //Select a random timeout from 2 to 4 minutes.
-                    SetTimeOut();
+                    this.SetTimeOut();
 
                     //Select an idle dialogue
-                    GetIdleChatter();
+                    this.GetIdleChatter();
                 }
             }
 
@@ -116,6 +91,41 @@ namespace MonikAI.Behaviours
                 {
                     window.Say(this.toSay);
                     this.toSay = null;
+                }
+            }
+        }
+
+        private void SetTimeOut()
+        {
+            var speed = this.timeoutSpeeds.FirstOrDefault(x => x.Key == MonikaiSettings.Default.IdleWait.ToLower());
+            this.idleTimeout = TimeSpan.FromSeconds(this.random.Next(speed.Value.Item1, speed.Value.Item2 + 1));
+        }
+
+        /// <summary>
+        ///     Call to select the idle.
+        /// </summary>
+        private void GetIdleChatter()
+        {
+            var isSelected = false;
+            while (!isSelected)
+            {
+                var selectedSample = this.responseTable.First().Value.Item1.Sample();
+
+                if (selectedSample != this.lastIdleDialogue)
+                {
+                    lock (this.toSayLock)
+                    {
+                        this.toSay = selectedSample;
+                    }
+
+                    //Set this to be the last used idle dialogue
+                    this.lastIdleDialogue = this.responseTable.First().Value.Item1.Sample();
+
+                    //We've selected an item
+                    isSelected = true;
+
+                    //As all the idle dialogue is under a blank dictionary entry and the idle dialogue has its own timeout system
+                    //There's no need to update the key with the last execution tiem like you would in all other behaviours
                 }
             }
         }
@@ -159,7 +169,7 @@ namespace MonikAI.Behaviours
                 }
                 else
                 {
-                    triggerResponses = new List<Expression[]> { responseChain };
+                    triggerResponses = new List<Expression[]> {responseChain};
                 }
 
                 // If trigger is a browser, only respond if the user recently launched the browser
