@@ -42,5 +42,11 @@ namespace MonikAI
         {
             this.Executed?.Invoke(this, EventArgs.Empty);
         }
+
+        public Expression AttachEvent(EventHandler eh)
+        {
+            this.Executed += eh;
+            return this;
+        }
     }
 }
