@@ -97,7 +97,7 @@ namespace MonikAI.Behaviours
 
         private void SetTimeOut()
         {
-            var speed = this.timeoutSpeeds.FirstOrDefault(x => x.Key == MonikaiSettings.Default.IdleWait.ToLower());
+            var speed = this.timeoutSpeeds.FirstOrDefault(x => x.Key.Contains(MonikaiSettings.Default.IdleWait.ToLower()));
             this.idleTimeout = TimeSpan.FromSeconds(this.random.Next(speed.Value.Item1, speed.Value.Item2 + 1));
         }
 
