@@ -223,7 +223,7 @@ namespace MonikAI
 
                     MonikaiSettings.Default.FirstLaunch = false;
                 }
-                else if (DateTime.Today.Month == 4 && DateTime.Today.Day == 1)
+                else if (DateTime.Today.Month == 4 && DateTime.Today.Day == 1 && !Debugger.IsAttached)
                 {
                     this.Say(new[]
                     {
@@ -407,7 +407,7 @@ namespace MonikAI
         }
 
         // Roughly estimating night time
-        public static bool IsNight => DateTime.Now.Hour > 20 || DateTime.Now.Hour < 7;
+        public static bool IsNight => MonikaiSettings.Default.DarkMode != "Day" && (MonikaiSettings.Default.DarkMode == "Night" || DateTime.Now.Hour > 20 || DateTime.Now.Hour < 7);
 
         public string CurrentFace { get; private set; } = "a";
 

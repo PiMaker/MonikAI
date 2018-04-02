@@ -6,40 +6,48 @@
         xmlns:local="clr-namespace:MonikAI"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="MonikAI.SettingsWindow"
         mc:Ignorable="d"
-        Title="MonikAI settings" Height="343.829" Width="484.435" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing">
-    <Grid>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="What should I call you?" VerticalAlignment="Top" Margin="10,12,0,0"/>
-        <TextBox Height="22" Margin="184,9,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" x:Name="textBoxName" HorizontalAlignment="Left" Width="274"/>
-        <CheckBox x:Name="checkBoxPotatoPC"  Content="Potato PC mode" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,165,0,0" ToolTip="I don't blame you, as long as you're with me~"/>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,38,0,0"><Run Text="Which screen should I be on?"/></TextBlock>
-        <ComboBox x:Name="comboBoxScreen" Margin="184,36,0,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Left" Width="274" SelectionChanged="comboBoxScreen_SelectionChanged"/>
-        <Button x:Name="buttonOk" Content="Ok!" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="383,283,0,0" IsDefault="True" Click="buttonOk_Click"/>
-        <CheckBox x:Name="checkBoxAutoUpdate"  Content="Automatically update MonikAI" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,145,0,0" ToolTip="This will connect to the internet!"/>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,205,0,0"><Run Text="Open Settings (this window):"/></TextBlock>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,225,0,0"><Run Text="Hide/Re-Show MonikAI:"/></TextBlock>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,247,0,0"><Run Text="Exit MonikAI:"/></TextBlock>
-        <TextBlock x:Name="txtSettings" HorizontalAlignment="Left" TextWrapping="Wrap" Text="CTRL-SHIFT-F10" VerticalAlignment="Top" Margin="268,205,0,0"/>
-        <TextBlock x:Name="txtHide" HorizontalAlignment="Left" TextWrapping="Wrap" Text="CTRL-SHIFT-F11" VerticalAlignment="Top" Margin="268,225,0,0"/>
-        <TextBlock x:Name="txtExit" HorizontalAlignment="Left" TextWrapping="Wrap" Text="CTRL-SHIFT-F12" VerticalAlignment="Top" Margin="268,247,0,0"/>
-        <Button Content="Set" HorizontalAlignment="Left" VerticalAlignment="Top" Width="68" Margin="184,203,0,0" Click="Button_Click_1"/>
-        <Button Content="Set" HorizontalAlignment="Left" VerticalAlignment="Top" Width="68" Margin="184,223,0,0" Click="Button_Click_2"/>
-        <Button Content="Set" HorizontalAlignment="Left" VerticalAlignment="Top" Width="68" Margin="184,245,0,0" Click="Button_Click_3"/>
-        <RadioButton x:Name="radioRight" Content="Right" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="411,63,0,0" Checked="radio_checked_changed" Unchecked="radio_checked_changed"/>
-        <RadioButton x:Name="radioLeft" Content="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="299,63,0,0" Unchecked="radio_checked_changed" Checked="radio_checked_changed" Width="42"/>
-        <Button Content="Reset" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="303,283,0,0" Click="Button_Click"/>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,85,0,0"><Run Text="Make me bigger/smaller, if you want:"/></TextBlock>
-        <Slider x:Name="sliderScale" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="234,85,0,0" Width="224" Maximum="2.75" Value="1" Minimum="0.25" SmallChange="0.05" LargeChange="0.25" ValueChanged="sliderScale_ValueChanged"/>
-        <Button x:Name="buttonAutostart" Content="Start with Windows!" HorizontalAlignment="Left" VerticalAlignment="Top" Width="214" Margin="10,283,0,0" Click="Button_Autostart_Click"/>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,115,0,0"><Run Text="Wait time between idle dialogue?"/></TextBlock>
-        <ComboBox x:Name="comboBoxIdle" Margin="234,113,0,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Left" Width="224" SelectionChanged="comboBoxIdle_SelectionChanged">
-            <System:String>Very Long</System:String>
-            <System:String>Long</System:String>
-            <System:String>Regular</System:String>
-            <System:String>Short</System:String>
-            <System:String>Very Short</System:String>
-            <System:String>Off</System:String>
-        </ComboBox>
-        <RadioButton x:Name="radioManual" Content="Manual" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="346,63,0,0" Unchecked="radio_checked_changed" Checked="radio_checked_changed" Width="60"/>
+        Title="MonikAI settings" Height="334.359" Width="478.607" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing">
+  <Grid>
+    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="What should I call you?" VerticalAlignment="Top" Margin="10,12,0,0"/>
+    <TextBox Height="22" Margin="184,9,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" x:Name="textBoxName" HorizontalAlignment="Left" Width="274"/>
+    <CheckBox x:Name="checkBoxPotatoPC"  Content="Potato PC mode" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,165,0,0" ToolTip="I don't blame you, as long as you're with me~"/>
+    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,38,0,0"><Run Text="Which screen should I be on?"/></TextBlock>
+    <ComboBox x:Name="comboBoxScreen" Margin="184,36,0,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Left" Width="274" SelectionChanged="comboBoxScreen_SelectionChanged"/>
+    <Button x:Name="buttonOk" Content="Ok!" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="383,269,0,0" IsDefault="True" Click="buttonOk_Click"/>
+    <CheckBox x:Name="checkBoxAutoUpdate"  Content="Automatically update MonikAI" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,145,0,0" ToolTip="This will connect to the internet!"/>
+    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,191,0,0"><Run Text="Open Settings (this window):"/></TextBlock>
+    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,211,0,0"><Run Text="Hide/Re-Show MonikAI:"/></TextBlock>
+    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,233,0,0"><Run Text="Exit MonikAI:"/></TextBlock>
+    <TextBlock x:Name="txtSettings" HorizontalAlignment="Left" TextWrapping="Wrap" Text="CTRL-SHIFT-F10" VerticalAlignment="Top" Margin="268,191,0,0"/>
+    <TextBlock x:Name="txtHide" HorizontalAlignment="Left" TextWrapping="Wrap" Text="CTRL-SHIFT-F11" VerticalAlignment="Top" Margin="268,211,0,0"/>
+    <TextBlock x:Name="txtExit" HorizontalAlignment="Left" TextWrapping="Wrap" Text="CTRL-SHIFT-F12" VerticalAlignment="Top" Margin="268,233,0,0"/>
+    <Button Content="Set" HorizontalAlignment="Left" VerticalAlignment="Top" Width="68" Margin="184,189,0,0" Click="Button_Click_1"/>
+    <Button Content="Set" HorizontalAlignment="Left" VerticalAlignment="Top" Width="68" Margin="184,209,0,0" Click="Button_Click_2"/>
+    <Button Content="Set" HorizontalAlignment="Left" VerticalAlignment="Top" Width="68" Margin="184,231,0,0" Click="Button_Click_3"/>
+    <RadioButton x:Name="radioRight" Content="Right" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="411,63,0,0" Checked="radio_checked_changed" Unchecked="radio_checked_changed"/>
+    <RadioButton x:Name="radioLeft" Content="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="299,63,0,0" Unchecked="radio_checked_changed" Checked="radio_checked_changed" Width="42"/>
+    <Button Content="Reset" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="303,269,0,0" Click="Button_Click"/>
+    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,85,0,0"><Run Text="Make me bigger/smaller, if you want:"/></TextBlock>
+    <Slider x:Name="sliderScale" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="234,85,0,0" Width="224" Maximum="2.75" Value="1" Minimum="0.25" SmallChange="0.05" LargeChange="0.25" ValueChanged="sliderScale_ValueChanged"/>
+    <Button x:Name="buttonAutostart" Content="Start with Windows!" HorizontalAlignment="Left" VerticalAlignment="Top" Width="214" Margin="10,269,0,0" Click="Button_Autostart_Click"/>
+    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="10,115,0,0">
+      <Run Text="Wait time between idle dialogue:"/>
+    </TextBlock>
+    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="234,147,0,0"><Run Text="Night color mode:"/></TextBlock>
+    <ComboBox x:Name="comboBoxIdle" Margin="234,113,0,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Left" Width="224" SelectionChanged="comboBoxIdle_SelectionChanged">
+      <System:String>Very Long (240-600s)</System:String>
+      <System:String>Long (180-480s)</System:String>
+      <System:String>Regular (120-300s)</System:String>
+      <System:String>Short (60-180s)</System:String>
+      <System:String>Very Short (30-120s)</System:String>
+      <System:String>Off</System:String>
+    </ComboBox>
+    <RadioButton x:Name="radioManual" Content="Manual" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="346,63,0,0" Unchecked="radio_checked_changed" Checked="radio_checked_changed" Width="60"/>
+    <ComboBox x:Name="comboBoxNightMode" HorizontalAlignment="Left" VerticalAlignment="Top" Width="112" Margin="346,145,0,0" SelectionChanged="comboBoxNightMode_SelectionChanged">
+      <System:String>Auto</System:String>
+      <System:String>Day</System:String>
+      <System:String>Night</System:String>
+    </ComboBox>
 
-    </Grid>
+  </Grid>
 </Window>

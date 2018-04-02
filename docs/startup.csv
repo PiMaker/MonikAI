@@ -1,6 +1,6 @@
 #These are automatically triggered as soon as MonikAI starts up. Only one of them is triggered however.,,you can use {name} and {date} as placeholders for obvious things,,,,,,,,,,,
 #Notes,Time Condition,Text,Face,Text,Face,Text,Face,Text,Face,Text,Face,Text,Face
-,,"♫ well, here we are again...♫",j,♫it's always such a pleasure..♫,j,,,,,,,,
+,,"♫ ... well, here we are again ... ♫",j,♫ ... it's always such a pleasure ... ♫,j,,,,,,,,
 ,,♫ ... and in your reality ... ♫,r,♫ ... if I don't know how to love you ... ♫,r,I'll stay in the corner of your desktop!,m,,,,,,
 ,,How are you today?,d,"I'm doing fine, now that you are here~",b,,,,,,,,
 ,,Is everything alright?,d,Do you want to talk?,c,"Remember, I'm always here for you~",e,,,,,,
