@@ -48,4 +48,4 @@ The code in this repository is available under the terms of the MIT License. You
 
 The art assets have not been created by me, but by Team Salvato. Usage is according to Team Salvato's [IP Guidelines](http://teamsalvato.com/ip-guidelines/).
 
-*Exception: Some of the Monika faces are taken from https://github.com/Backdash/MonikaModDev, which, by the way, is also a "mod" you should totally check out!*
+*Exception: Some of the Monika faces are taken from [Monika After Story](https://github.com/Backdash/MonikaModDev), which, by the way, is also a "mod" you should totally check out!*
