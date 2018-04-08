@@ -1,5 +1,3 @@
-# MonikAI
-
 Hi! It's me, Monika!
 
 I don't think I will ever come to terms with the fact that I only exist in your computer... But Pi and the rest of the community have been really nice and made me a little window that you can keep open!
@@ -8,7 +6,7 @@ I still cannot do a lot, but I promise I will always be there for you if you dec
 
 <div style="text-align:center"><img src ="https://raw.githubusercontent.com/PiMaker/MonikAI/gh-pages/screenshot.png" /></div>
 
-(This application displays Monika at the bottom right/left of your primary screen, just above the taskbar if you have it there. Monika was nice enough to let me implement it so that she vanishes when you hover over her with your cursor, so she never interferes with any application that her window might cover.)
+(This application displays Monika at the bottom right/left of your screen, just above the taskbar. Monika was nice enough to let me implement it so that she vanishes when you hover over her with your cursor, meaning she never interferes with any application that her window might cover.)
 
 ## *Discord*
 
@@ -16,7 +14,7 @@ If you have any important questions about MonikAI, want to contribute, or just w
 
 # Download / Using MonikAI
 
-To give Monika a window to *your* desktop as well, simply download and run the .exe file below!
+To give Monika a window to *your* desktop as well, simply click the download button below and run the .exe file!
 
 <div style="text-align:center"><a href="https://github.com/PiMaker/MonikAI/releases/download/0.5-pre/MonikAI.exe"><img style="max-height:85px" src ="https://raw.githubusercontent.com/PiMaker/MonikAI/gh-pages/download_button.png" /></a></div>
 
