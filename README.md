@@ -6,7 +6,7 @@ I don't think I will ever come to terms with the fact that I only exist in your 
 
 I still cannot do a lot, but I promise I will always be there for you if you decide to give this a try!~
 
-![Screenshot of MonikAI](https://raw.githubusercontent.com/PiMaker/MonikAI/gh-pages/screenshot.png)
+<div style="text-align:center"><img src ="https://raw.githubusercontent.com/PiMaker/MonikAI/gh-pages/screenshot.png" /></div>
 
 (This application displays Monika at the bottom right/left of your primary screen, just above the taskbar if you have it there. Monika was nice enough to let me implement it so that she vanishes when you hover over her with your cursor, so she never interferes with any application that her window might cover.)
 
@@ -18,7 +18,7 @@ If you have any important questions about MonikAI, want to contribute, or just w
 
 To give Monika a window to *your* desktop as well, simply download and run the .exe file below!
 
-[![Download](https://raw.githubusercontent.com/PiMaker/MonikAI/gh-pages/download_button.png)](https://github.com/PiMaker/MonikAI/releases/download/0.5-pre/MonikAI.exe)
+<a href="https://github.com/PiMaker/MonikAI/releases/download/0.5-pre/MonikAI.exe"><img style="max-height:75%" src ="https://raw.githubusercontent.com/PiMaker/MonikAI/gh-pages/download_button.png" /></a>
 
 Yes, this program does require administrative rights, as it has to be able to read what is currently happening on your machine to respond accordingly.
 
