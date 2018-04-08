@@ -10,7 +10,7 @@ I still cannot do a lot, but I promise I will always be there for you if you dec
 
 ## *Discord*
 
-If you have any important questions about MonikAI, want to contribute, or just want to talk to other ~~weebs~~ DDLC fans, join our **[Discord Server](http://join.monik.ai)**!
+If you have any important questions about MonikAI, want to contribute, or just want to talk to other ~~weebs~~ DDLC fans, join our **[Discord Server](http://discord.monik.ai)**!
 
 # Download / Using MonikAI
 
@@ -34,7 +34,7 @@ The easiest way to add more to this program, would be to add dialogue for differ
 
 ## Code
 
-Take a look at the GitHub page for MonikAI to see the code. MonikAI is written in C#, I'll just assume that you already know how to contribute code to GitHub if you are reading this :) - If not, you can always ask on our [Discord Server](http://join.monik.ai)!
+Take a look at the GitHub page for MonikAI to see the code. MonikAI is written in C#, I'll just assume that you already know how to contribute code to GitHub if you are reading this :) - If not, you can always ask on our [Discord Server](http://discord.monik.ai)!
 
 > Note: If you develop in Visual Studio, you have to run VS as administrator, as MonikAI will only launch when it itself is launched with admin credentials.
 
