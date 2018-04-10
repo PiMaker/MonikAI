@@ -75,6 +75,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Speech" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -101,6 +102,7 @@
     <Compile Include="Behaviours\IBehaviour.cs" />
     <Compile Include="Behaviours\IdleBehaviour.cs" />
     <Compile Include="Behaviours\TriggerComparer.cs" />
+    <Compile Include="Behaviours\VoiceBehaviour.cs" />
     <Compile Include="Behaviours\WebBrowserBehaviour.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="MonikaiSettings.Designer.cs">

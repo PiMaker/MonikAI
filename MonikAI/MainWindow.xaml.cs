@@ -35,8 +35,7 @@ namespace MonikAI
         private static IntPtr desktopWindow, shellWindow;
         private readonly BitmapImage backgroundDay;
         private readonly BitmapImage backgroundNight;
-
-        private readonly Dictionary<string, Func<string>> placeholders = new Dictionary<string, Func<string>>
+		private readonly Dictionary<string, Func<string>> placeholders = new Dictionary<string, Func<string>>
         {
             {
                 "{name}", () => { return MonikaiSettings.Default.UserName; }
@@ -46,7 +45,7 @@ namespace MonikAI
             }
         };
 
-        private readonly Queue<IEnumerable<Expression>> saying = new Queue<IEnumerable<Expression>>();
+		private readonly Queue<IEnumerable<Expression>> saying = new Queue<IEnumerable<Expression>>();
         private readonly Updater updater;
         private readonly Task updaterInitTask;
         private bool applicationRunning = true;
@@ -93,8 +92,8 @@ namespace MonikAI
             this.SetupScale();
             this.SetPosition(this.MonikaScreen);
 
-            // Hook shutdown event
-            SystemEvents.SessionEnding += (sender, args) =>
+			// Hook shutdown event
+			SystemEvents.SessionEnding += (sender, args) =>
             {
                 MonikaiSettings.Default.IsColdShutdown = false;
                 MonikaiSettings.Default.Save();
@@ -174,8 +173,8 @@ namespace MonikAI
                 this.SetMonikaFace("a");
                 this.facePicture.Opacity = 1.0;
 
-                // Start speech-thread
-                Task.Run(async () => await this.SpeakingThread());
+				// Start speech-thread
+				Task.Run(async () => await this.SpeakingThread());
 
                 if (File.Exists("firstlaunch.txt") || Environment.GetCommandLineArgs().Contains("/firstlaunch"))
                 {
