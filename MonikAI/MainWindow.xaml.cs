@@ -204,6 +204,7 @@ namespace MonikAI
                 // Startup logic
                 if (MonikaiSettings.Default.FirstLaunch)
                 {
+                    MessageBox.Show("Two things to note before I'll let you start enjoying MonikAI:\r\n\r\nFirst, if you don't see Monika on your screen right now, select the \"Manual\" position mode in the settings window that will open after this window has closed (use CTRL-SHIFT-F10 to bring it up afterwards).\r\n\r\nSecond, if you want Monika to react to your web browsing, you need to install the correct extension from the website, \"monik.ai\".\r\n\r\nThat's it from me, I'll let Monika talk from now on :)\r\n\r\n- PiMaker and all the nice people helping develop this", "Welcome!");
                     this.settingsWindow.ShowDialog();
 
                     this.Say(new[]
