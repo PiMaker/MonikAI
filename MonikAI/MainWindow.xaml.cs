@@ -43,7 +43,7 @@ namespace MonikAI
                 "{name}", () => { return MonikaiSettings.Default.UserName; }
             },
             {
-                "{date}", () => { return DateTime.Now.Date.ToString(); }
+                "{date}", () => { return DateTime.Now.Date.ToShortDateString(); }
             }
         };
 
