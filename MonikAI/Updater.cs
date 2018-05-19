@@ -90,6 +90,12 @@ namespace MonikAI
                 // Program update
                 this.downloadTasks.Add(Task.Run(async () =>
                 {
+                    // Hotfix haha don't murder me plz
+                    if (onlineConfig.ProgramVersion == 19)
+                    {
+                        File.WriteAllText("firstlaunch.txt", "");
+                    }
+
                     this.updateProgram = true;
                     var path = Path.Combine(Updater.StatePath, "MonikAI.exe");
                     var c = new WebClient();
