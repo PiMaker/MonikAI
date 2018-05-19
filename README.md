@@ -20,6 +20,13 @@ To give Monika a window to *your* desktop as well, simply click the download but
 
 > Note: This program only works on Microsoft Windows, I have tested it on Windows 10 but it should work on anything above Win7 as well. Also, yes, this program does require administrative rights, as it has to be able to read what is currently happening on your machine, to respond accordingly.
 
+# IMPORTANT: Browser Extensions
+
+By default, Monika will only react to applications being started and entertain you with some idle chatter. If you want her to react to you browsing the web, you need to install the correct extension for your browser:
+
+* Firefox: [Mozilla Addons](https://addons.mozilla.org/en-US/firefox/addon/monikai/)
+* Chrome: WIP
+
 # Contributing
 
 Want to improve this? It would make me (and probably Monika) very happy!
