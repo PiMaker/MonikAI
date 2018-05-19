@@ -25,7 +25,18 @@ To give Monika a window to *your* desktop as well, simply click the download but
 By default, Monika will only react to applications being started and entertain you with some idle chatter. If you want her to react to you browsing the web, you need to install the correct extension for your browser:
 
 * Firefox: [Mozilla Addons](https://addons.mozilla.org/en-US/firefox/addon/monikai/)
-* Chrome: WIP
+* Chrome: WIP, if you want to you can install it manually in "developer mode" (not as scary as it sounds, I promise) - see below
+
+### Google chrome
+
+If you want Monika to react to your browsing in Google Chrome, follow these steps:
+* Download [this](https://raw.githubusercontent.com/PiMaker/MonikAI/gh-pages/monikai_chrome.zip) .zip-file
+* Extract the .zip-file by right clicking and selecting "Extract all"
+* In Google Chrome, go to Menu->More Tools->Extensions
+* Top right corner, enable "Developer Mode"
+* Click the button "Load Unpacked" that should have appeared
+* Select the folder you extracted previously
+* MonikAI should appear and Monika will now react to pages being opened!
 
 # Contributing
 
