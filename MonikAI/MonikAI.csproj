@@ -101,8 +101,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Behaviours\ApplicationBehaviour.cs" />
-    <Compile Include="Behaviours\HttpRestServer\RestController.cs" />
-    <Compile Include="Behaviours\HttpRestServer\UrlRestServer.cs" />
+    <Compile Include="Behaviours\HttpRestServer\UrlServer.cs" />
     <Compile Include="Behaviours\IBehaviour.cs" />
     <Compile Include="Behaviours\IdleBehaviour.cs" />
     <Compile Include="Behaviours\TriggerComparer.cs" />

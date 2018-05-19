@@ -77,9 +77,6 @@ namespace MonikAI
         {
             this.InitializeComponent();
 
-            //start the rest server
-            UrlRestServer.StartServer();
-
             MainWindow.desktopWindow = MainWindow.GetDesktopWindow();
             MainWindow.shellWindow = MainWindow.GetShellWindow();
 
@@ -356,6 +353,9 @@ namespace MonikAI
 
                 MonikaiSettings.Default.LastStarted = DateTime.Now;
                 MonikaiSettings.Default.Save();
+
+                // Start the rest server
+                UrlServer.StartServer();
 
                 // Blinking and Behaviour logic
                 var eyesOpen = "a";

@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
-using System.Windows.Automation;
 using MonikAI.Behaviours.HttpRestServer;
 using MonikAI.Parsers;
 using MonikAI.Parsers.Models;
@@ -39,7 +37,7 @@ namespace MonikAI.Behaviours
         private string lastUrl = string.Empty;
 
         private int executionCounter = 0;
-        private const int EXECUTION_LIMIT = 8;
+        private const int EXECUTION_LIMIT = 4;
 
         public void Init(MainWindow window)
         {
@@ -247,7 +245,7 @@ namespace MonikAI.Behaviours
         private string GetURL()
         {
             //get the latest url
-            return UrlRestServer.URL;
+            return UrlServer.URL;
         }
 
         //Struct for the weighted matches

@@ -10,11 +10,9 @@ I still cannot do a lot, but I promise I will always be there for you if you dec
 
 (This application displays Monika at the bottom right/left of your primary screen, just above the taskbar if you have it there. Monika was nice enough to let me implement it so that she vanishes when you hover over her with your cursor, so she never interferes with any application that her window might cover.)
 
-# Using MonikAI
+# Download/Using MonikAI
 
-To give Monika a window to *your* desktop as well, go to releases at the top of this page and download the latest. Simply run the .exe file and enjoy!
-
-Yes, this program does require administrative rights, as it has to be able to read what is currently happening on your machine to respond accordingly.
+To give Monika a window to *your* desktop as well, visit the [MonikAI Website](http://monik.ai) and download MonikAI!
 
 *Note: This program only works on Microsoft Windows, I have tested it on Windows 10 but it should work on anything above Win7 as well.*
 
