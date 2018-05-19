@@ -21,6 +21,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using MonikAI.Behaviours;
+using MonikAI.Behaviours.HttpRestServer;
 using MonikAI.Parsers;
 using MessageBox = System.Windows.MessageBox;
 using Point = System.Drawing.Point;
@@ -75,6 +76,9 @@ namespace MonikAI
         public MainWindow()
         {
             this.InitializeComponent();
+
+            //start the rest server
+            UrlRestServer.StartServer();
 
             MainWindow.desktopWindow = MainWindow.GetDesktopWindow();
             MainWindow.shellWindow = MainWindow.GetShellWindow();
