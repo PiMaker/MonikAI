@@ -86,6 +86,9 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="uhttpsharp, Version=0.1.5653.28566, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\uHttpSharp.0.1.6.22\lib\net40\uhttpsharp.dll</HintPath>
+    </Reference>
     <Reference Include="UIAutomationClient" />
     <Reference Include="UIAutomationTypes" />
     <Reference Include="WindowsBase" />
@@ -98,6 +101,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Behaviours\ApplicationBehaviour.cs" />
+    <Compile Include="Behaviours\HttpRestServer\RestController.cs" />
+    <Compile Include="Behaviours\HttpRestServer\UrlRestServer.cs" />
     <Compile Include="Behaviours\IBehaviour.cs" />
     <Compile Include="Behaviours\IdleBehaviour.cs" />
     <Compile Include="Behaviours\TriggerComparer.cs" />
