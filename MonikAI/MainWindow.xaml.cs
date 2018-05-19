@@ -472,9 +472,9 @@ namespace MonikAI
             this.textPicture.Height = this.scaleBaseTextPictureHeight * scaleRatio;
             this.textPicture.Margin = new Thickness(this.baseTextThickness.Left * scaleRatio,
                 this.baseTextThickness.Top * scaleRatio, this.textPicture.Margin.Right, this.textPicture.Margin.Bottom);
-            this.textBox.Height = this.scaleBaseTextBoxHeight * scaleRatio;
+            this.textBox.Height = this.scaleBaseTextBoxHeight * scaleRatio * 1.05;
             this.textBox.Width = this.scaleBaseTextBoxWidth * scaleRatio;
-            this.textBox.FontSize = this.scaleBaseTextBoxFontSize * scaleRatio;
+            this.textBox.FontSize = this.scaleBaseTextBoxFontSize * scaleRatio * 0.95;
         }
 
         private void RegisterBehaviours(object sender, EventArgs eventArgs)
