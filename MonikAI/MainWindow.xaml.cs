@@ -59,6 +59,8 @@ namespace MonikAI
 
         private DateTime lastKeyComboTime = DateTime.Now;
 
+        private float dpiScale = 1.0f;
+
         private double scaleBaseWidth,
             scaleBaseHeight,
             scaleBaseFacePictureWidth,
@@ -88,6 +90,28 @@ namespace MonikAI
             this.updaterInitTask = Task.Run(async () => await this.updater.Init());
 
             this.settingsWindow = new SettingsWindow(this);
+
+            // Init background images
+            this.backgroundDay = new BitmapImage();
+            this.backgroundDay.BeginInit();
+            this.backgroundDay.UriSource = new Uri("pack://application:,,,/MonikAI;component/monika/1.png");
+            this.backgroundDay.EndInit();
+
+            this.backgroundNight = new BitmapImage();
+            this.backgroundNight.BeginInit();
+            this.backgroundNight.UriSource = new Uri("pack://application:,,,/MonikAI;component/monika/1-n.png");
+            this.backgroundNight.EndInit();
+        }
+
+        // Perform all startup initialization
+        private void MainWindow_OnLoaded(object senderUnused, RoutedEventArgs eUnused)
+        {
+            var handle = new WindowInteropHelper(this).Handle;
+            var initialStyle = MainWindow.GetWindowLong(handle, -20);
+            MainWindow.SetWindowLong(handle, -20, initialStyle | 0x20 | 0x80000);
+
+            var wpfDpi = PresentationSource.FromVisual(this)?.CompositionTarget?.TransformToDevice.M11;
+            this.dpiScale = 1f / (float)wpfDpi.GetValueOrDefault(1);
 
             // Screen size and positioning init
             this.UpdateMonikaScreen();
@@ -132,17 +156,6 @@ namespace MonikAI
                     });
                 }
             };
-
-            // Init background images
-            this.backgroundDay = new BitmapImage();
-            this.backgroundDay.BeginInit();
-            this.backgroundDay.UriSource = new Uri("pack://application:,,,/MonikAI;component/monika/1.png");
-            this.backgroundDay.EndInit();
-
-            this.backgroundNight = new BitmapImage();
-            this.backgroundNight.BeginInit();
-            this.backgroundNight.UriSource = new Uri("pack://application:,,,/MonikAI;component/monika/1-n.png");
-            this.backgroundNight.EndInit();
 
             // Start animation
             var animationLogo = new DoubleAnimation(0.0, 1.0, new Duration(TimeSpan.FromSeconds(1.5)));
@@ -275,7 +288,7 @@ namespace MonikAI
                         }),
                         new Expression("...", "q"),
                         new Expression("Why does this never work?!", "o"),
-                        new Expression("Oh well, back to normal I guess... Sorry, {name}.", "r") 
+                        new Expression("Oh well, back to normal I guess... Sorry, {name}.", "r")
                     });
                 }
                 else
@@ -395,6 +408,158 @@ namespace MonikAI
 
             // Startup
             this.backgroundPicture.BeginAnimation(UIElement.OpacityProperty, animationLogo);
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var prev = new Point();
+
+                    var rectangle = new Rectangle();
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        rectangle = new Rectangle((int)this.Left, (int)this.Top, (int)this.Width,
+                            (int)this.Height);
+                    });
+
+                    while (this.applicationRunning)
+                    {
+                        var point = new Point();
+                        MainWindow.GetCursorPos(ref point);
+                        point.X = (int)(point.X * this.dpiScale);
+                        point.Y = (int)(point.Y * this.dpiScale);
+
+                        if (!point.Equals(prev))
+                        {
+                            prev = point;
+
+                            var opacity = 1.0;
+                            const double MIN_OP = 0.125;
+                            const double FADE = 175;
+
+                            if (this.settingsWindow == null || !this.settingsWindow.IsPositioning)
+                            {
+                                if (rectangle.Contains(point))
+                                {
+                                    opacity = MIN_OP;
+                                }
+                                else
+                                {
+                                    if (point.Y <= rectangle.Bottom)
+                                    {
+                                        if (point.Y >= rectangle.Y)
+                                        {
+                                            if (point.X < rectangle.X && rectangle.X - point.X < FADE)
+                                            {
+                                                opacity = MainWindow.Lerp(1.0, MIN_OP, (rectangle.X - point.X) / FADE);
+                                            }
+                                            else if (point.X > rectangle.Right && point.X - rectangle.Right < FADE)
+                                            {
+                                                opacity = MainWindow.Lerp(1.0, MIN_OP,
+                                                    (point.X - rectangle.Right) / FADE);
+                                            }
+                                        }
+                                        else if (point.Y < rectangle.Y)
+                                        {
+                                            if (point.X >= rectangle.X && point.X <= rectangle.Right)
+                                            {
+                                                if (rectangle.Y - point.Y < FADE)
+                                                {
+                                                    opacity = MainWindow.Lerp(1.0, MIN_OP,
+                                                        (rectangle.Y - point.Y) / FADE);
+                                                }
+                                            }
+                                            else if (rectangle.X > point.X || rectangle.Right < point.X)
+                                            {
+                                                var distance =
+                                                    Math.Sqrt(
+                                                        Math.Pow(
+                                                            (point.X < rectangle.X ? rectangle.X : rectangle.Right) -
+                                                            point.X, 2) +
+                                                        Math.Pow(rectangle.Y - point.Y, 2));
+                                                if (distance < FADE)
+                                                {
+                                                    opacity = MainWindow.Lerp(1.0, MIN_OP, distance / FADE);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            this.Dispatcher.Invoke(() => { this.Opacity = opacity; });
+                        }
+
+                        var hidePressed = false;
+                        var exitPressed = false;
+                        var settingsPressed = false;
+                        // Set position anew to correct for fullscreen apps hiding taskbar
+                        this.Dispatcher.Invoke(() =>
+                        {
+                            this.SetPosition(this.MonikaScreen);
+                            rectangle = new Rectangle((int)this.Left, (int)this.Top, (int)this.Width,
+                                (int)this.Height);
+
+                            // Detect exit key combo
+                            hidePressed = this.AreKeysPressed(MonikaiSettings.Default.HotkeyHide);
+                            exitPressed = this.AreKeysPressed(MonikaiSettings.Default.HotkeyExit);
+                            settingsPressed = this.AreKeysPressed(MonikaiSettings.Default.HotkeySettings);
+                        });
+
+
+                        if (hidePressed && (DateTime.Now - this.lastKeyComboTime).TotalSeconds > 2)
+                        {
+                            this.lastKeyComboTime = DateTime.Now;
+
+                            if (this.Visibility == Visibility.Visible)
+                            {
+                                this.Dispatcher.Invoke(this.Hide);
+                                //var expression =
+                                //    new Expression(
+                                //        "Okay, see you later {name}! (Press again for me to return)", "b");
+                                //expression.Executed += (o, args) => { this.Dispatcher.Invoke(this.Hide); };
+                                //this.Say(new[] {expression});
+                            }
+                            else
+                            {
+                                this.Dispatcher.Invoke(this.Show);
+                            }
+                        }
+
+                        if (exitPressed)
+                        {
+                            var expression =
+                                new Expression(
+                                    "Goodbye for now! Come back soon please~", "b");
+                            MonikaiSettings.Default.IsColdShutdown = false;
+                            MonikaiSettings.Default.Save();
+                            expression.Executed += (o, args) =>
+                            {
+                                this.Dispatcher.Invoke(() => { Environment.Exit(0); });
+                            };
+                            this.Say(new[] { expression });
+                        }
+
+                        if (settingsPressed)
+                        {
+                            this.Dispatcher.Invoke(() =>
+                            {
+                                if (this.settingsWindow == null || !this.settingsWindow.IsVisible)
+                                {
+                                    this.settingsWindow = new SettingsWindow(this);
+                                    this.settingsWindow.Show();
+                                }
+                            });
+                        }
+
+                        await Task.Delay(MonikaiSettings.Default.PotatoPC ? 100 : 32);
+                    }
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            });
         }
 
         private static void DoTheThing()
@@ -444,6 +609,9 @@ namespace MonikAI
                 return;
             }
 
+            var wpfDpi = PresentationSource.FromVisual(this)?.CompositionTarget?.TransformToDevice.M11;
+            this.dpiScale = 1f / (float)wpfDpi.GetValueOrDefault(1);
+
             if (!this.initializedScales)
             {
                 this.initializedScales = true;
@@ -461,6 +629,7 @@ namespace MonikAI
             }
 
             var scaleRatio = this.MonikaScreen.Bounds.Height / 1080.0 * MonikaiSettings.Default.ScaleModifier;
+            scaleRatio *= this.dpiScale;
             this.Width = this.scaleBaseWidth * scaleRatio;
             this.Height = this.scaleBaseHeight * scaleRatio;
             this.facePicture.Width = this.scaleBaseFacePictureWidth * scaleRatio;
@@ -496,19 +665,19 @@ namespace MonikAI
             // Override position if necessary
             if (MonikaiSettings.Default.ManualPosition)
             {
-                this.Top = MonikaiSettings.Default.ManualPositionY;
-                this.Left = MonikaiSettings.Default.ManualPositionX;
+                this.Top = MonikaiSettings.Default.ManualPositionY * this.dpiScale;
+                this.Left = MonikaiSettings.Default.ManualPositionX * this.dpiScale;
                 return;
             }
 
             // Only update screen ever so often, but necessary to avoid taskbar glitches
-            if (DateTime.Now.Second % 3 == 0 && (this.settingsWindow == null || !this.settingsWindow.IsVisible))
+            if (DateTime.Now.Second % (MonikaiSettings.Default.PotatoPC ? 10 : 3) == 0 && (this.settingsWindow == null || !this.settingsWindow.IsVisible))
             {
                 this.UpdateMonikaScreen();
             }
 
-            var position = new System.Windows.Point(screen.Bounds.X + screen.Bounds.Width - this.Width,
-                screen.Bounds.Y + screen.Bounds.Height - this.Height);
+            var position = new System.Windows.Point(screen.Bounds.X + screen.Bounds.Width - this.Width * (1 / this.dpiScale),
+                screen.Bounds.Y + screen.Bounds.Height - this.Height * (1 / this.dpiScale));
 
             if (MonikaiSettings.Default.LeftAlign)
             {
@@ -550,8 +719,8 @@ namespace MonikAI
                 }
             }
 
-            this.Top = position.Y;
-            this.Left = position.X;
+            this.Top = position.Y * this.dpiScale;
+            this.Left = position.X * this.dpiScale;
         }
 
         [DllImport("user32.dll")]
@@ -791,163 +960,6 @@ namespace MonikAI
             }
 
             return dockedRects;
-        }
-
-        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
-        {
-            var handle = new WindowInteropHelper(this).Handle;
-            var initialStyle = MainWindow.GetWindowLong(handle, -20);
-            MainWindow.SetWindowLong(handle, -20, initialStyle | 0x20 | 0x80000);
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    var prev = new Point();
-
-                    var rectangle = new Rectangle();
-                    await this.Dispatcher.InvokeAsync(() =>
-                    {
-                        rectangle = new Rectangle((int) this.Left, (int) this.Top, (int) this.Width,
-                            (int) this.Height);
-                    });
-
-                    while (this.applicationRunning)
-                    {
-                        var point = new Point();
-                        MainWindow.GetCursorPos(ref point);
-
-                        if (!point.Equals(prev))
-                        {
-                            prev = point;
-
-                            var opacity = 1.0;
-                            const double MIN_OP = 0.125;
-                            const double FADE = 175;
-
-                            if (this.settingsWindow == null || !this.settingsWindow.IsPositioning)
-                            {
-                                if (rectangle.Contains(point))
-                                {
-                                    opacity = MIN_OP;
-                                }
-                                else
-                                {
-                                    if (point.Y <= rectangle.Bottom)
-                                    {
-                                        if (point.Y >= rectangle.Y)
-                                        {
-                                            if (point.X < rectangle.X && rectangle.X - point.X < FADE)
-                                            {
-                                                opacity = MainWindow.Lerp(1.0, MIN_OP, (rectangle.X - point.X) / FADE);
-                                            }
-                                            else if (point.X > rectangle.Right && point.X - rectangle.Right < FADE)
-                                            {
-                                                opacity = MainWindow.Lerp(1.0, MIN_OP,
-                                                    (point.X - rectangle.Right) / FADE);
-                                            }
-                                        }
-                                        else if (point.Y < rectangle.Y)
-                                        {
-                                            if (point.X >= rectangle.X && point.X <= rectangle.Right)
-                                            {
-                                                if (rectangle.Y - point.Y < FADE)
-                                                {
-                                                    opacity = MainWindow.Lerp(1.0, MIN_OP,
-                                                        (rectangle.Y - point.Y) / FADE);
-                                                }
-                                            }
-                                            else if (rectangle.X > point.X || rectangle.Right < point.X)
-                                            {
-                                                var distance =
-                                                    Math.Sqrt(
-                                                        Math.Pow(
-                                                            (point.X < rectangle.X ? rectangle.X : rectangle.Right) -
-                                                            point.X, 2) +
-                                                        Math.Pow(rectangle.Y - point.Y, 2));
-                                                if (distance < FADE)
-                                                {
-                                                    opacity = MainWindow.Lerp(1.0, MIN_OP, distance / FADE);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            this.Dispatcher.Invoke(() => { this.Opacity = opacity; });
-                        }
-
-                        var hidePressed = false;
-                        var exitPressed = false;
-                        var settingsPressed = false;
-                        // Set position anew to correct for fullscreen apps hiding taskbar
-                        this.Dispatcher.Invoke(() =>
-                        {
-                            this.SetPosition(this.MonikaScreen);
-                            rectangle = new Rectangle((int) this.Left, (int) this.Top, (int) this.Width,
-                                (int) this.Height);
-
-                            // Detect exit key combo
-                            hidePressed = this.AreKeysPressed(MonikaiSettings.Default.HotkeyHide);
-                            exitPressed = this.AreKeysPressed(MonikaiSettings.Default.HotkeyExit);
-                            settingsPressed = this.AreKeysPressed(MonikaiSettings.Default.HotkeySettings);
-                        });
-
-
-                        if (hidePressed && (DateTime.Now - this.lastKeyComboTime).TotalSeconds > 2)
-                        {
-                            this.lastKeyComboTime = DateTime.Now;
-
-                            if (this.Visibility == Visibility.Visible)
-                            {
-                                this.Dispatcher.Invoke(this.Hide);
-                                //var expression =
-                                //    new Expression(
-                                //        "Okay, see you later {name}! (Press again for me to return)", "b");
-                                //expression.Executed += (o, args) => { this.Dispatcher.Invoke(this.Hide); };
-                                //this.Say(new[] {expression});
-                            }
-                            else
-                            {
-                                this.Dispatcher.Invoke(this.Show);
-                            }
-                        }
-
-                        if (exitPressed)
-                        {
-                            var expression =
-                                new Expression(
-                                    "Goodbye for now! Come back soon please~", "b");
-                            MonikaiSettings.Default.IsColdShutdown = false;
-                            MonikaiSettings.Default.Save();
-                            expression.Executed += (o, args) =>
-                            {
-                                this.Dispatcher.Invoke(() => { Environment.Exit(0); });
-                            };
-                            this.Say(new[] {expression});
-                        }
-
-                        if (settingsPressed)
-                        {
-                            this.Dispatcher.Invoke(() =>
-                            {
-                                if (this.settingsWindow == null || !this.settingsWindow.IsVisible)
-                                {
-                                    this.settingsWindow = new SettingsWindow(this);
-                                    this.settingsWindow.Show();
-                                }
-                            });
-                        }
-
-                        await Task.Delay(MonikaiSettings.Default.PotatoPC ? 100 : 32);
-                    }
-                }
-                catch (Exception)
-                {
-                    // ignored
-                }
-            });
         }
 
         private bool AreKeysPressed(string combo)

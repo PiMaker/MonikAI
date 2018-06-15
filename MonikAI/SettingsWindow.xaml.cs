@@ -100,7 +100,7 @@ namespace MonikAI
                 }
             }
 
-            //For some reason it's broken. Did they manually edit the settings? Lets force regular.
+            // For some reason it's broken. Did they manually edit the settings? Lets force regular.
             if (selObj == null)
             {
                 selObj = this.comboBoxIdle.Items[2];
@@ -126,9 +126,8 @@ namespace MonikAI
             this.mainWindow.MonikaScreen =
                 Screen.AllScreens.First(x => this.comboBoxScreen.SelectedItem.ToString().Contains(x.DeviceName));
             this.mainWindow.SetupScale();
-            // Not needed but left here for whatever reason you can come up with yourself
-            // I'm just a comment, not someone to give meaning to life, you know?
-            //this.mainWindow.SetPosition(this.mainWindow.MonikaScreen);
+            this.mainWindow.SetPosition(this.mainWindow.MonikaScreen);
+            this.mainWindow.SetupScale();
         }
 
         private void buttonOk_Click(object sender, RoutedEventArgs e)
@@ -215,6 +214,9 @@ namespace MonikAI
             else
             {
                 MonikaiSettings.Default.ManualPosition = false;
+                this.mainWindow.SetupScale();
+                this.mainWindow.SetPosition(this.mainWindow.MonikaScreen);
+                this.mainWindow.SetupScale();
             }
         }
 
