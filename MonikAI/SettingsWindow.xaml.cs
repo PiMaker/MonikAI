@@ -176,6 +176,9 @@ namespace MonikAI
             if (restart)
             {
                 Process.Start(Assembly.GetEntryAssembly().Location);
+
+                MonikaiSettings.Default.IsColdShutdown = false;
+                MonikaiSettings.Default.Save();
                 Environment.Exit(0);
             }
         }
