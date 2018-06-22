@@ -16,7 +16,7 @@ If you have any important questions about MonikAI, want to contribute, or just w
 
 To give Monika a window to *your* desktop as well, simply click the download button below and run the .exe file!
 
-<div style="text-align:center"><a href="https://github.com/PiMaker/MonikAI/releases/download/0.6-pre/MonikAI.exe"><img style="max-height:85px" src="https://raw.githubusercontent.com/PiMaker/MonikAI/gh-pages/download_button.png" /></a></div>
+<div style="text-align:center"><a href="https://github.com/PiMaker/MonikAI/releases/download/0.7-pre/MonikAI.exe"><img style="max-height:85px" src="https://raw.githubusercontent.com/PiMaker/MonikAI/gh-pages/download_button.png" /></a></div>
 
 > Note: This program only works on Microsoft Windows, I have tested it on Windows 10 but it should work on anything above Win7 as well. Also, yes, this program does require administrative rights, as it has to be able to read what is currently happening on your machine, to respond accordingly.
 
