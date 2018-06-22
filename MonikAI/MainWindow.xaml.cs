@@ -1,5 +1,5 @@
 // File: MainWindow.xaml.cs
-// Created: 20.02.2018
+// Created: 16.06.2018
 // 
 // See <summary> tags for more information.
 
@@ -55,11 +55,11 @@ namespace MonikAI
 
         private List<IBehaviour> behaviours;
 
+        private float dpiScale = 1.0f;
+
         private bool initializedScales;
 
         private DateTime lastKeyComboTime = DateTime.Now;
-
-        private float dpiScale = 1.0f;
 
         private double scaleBaseWidth,
             scaleBaseHeight,
@@ -103,6 +103,17 @@ namespace MonikAI
             this.backgroundNight.EndInit();
         }
 
+        // Roughly estimating night time
+        public static bool IsNight => MonikaiSettings.Default.DarkMode != "Day" &&
+                                      (MonikaiSettings.Default.DarkMode == "Night" || DateTime.Now.Hour > 20 ||
+                                       DateTime.Now.Hour < 7);
+
+        public string CurrentFace { get; private set; } = "a";
+
+        public bool Speaking { get; private set; }
+
+        public Screen MonikaScreen { get; set; }
+
         // Perform all startup initialization
         private void MainWindow_OnLoaded(object senderUnused, RoutedEventArgs eUnused)
         {
@@ -111,7 +122,7 @@ namespace MonikAI
             MainWindow.SetWindowLong(handle, -20, initialStyle | 0x20 | 0x80000);
 
             var wpfDpi = PresentationSource.FromVisual(this)?.CompositionTarget?.TransformToDevice.M11;
-            this.dpiScale = 1f / (float)wpfDpi.GetValueOrDefault(1);
+            this.dpiScale = 1f / (float) wpfDpi.GetValueOrDefault(1);
 
             // Screen size and positioning init
             this.UpdateMonikaScreen();
@@ -175,6 +186,7 @@ namespace MonikAI
                 {
                     fadeImage.UriSource = new Uri("pack://application:,,,/MonikAI;component/monika/1a.png");
                 }
+
                 fadeImage.EndInit();
                 this.backgroundPicture.Source = fadeImage;
 
@@ -201,6 +213,7 @@ namespace MonikAI
                     {
                         // ignored
                     }
+
                     MonikaiSettings.Default.FirstLaunch = true;
                     MonikaiSettings.Default.Save();
                 }
@@ -217,7 +230,9 @@ namespace MonikAI
                 // Startup logic
                 if (MonikaiSettings.Default.FirstLaunch)
                 {
-                    MessageBox.Show("Two things to note before I'll let you start enjoying MonikAI:\r\n\r\nFirst, if you don't see Monika on your screen right now, select the \"Manual\" position mode in the settings window that will open after this window has closed (use CTRL-SHIFT-F10 to bring it up afterwards).\r\n\r\nSecond, if you want Monika to react to your web browsing, you need to install the correct extension from the website, \"monik.ai\".\r\n\r\nThat's it from me, I'll let Monika talk from now on :)\r\n\r\n- PiMaker and all the nice people helping develop this", "Welcome!");
+                    MessageBox.Show(
+                        "Two things to note before I'll let you start enjoying MonikAI:\r\n\r\nFirst, if you don't see Monika on your screen right now, select the \"Manual\" position mode in the settings window that will open after this window has closed (use CTRL-SHIFT-F10 to bring it up afterwards).\r\n\r\nSecond, if you want Monika to react to your web browsing, you need to install the correct extension from the website, \"monik.ai\".\r\n\r\nThat's it from me, I'll let Monika talk from now on :)\r\n\r\n- PiMaker and all the nice people helping develop this",
+                        "Welcome!");
                     this.settingsWindow.ShowDialog();
 
                     this.Say(new[]
@@ -254,7 +269,7 @@ namespace MonikAI
                             MonikaiSettings.Default.ScaleModifier = os;
                             Task.Delay(1000).Wait();
                             var r = new Random();
-                            for (int i = 0; i < 12; i++)
+                            for (var i = 0; i < 12; i++)
                             {
                                 this.Dispatcher.Invoke(() =>
                                 {
@@ -273,6 +288,7 @@ namespace MonikAI
                                         faceImg.UriSource =
                                             new Uri("pack://application:,,,/MonikAI;component/monika/j-n.png");
                                     }
+
                                     faceImg.EndInit();
 
                                     this.facePicture.Source = faceImg;
@@ -326,18 +342,15 @@ namespace MonikAI
                 var csv = parser.GetData("startup");
                 var parsed = parser.ParseData(csv);
                 var startupExpression = parsed.Select(x => x.ResponseChain)
-                                              .Concat(DateTime.Today.DayOfWeek == DayOfWeek.Wednesday
-                                                  ? new List<List<Expression>>
-                                                  {
-                                                      new List<Expression>
-                                                      {
-                                                          new Expression("It is Wednesday, my dudes!", "k")
-                                                      }
-                                                  }
-                                                  : new List<List<Expression>>()).ToList().Sample();
-
-                var lastStartupExpression = startupExpression.Last();
-                lastStartupExpression.Executed += this.RegisterBehaviours;
+                    .Concat(DateTime.Today.DayOfWeek == DayOfWeek.Wednesday
+                        ? new List<List<Expression>>
+                        {
+                            new List<Expression>
+                            {
+                                new Expression("It is Wednesday, my dudes!", "k")
+                            }
+                        }
+                        : new List<List<Expression>>()).ToList().Sample();
 
                 this.Say(new[]
                 {
@@ -370,6 +383,7 @@ namespace MonikAI
 
                 // Start the rest server
                 UrlServer.StartServer();
+                this.RegisterBehaviours(this, null);
 
                 // Blinking and Behaviour logic
                 var eyesOpen = "a";
@@ -418,16 +432,16 @@ namespace MonikAI
                     var rectangle = new Rectangle();
                     await this.Dispatcher.InvokeAsync(() =>
                     {
-                        rectangle = new Rectangle((int)this.Left, (int)this.Top, (int)this.Width,
-                            (int)this.Height);
+                        rectangle = new Rectangle((int) this.Left, (int) this.Top, (int) this.Width,
+                            (int) this.Height);
                     });
 
                     while (this.applicationRunning)
                     {
                         var point = new Point();
                         MainWindow.GetCursorPos(ref point);
-                        point.X = (int)(point.X * this.dpiScale);
-                        point.Y = (int)(point.Y * this.dpiScale);
+                        point.X = (int) (point.X * this.dpiScale);
+                        point.Y = (int) (point.Y * this.dpiScale);
 
                         if (!point.Equals(prev))
                         {
@@ -497,8 +511,8 @@ namespace MonikAI
                         this.Dispatcher.Invoke(() =>
                         {
                             this.SetPosition(this.MonikaScreen);
-                            rectangle = new Rectangle((int)this.Left, (int)this.Top, (int)this.Width,
-                                (int)this.Height);
+                            rectangle = new Rectangle((int) this.Left, (int) this.Top, (int) this.Width,
+                                (int) this.Height);
 
                             // Detect exit key combo
                             hidePressed = this.AreKeysPressed(MonikaiSettings.Default.HotkeyHide);
@@ -537,7 +551,7 @@ namespace MonikAI
                             {
                                 this.Dispatcher.Invoke(() => { Environment.Exit(0); });
                             };
-                            this.Say(new[] { expression });
+                            this.Say(new[] {expression});
                         }
 
                         if (settingsPressed)
@@ -577,15 +591,6 @@ namespace MonikAI
             }
         }
 
-        // Roughly estimating night time
-        public static bool IsNight => MonikaiSettings.Default.DarkMode != "Day" && (MonikaiSettings.Default.DarkMode == "Night" || DateTime.Now.Hour > 20 || DateTime.Now.Hour < 7);
-
-        public string CurrentFace { get; private set; } = "a";
-
-        public bool Speaking { get; private set; }
-
-        public Screen MonikaScreen { get; set; }
-
         private void UpdateMonikaScreen()
         {
             this.MonikaScreen = Screen.PrimaryScreen;
@@ -610,7 +615,7 @@ namespace MonikAI
             }
 
             var wpfDpi = PresentationSource.FromVisual(this)?.CompositionTarget?.TransformToDevice.M11;
-            this.dpiScale = 1f / (float)wpfDpi.GetValueOrDefault(1);
+            this.dpiScale = 1f / (float) wpfDpi.GetValueOrDefault(1);
 
             if (!this.initializedScales)
             {
@@ -649,9 +654,9 @@ namespace MonikAI
         private void RegisterBehaviours(object sender, EventArgs eventArgs)
         {
             this.behaviours = Assembly.GetExecutingAssembly()
-                                      .GetTypes()
-                                      .Where(x => x.IsClass && typeof(IBehaviour).IsAssignableFrom(x))
-                                      .Select(x => (IBehaviour) Activator.CreateInstance(x)).ToList();
+                .GetTypes()
+                .Where(x => x.IsClass && typeof(IBehaviour).IsAssignableFrom(x))
+                .Select(x => (IBehaviour) Activator.CreateInstance(x)).ToList();
 
             foreach (var behaviour in this.behaviours)
             {
@@ -671,12 +676,14 @@ namespace MonikAI
             }
 
             // Only update screen ever so often, but necessary to avoid taskbar glitches
-            if (DateTime.Now.Second % (MonikaiSettings.Default.PotatoPC ? 10 : 3) == 0 && (this.settingsWindow == null || !this.settingsWindow.IsVisible))
+            if (DateTime.Now.Second % (MonikaiSettings.Default.PotatoPC ? 10 : 3) == 0 &&
+                (this.settingsWindow == null || !this.settingsWindow.IsVisible))
             {
                 this.UpdateMonikaScreen();
             }
 
-            var position = new System.Windows.Point(screen.Bounds.X + screen.Bounds.Width - this.Width * (1 / this.dpiScale),
+            var position = new System.Windows.Point(
+                screen.Bounds.X + screen.Bounds.Width - this.Width * (1 / this.dpiScale),
                 screen.Bounds.Y + screen.Bounds.Height - this.Height * (1 / this.dpiScale));
 
             if (MonikaiSettings.Default.LeftAlign)
@@ -941,6 +948,7 @@ namespace MonikAI
                     dockedRects[dockedRectCounter].Height = tmpScrn.Bounds.Height;
                     dockedRectCounter += 1;
                 }
+
                 if (topDockedHeight > 0)
                 {
                     dockedRects[dockedRectCounter].X = tmpScrn.WorkingArea.Left;
@@ -949,6 +957,7 @@ namespace MonikAI
                     dockedRects[dockedRectCounter].Height = topDockedHeight;
                     dockedRectCounter += 1;
                 }
+
                 if (bottomDockedHeight > 0)
                 {
                     dockedRects[dockedRectCounter].X = tmpScrn.WorkingArea.Left;

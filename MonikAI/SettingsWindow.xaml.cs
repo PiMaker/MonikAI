@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -10,6 +11,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Win32.TaskScheduler;
+using Newtonsoft.Json;
 using Action = System.Action;
 using MessageBox = System.Windows.MessageBox;
 using Point = System.Drawing.Point;
@@ -42,6 +44,17 @@ namespace MonikAI
                 MonikaiSettings.Default.AutoUpdate = true;
             }
 
+            if (!string.IsNullOrWhiteSpace(MonikaiSettings.Default.LastUpdateConfig))
+            {
+                var localConfig =
+                    JsonConvert.DeserializeObject<UpdateConfig>(MonikaiSettings.Default.LastUpdateConfig);
+                this.textBlockVersion.Text = "Version p" + localConfig.ProgramVersion + "t" + localConfig.ResponsesVersion
+#if DEBUG
+                    + "d"
+#endif
+                    ;
+            }
+
             // Settings window initialization code
             this.textBoxName.Text = string.IsNullOrWhiteSpace(MonikaiSettings.Default.UserName)
                 ? Environment.UserName
@@ -54,6 +67,8 @@ namespace MonikAI
             this.txtSettings.Text = MonikaiSettings.Default.HotkeySettings;
             this.txtExit.Text = MonikaiSettings.Default.HotkeyExit;
             this.txtHide.Text = MonikaiSettings.Default.HotkeyHide;
+
+            this.comboBoxLanguage.Text = MonikaiSettings.Default.Language;
 
             if (MonikaiSettings.Default.LeftAlign)
             {
@@ -137,10 +152,18 @@ namespace MonikAI
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            var restart = false;
+            if ((string) this.comboBoxLanguage.SelectedItem != MonikaiSettings.Default.Language)
+            {
+                MessageBox.Show("Language settings have been changed. MonikAI will now restart.", "Note");
+                restart = true;
+            }
+
             MonikaiSettings.Default.AutoUpdate = this.checkBoxAutoUpdate.IsChecked.GetValueOrDefault(true);
             MonikaiSettings.Default.PotatoPC = this.checkBoxPotatoPC.IsChecked.GetValueOrDefault(false);
             MonikaiSettings.Default.DarkMode = (string)this.comboBoxNightMode.SelectedItem;
             MonikaiSettings.Default.UserName = this.textBoxName.Text;
+            MonikaiSettings.Default.Language = (string) this.comboBoxLanguage.SelectedItem;
             if (this.comboBoxScreen.SelectedItem != null && Screen.AllScreens != null)
             {
                 MonikaiSettings.Default.Screen =
@@ -149,6 +172,12 @@ namespace MonikAI
             }
 
             MonikaiSettings.Default.Save();
+
+            if (restart)
+            {
+                Process.Start(Assembly.GetEntryAssembly().Location);
+                Environment.Exit(0);
+            }
         }
 
         [DllImport("user32.dll")]
@@ -241,18 +270,18 @@ namespace MonikAI
         // Hide hotkey
         private async void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            await this.HotkeySetTask(this.txtHide, () => MonikaiSettings.Default.HotkeySettings = this.txtHide.Text);
+            await this.HotkeySetTask(this.txtHide, () => MonikaiSettings.Default.HotkeyHide = this.txtHide.Text);
         }
 
         // Exit hotkey
         private async void Button_Click_3(object sender, RoutedEventArgs e)
         {
-            await this.HotkeySetTask(this.txtExit, () => MonikaiSettings.Default.HotkeySettings = this.txtExit.Text);
+            await this.HotkeySetTask(this.txtExit, () => MonikaiSettings.Default.HotkeyExit = this.txtExit.Text);
         }
 
         private async Task HotkeySetTask(TextBlock output, Action callback)
         {
-            output.Dispatcher.Invoke(() => output.Text = "Press and HOLD any key combination...");
+            output.Dispatcher.Invoke(() => output.Text = "Press and HOLD any key combination");
 
             await this.WaitForKeyChange();
 

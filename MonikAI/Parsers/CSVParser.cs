@@ -1,10 +1,11 @@
 // File: CSVParser.cs
-// Created: 22.02.2018
+// Created: 19.03.2018
 // 
 // See <summary> tags for more information.
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,15 +22,15 @@ namespace MonikAI.Parsers
         /// <returns>A string containing the path to the csv data or null if there is no csv file to load.</returns>
         public string GetData(string csvFileName)
         {
-            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "MonikAI\\" + csvFileName + ".csv");
+            var languageExtension = "_" + MonikaiSettings.Default.Language;
 
-            if (!File.Exists(path))
+            if (languageExtension == "_English")
             {
-                return null;
+                languageExtension = "";
             }
 
-            return path;
+            var retval = this.GetData(csvFileName, languageExtension);
+            return retval ?? this.GetData(csvFileName, "");
         }
 
         /// <summary>
@@ -55,7 +56,8 @@ namespace MonikAI.Parsers
 
                     var row = reader.ReadLine();
 
-                    if (row.StartsWith("#") || row.StartsWith("\"#") || string.IsNullOrWhiteSpace(row) || row.All(x => x == ','))
+                    if (row.StartsWith("#") || row.StartsWith("\"#") || string.IsNullOrWhiteSpace(row) ||
+                        row.All(x => x == ',' || x == '\"'))
                     {
                         continue;
                     }
@@ -108,7 +110,9 @@ namespace MonikAI.Parsers
                         {
                             var resText = columns[textCell].ToString();
                             var responseLength = resText.Length;
-                            var face = string.IsNullOrWhiteSpace(columns[textCell + 1].ToString()) ? "a" : columns[textCell + 1].ToString(); // "a" face is default
+                            var face = string.IsNullOrWhiteSpace(columns[textCell + 1].ToString())
+                                ? "a"
+                                : columns[textCell + 1].ToString(); // "a" face is default
 
                             // If text can fit in a single box then add it to the response chain, otherwise break it up.
                             while (responseLength > 0)
@@ -120,15 +124,13 @@ namespace MonikAI.Parsers
                                     res.ResponseChain.Add(new Expression(resText, face));
                                     break;
                                 }
-                                else
-                                {
-                                    // Get next response segment and update remaining response
-                                    var responseSegment = resText.Substring(0, 90);
-                                    resText = resText.Substring(90).Trim();
-                                    responseLength = resText.Length;
 
-                                    res.ResponseChain.Add(new Expression(responseSegment.Trim(), face));
-                                }
+                                // Get next response segment and update remaining response
+                                var responseSegment = resText.Substring(0, 90);
+                                resText = resText.Substring(90).Trim();
+                                responseLength = resText.Length;
+
+                                res.ResponseChain.Add(new Expression(responseSegment.Trim(), face));
                             }
                         }
                     }
@@ -139,6 +141,19 @@ namespace MonikAI.Parsers
 
                 return characterResponses;
             }
+        }
+
+        private string GetData(string csvFileName, string languageExtension)
+        {
+            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "MonikAI\\" + csvFileName + languageExtension + ".csv");
+
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+
+            return path;
         }
     }
 }
