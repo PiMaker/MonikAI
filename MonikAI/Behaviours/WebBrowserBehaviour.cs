@@ -42,11 +42,11 @@ namespace MonikAI.Behaviours
         public void Init(MainWindow window)
         {
             // Parse the CSV file
-            var csvFile = this.parser.GetData("website");
+            var csvFile = this.parser.GetData("Websites");
             this.PopulateResponseTable(this.parser.ParseData(csvFile));
 
             // Add google search CSV
-            var googleCsvFile = this.parser.GetData("google");
+            var googleCsvFile = this.parser.GetData("Google Searches");
             this.PopulateGoogleResponseTable(this.parser.ParseData(googleCsvFile));
         }
 

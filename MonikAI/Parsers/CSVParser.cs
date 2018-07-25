@@ -22,15 +22,15 @@ namespace MonikAI.Parsers
         /// <returns>A string containing the path to the csv data or null if there is no csv file to load.</returns>
         public string GetData(string csvFileName)
         {
-            var languageExtension = "_" + MonikaiSettings.Default.Language;
+            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "MonikAI\\MonikAI " + MonikaiSettings.Default.Language + (MonikaiSettings.Default.Language == "English" ? " (Original)" : "") + " - " + csvFileName + ".csv");
 
-            if (languageExtension == "_English")
+            if (!File.Exists(path))
             {
-                languageExtension = "";
+                return null;
             }
 
-            var retval = this.GetData(csvFileName, languageExtension);
-            return retval ?? this.GetData(csvFileName, "");
+            return path;
         }
 
         /// <summary>
@@ -60,6 +60,11 @@ namespace MonikAI.Parsers
                         row.All(x => x == ',' || x == '\"'))
                     {
                         continue;
+                    }
+
+                    if (csvPath.EndsWith("Startup.csv"))
+                    {
+                        row = "," + row;
                     }
 
                     var columns = new List<StringBuilder>();
@@ -141,19 +146,6 @@ namespace MonikAI.Parsers
 
                 return characterResponses;
             }
-        }
-
-        private string GetData(string csvFileName, string languageExtension)
-        {
-            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "MonikAI\\" + csvFileName + languageExtension + ".csv");
-
-            if (!File.Exists(path))
-            {
-                return null;
-            }
-
-            return path;
         }
     }
 }

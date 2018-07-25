@@ -43,6 +43,9 @@ namespace MonikAI
                 "{name}", () => { return MonikaiSettings.Default.UserName; }
             },
             {
+                "(name)", () => { return MonikaiSettings.Default.UserName; } // Just because
+            },
+            {
                 "{date}", () => { return DateTime.Now.Date.ToShortDateString(); }
             }
         };
@@ -231,7 +234,7 @@ namespace MonikAI
                 if (MonikaiSettings.Default.FirstLaunch)
                 {
                     MessageBox.Show(
-                        "Two things to note before I'll let you start enjoying MonikAI:\r\n\r\nFirst, if you don't see Monika on your screen right now, select the \"Manual\" position mode in the settings window that will open after this window has closed (use CTRL-SHIFT-F10 to bring it up afterwards).\r\n\r\nSecond, if you want Monika to react to your web browsing, you need to install the correct extension from the website, \"monik.ai\".\r\n\r\nThat's it from me, I'll let Monika talk from now on :)\r\n\r\n- PiMaker and all the nice people helping develop this",
+                        "Quick note: If you want Monika to react to your web browsing, you need to install the correct extension from the website, \"monik.ai\".\r\n\r\nThat's it from me, I'll let Monika talk from now on :)\r\n\r\n- PiMaker and all the nice people helping develop this",
                         "Welcome!");
                     this.settingsWindow.ShowDialog();
 
@@ -339,7 +342,7 @@ namespace MonikAI
 
                 // Parse startup CSV
                 var parser = new CSVParser();
-                var csv = parser.GetData("startup");
+                var csv = parser.GetData("Startup");
                 var parsed = parser.ParseData(csv);
                 var startupExpression = parsed.Select(x => x.ResponseChain)
                     .Concat(DateTime.Today.DayOfWeek == DayOfWeek.Wednesday
@@ -856,7 +859,7 @@ namespace MonikAI
                             await Task.Delay(25);
                         }
 
-                        await Task.Delay(Math.Max(2000, 52 * completedText.Length));
+                        await Task.Delay(Math.Max(2000, 52 * completedText.Length * (MonikaiSettings.Default.Language == "Japanese" ? 2 : 1)));
 
                         line.OnExecuted();
                     }

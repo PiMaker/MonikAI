@@ -1,6 +1,6 @@
 {
-  "ProgramVersion": 22,
-  "ResponsesVersion": 10,
+  "ProgramVersion": 23,
+  "ResponsesVersion": 11,
   "ProgramURL": "https://github.com/PiMaker/MonikAI/raw/master/docs/MonikAI.exe",
   "ResponseURLs": [
     "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/application.csv",
@@ -13,6 +13,30 @@
     "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Russian/google_Russian.csv",
     "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Russian/startup_Russian.csv",
     "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Russian/website_Russian.csv",
-    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Russian/idle_dialogue_Russian.csv"
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Russian/idle_dialogue_Russian.csv",
+	
+	"https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Russian/MonikAI Russian - Applications.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Russian/MonikAI Russian - Google Searches.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Russian/MonikAI Russian - Idle Dialogue.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Russian/MonikAI Russian - Startup.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Russian/MonikAI Russian - Websites.csv",
+	
+	"https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/French/MonikAI French - Applications.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/French/MonikAI French - Google Searches.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/French/MonikAI French - Idle Dialogue.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/French/MonikAI French - Startup.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/French/MonikAI French - Websites.csv",
+	
+	"https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Japanese/MonikAI Japanese - Applications.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Japanese/MonikAI Japanese - Google Searches.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Japanese/MonikAI Japanese - Idle Dialogue.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Japanese/MonikAI Japanese - Startup.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Japanese/MonikAI Japanese - Websites.csv",
+	
+	"https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/Russian/MonikAI English (Original) - Applications.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/Russian/MonikAI English (Original) - Google Searches.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/Russian/MonikAI English (Original) - Idle Dialogue.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/Russian/MonikAI English (Original) - Startup.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/Russian/MonikAI English (Original) - Websites.csv"
   ]
 }

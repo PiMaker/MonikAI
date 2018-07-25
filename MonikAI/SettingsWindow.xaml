@@ -52,6 +52,8 @@
         <ComboBox x:Name="comboBoxLanguage" Margin="184,36,0,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Left" Width="274">
             <System:String>English</System:String>
             <System:String>Russian</System:String>
+            <System:String>French</System:String>
+            <System:String>Japanese</System:String>
         </ComboBox>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Which language should I use?" VerticalAlignment="Top" Margin="10,39,0,0"/>
     </Grid>

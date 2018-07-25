@@ -51,7 +51,7 @@ namespace MonikAI.Behaviours
             try
             {
                 // Parse the CSV file
-                var csvFile = this.parser.GetData("idle_dialogue");
+                var csvFile = this.parser.GetData("Idle Dialogue");
                 this.PopulateResponseTable(this.parser.ParseData(csvFile));
             }
             catch (Exception ex)

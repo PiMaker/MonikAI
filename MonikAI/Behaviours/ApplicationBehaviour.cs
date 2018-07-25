@@ -36,7 +36,7 @@ namespace MonikAI.Behaviours
             try
             {
                 // Parse the CSV file
-                var csvFile = this.parser.GetData("application");
+                var csvFile = this.parser.GetData("Applications");
                 this.PopulateResponseTable(this.parser.ParseData(csvFile));
 
                 q = new WqlEventQuery {EventClassName = "Win32_ProcessStartTrace"};
