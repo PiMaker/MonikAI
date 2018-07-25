@@ -1,6 +1,6 @@
 {
   "ProgramVersion": 23,
-  "ResponsesVersion": 11,
+  "ResponsesVersion": 12,
   "ProgramURL": "https://github.com/PiMaker/MonikAI/raw/master/docs/MonikAI.exe",
   "ResponseURLs": [
     "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/application.csv",
@@ -33,10 +33,10 @@
     "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Japanese/MonikAI Japanese - Startup.csv",
     "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/translations/Japanese/MonikAI Japanese - Websites.csv",
 	
-	"https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/Russian/MonikAI English (Original) - Applications.csv",
-    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/Russian/MonikAI English (Original) - Google Searches.csv",
-    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/Russian/MonikAI English (Original) - Idle Dialogue.csv",
-    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/Russian/MonikAI English (Original) - Startup.csv",
-    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/Russian/MonikAI English (Original) - Websites.csv"
+	"https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/MonikAI English (Original) - Applications.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/MonikAI English (Original) - Google Searches.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/MonikAI English (Original) - Idle Dialogue.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/MonikAI English (Original) - Startup.csv",
+    "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/MonikAI English (Original) - Websites.csv"
   ]
 }
