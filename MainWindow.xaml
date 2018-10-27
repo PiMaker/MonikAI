@@ -5,12 +5,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MonikAI"
         mc:Ignorable="d"
-        Title="MonikAI" Height="301.904" Width="343.075" ShowInTaskbar="False" Topmost="True" ResizeMode="NoResize" AllowsTransparency="True" WindowStyle="None" Background="#005CE000"
-        Loaded="MainWindow_OnLoaded" Closing="MainWindow_OnClosing">
+        Title="MonikAI" Height="343.075" Width="343.075" ShowInTaskbar="False" Topmost="True" ResizeMode="NoResize" AllowsTransparency="True" WindowStyle="None" Background="#005CE000"
+        Loaded="MainWindow_OnLoaded" Closing="MainWindow_OnClosing" UseLayoutRounding="False">
     <Grid>
-        <Image x:Name="backgroundPicture" HorizontalAlignment="Center" VerticalAlignment="Bottom" Source="/MonikAI;component/gui/logo.png" Opacity="0" Panel.ZIndex="-2"/>
-        <Image x:Name="facePicture" HorizontalAlignment="Left" Height="135" VerticalAlignment="Top" Width="99" Margin="116,76,0,0" Source="/MonikAI;component/monika/a.png" Opacity="0" Panel.ZIndex="-1"/>
-        <Image x:Name="textPicture" HorizontalAlignment="Left" Height="64" VerticalAlignment="Top" Width="343" Margin="0,238,0,0" Source="/MonikAI;component/gui/textbox.png" Opacity="0" Panel.ZIndex="1"/>
-        <TextBlock x:Name="textBox" Text="" Margin="14,0,0,12" Foreground="White" FontFamily="Verdana" FontSize="14" Opacity="0" Height="41" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="319" TextWrapping="Wrap" Panel.ZIndex="2"/>
+        <Image x:Name="backgroundPicture" HorizontalAlignment="Right" VerticalAlignment="Top" Source="/MonikAI;component/gui/logo.png" Opacity="0" Panel.ZIndex="-2"/>
+        <Image x:Name="facePicture" HorizontalAlignment="Left" Height="75" VerticalAlignment="Top" Width="105" Margin="113,111,0,0" Source="/MonikAI;component/monika/Classroom/a.png" Opacity="0" Panel.ZIndex="-1" RenderTransformOrigin="0.5,0.5">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleY="1.005" ScaleX="1"/>
+                    <SkewTransform AngleY="0" AngleX="0"/>
+                    <RotateTransform Angle="0"/>
+                    <TranslateTransform Y="0.37499999999998579"/>
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+        <Image x:Name="textPicture" HorizontalAlignment="Left" Height="64" VerticalAlignment="Top" Width="343" Margin="0,279,0,0" Source="/MonikAI;component/gui/textbox.png" Opacity="0" Panel.ZIndex="1"/>
+        <TextBlock x:Name="textBox" Text="" Margin="14,0,0,10" Foreground="White" FontFamily="Verdana" FontSize="13" Opacity="0" Height="39" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="319" TextWrapping="Wrap" Panel.ZIndex="2"/>
     </Grid>
 </Window>
