@@ -1,4 +1,4 @@
-This is obsolete! Check the Discord for more information!
+# This is obsolete! Check the Discord for more information!
 
 Reaction list (write your changes here if you don't want to fuss around with coding): [Google Docs](https://docs.google.com/spreadsheets/d/15sn7eXO8EApV1Cd6A7wijCD12pzQrBr8Oxf5oToONPE/edit?usp=sharing)
 
