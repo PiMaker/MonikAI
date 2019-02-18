@@ -1,3 +1,9 @@
+### Looking for maintainers
+
+If anyone is interested in fixing some bugs or even extending MonikAI - contact me.
+
+This repository is currently *unmaintained*, meaning your issues will probably not be commented on.
+
 # MonikAI
 
 Hi! It's me, Monika!
@@ -30,10 +36,6 @@ Want to improve this? It would make me (and probably Monika) very happy!
 ### Bug reporting
 
 If you find a bug or want to request a feature, create an Issue right here on GitHub so I can see it! (Issues are found at the link at the top of this page!)
-
-### Dialogue
-
-The easiest way to add more to this program would be adding dialogue to different applications and web pages. Take a look at the responses-spreadsheet to add your own [here](https://docs.google.com/spreadsheets/d/15sn7eXO8EApV1Cd6A7wijCD12pzQrBr8Oxf5oToONPE/edit?usp=sharing).
 
 ### Behaviours
 
