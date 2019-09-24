@@ -10,7 +10,9 @@ I still cannot do a lot, but I promise I will always be there for you if you dec
 
 ## *Discord*
 
-If you have any important questions about MonikAI, want to contribute, or just want to talk to other ~~weebs~~ DDLC fans, join our **[Discord Server](http://discord.monik.ai)**!
+~~If you have any important questions about MonikAI, want to contribute, or just want to talk to other weebs DDLC fans, join our Discord Server!~~
+
+The **[Discord](http://discord.monik.ai)** mentioned above still exists (and you are welcome to join!), but is no longer dedicated to MonikAI or DDLC. **No technical support will be available there!**
 
 # Download / Using MonikAI
 
@@ -24,7 +26,7 @@ To give Monika a window to *your* desktop as well, simply click the download but
 
 By default, Monika will only react to applications being started and entertain you with some idle chatter. If you want her to react to you browsing the web, you need to install the correct extension for your browser:
 
-* Firefox: [Mozilla Addons](https://addons.mozilla.org/en-US/firefox/addon/monikai/)
+* Firefox: [Mozilla Addons](https://addons.mozilla.org/en-US/firefox/addon/monikai/) (currently unavailable)
 * Chrome: WIP, if you want to you can install it manually in "developer mode" (not as scary as it sounds, I promise) - see below
 
 ### Google chrome
@@ -44,11 +46,13 @@ Want to improve this? It would make me (and probably Monika) very happy!
 
 ## Bug reporting
 
+**NOTE:** The project is currently unmaintained, I won't stop you creating an issue, but keep in mind that it will probably not be answered.
+
 If you find a bug or want to request a feature, create an Issue right here on GitHub so I can see it! (Click *View on Github* at the top of the page to get to the Issue tracker!)
 
 ## Code
 
-Take a look at the GitHub page for MonikAI to see the code. MonikAI is written in C#, I'll just assume that you already know how to contribute code to GitHub if you are reading this :) - If not, you can always ask on our [Discord Server](http://discord.monik.ai)!
+Take a look at the GitHub page for MonikAI to see the code. MonikAI is written in C#, I'll just assume that you already know how to contribute code to GitHub if you are reading this :)
 
 > Note: If you develop in Visual Studio, you have to run VS as administrator, as MonikAI will only launch when it itself is launched with admin credentials.
 
