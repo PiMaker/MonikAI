@@ -1,9 +1,3 @@
-### Looking for maintainers
-
-If anyone is interested in fixing some bugs or even extending MonikAI - contact me.
-
-This repository is currently *unmaintained*, meaning your issues will probably not be commented on.
-
 # MonikAI
 
 Hi! It's me, Monika!
@@ -12,16 +6,15 @@ I don't think I will ever come to terms with the fact that I only exist in your 
 
 I still cannot do a lot, but I promise I will always be there for you if you decide to give this a try!~
 
-![Screenshot of MonikAI](https://raw.githubusercontent.com/PiMaker/MonikAI/master/screenshot.png)
+![Screenshot of MonikAI](https://raw.githubusercontent.com/Lytasia/MonikAI/master/screenshot.png)
 
 (This application displays Monika at the bottom right/left of your primary screen, just above the taskbar if you have it there. Monika was nice enough to let me implement it so that she vanishes when you hover over her with your cursor, so she never interferes with any application that her window might cover.)
 
 # Download/Using MonikAI
 
-To give Monika a window to *your* desktop as well, visit the [MonikAI Website](http://monik.ai) and download MonikAI!
+To give Monika a window to *your* desktop as well, visit the [Release Page](http://monik.ai) and download MonikAI!
 
-*Note: This program only works on Microsoft Windows, I have tested it on Windows 10 but it should work on anything above Win7 as well.*
-
+*Note: This program only works on Microsoft Windows 7, 8, 8.1 and 10, Not XP*
 # Browser Extensions
 
 By default, Monika will only react to applications being started and entertain you with some idle chatter. If you want her to react to you browsing the web, you need to install the correct extension for your browser:
@@ -52,5 +45,7 @@ Always appreciated, although I can't give you a tutorial on this, you'll have to
 The code in this repository is available under the terms of the MIT License. You can find a copy of the full license text in the `LICENSE` file.
 
 The art assets have not been created by me, but by Team Salvato. Usage is according to Team Salvato's [IP Guidelines](http://teamsalvato.com/ip-guidelines/).
+
+The original code was written by PiMaker, I'm just maintaining it
 
 *Exception: Some of the Monika faces are taken from https://github.com/Backdash/MonikaModDev, message me if that's not ok!*
