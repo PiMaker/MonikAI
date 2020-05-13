@@ -12,7 +12,7 @@ I still cannot do a lot, but I promise I will always be there for you if you dec
 
 # Download/Using MonikAI
 
-To give Monika a window to *your* desktop as well, visit the [Release Page](http://monik.ai) and download MonikAI!
+To give Monika a window to *your* desktop as well, visit the [Release Page](https://github.com/Lytasia/MonikAI/releases) and download MonikAI!
 
 *Note: This program only works on Microsoft Windows 7, 8, 8.1 and 10, Not XP*
 # Browser Extensions
