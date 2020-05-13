@@ -1,6 +1,6 @@
 {
-  "ProgramVersion": 25,
-  "ResponsesVersion": 12,
+  "ProgramVersion": 30,
+  "ResponsesVersion": 15,
   "ProgramURL": "https://github.com/PiMaker/MonikAI/raw/master/docs/MonikAI.exe",
   "ResponseURLs": [
     "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/application.csv",
