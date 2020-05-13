@@ -1021,5 +1021,40 @@ namespace MonikAI
             public readonly int right;
             public readonly int bottom;
         }
+
+        internal void ILuvU()
+        {
+            var rand = new Random(); 
+            
+            int numb = rand.Next(2);
+            if (numb == 0)
+            {
+                this.Say(new[]
+                {
+                    new Expression("Aww, That's so cute !", "n"),
+                    new Expression("I love you too, {name} <3", "j")
+
+                });
+            }
+
+            if (numb == 1)
+            {
+                this.Say(new[]
+                {
+                    new Expression("That's so sweet, {name} !", "e"),
+                    new Expression("I will always love you~", "j")
+                });
+            }
+            if (numb == 2)
+            {
+                this.Say(new[]
+                {
+
+                    new Expression("I love you too, {name} ~", "s"),
+                    new Expression("And nothing can change that <3", "s")
+
+                });
+            }
+        }
     }
 }

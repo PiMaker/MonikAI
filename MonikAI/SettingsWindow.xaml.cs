@@ -59,6 +59,9 @@ namespace MonikAI
             this.textBoxName.Text = string.IsNullOrWhiteSpace(MonikaiSettings.Default.UserName)
                 ? Environment.UserName
                 : MonikaiSettings.Default.UserName;
+            this.textBoxNickName.Text = string.IsNullOrWhiteSpace(MonikaiSettings.Default.NickName)
+                ? MonikaiSettings.Default.NickName
+                : MonikaiSettings.Default.NickName;
             this.checkBoxPotatoPC.IsChecked = MonikaiSettings.Default.PotatoPC;
             this.checkBoxAutoUpdate.IsChecked = MonikaiSettings.Default.AutoUpdate;
 
@@ -163,6 +166,7 @@ namespace MonikAI
             MonikaiSettings.Default.PotatoPC = this.checkBoxPotatoPC.IsChecked.GetValueOrDefault(false);
             MonikaiSettings.Default.DarkMode = (string)this.comboBoxNightMode.SelectedItem;
             MonikaiSettings.Default.UserName = this.textBoxName.Text;
+            MonikaiSettings.Default.NickName = this.textBoxNickName.Text;
             MonikaiSettings.Default.Language = (string) this.comboBoxLanguage.SelectedItem;
             if (this.comboBoxScreen.SelectedItem != null && Screen.AllScreens != null)
             {
@@ -456,6 +460,12 @@ namespace MonikAI
         {
             MonikaiSettings.Default.DarkMode = (string)this.comboBoxNightMode.SelectedItem;
             this.mainWindow.SetMonikaFace("a");
+        }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        { 
+            this.mainWindow.ILuvU();
+            this.Close();
         }
     }
 }

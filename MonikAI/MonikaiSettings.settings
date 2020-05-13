@@ -8,14 +8,17 @@
     <Setting Name="FirstLaunch" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="UserName" Type="System.String" Scope="User">
+	  <Setting Name="UserName" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="PotatoPC" Type="System.Boolean" Scope="User">
+	<Setting Name="NickName" Type="System.String" Scope="User">
+		<Value Profile="(Default)" />
+	</Setting>
+	  <Setting Name="PotatoPC" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="Screen" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">MonikAI</Value> 
     </Setting>
     <Setting Name="AutoUpdate" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -32,7 +35,7 @@
     <Setting Name="HotkeyExit" Type="System.String" Scope="User">
       <Value Profile="(Default)">CTRL-SHIFT-F12</Value>
     </Setting>
-    <Setting Name="IsColdShutdown" Type="System.Boolean" Scope="User">
+	  <Setting Name="IsColdShutdown" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="LastUpdateConfig" Type="System.String" Scope="User">
