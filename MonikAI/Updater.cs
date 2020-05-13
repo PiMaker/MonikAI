@@ -66,7 +66,7 @@ namespace MonikAI
             {
                 onlineConfigRaw =
                     await client.GetStringAsync(
-                        "https://raw.githubusercontent.com/PiMaker/MonikAI/master/docs/update.json");
+                        "https://raw.githubusercontent.com/Lytasia/MonikAI/master/docs/update.json");
                 onlineConfig = JsonConvert.DeserializeObject<UpdateConfig>(onlineConfigRaw);
             }
             catch (Exception e)
