@@ -28,11 +28,17 @@ namespace MonikAI
         private readonly MainWindow mainWindow;
 
         private bool settingsLoaded;
+        private ButtonWindow buttonWindow;
 
         public SettingsWindow(MainWindow mainWindow)
         {
             this.mainWindow = mainWindow;
             this.InitializeComponent();
+        }
+
+        public SettingsWindow(ButtonWindow buttonWindow)
+        {
+            this.buttonWindow = buttonWindow;
         }
 
         public bool IsPositioning { get; private set; }
@@ -59,9 +65,7 @@ namespace MonikAI
             this.textBoxName.Text = string.IsNullOrWhiteSpace(MonikaiSettings.Default.UserName)
                 ? Environment.UserName
                 : MonikaiSettings.Default.UserName;
-            this.textBoxNickName.Text = string.IsNullOrWhiteSpace(MonikaiSettings.Default.NickName)
-                ? MonikaiSettings.Default.NickName
-                : MonikaiSettings.Default.NickName;
+
             this.checkBoxPotatoPC.IsChecked = MonikaiSettings.Default.PotatoPC;
             this.checkBoxAutoUpdate.IsChecked = MonikaiSettings.Default.AutoUpdate;
 
@@ -166,7 +170,6 @@ namespace MonikAI
             MonikaiSettings.Default.PotatoPC = this.checkBoxPotatoPC.IsChecked.GetValueOrDefault(false);
             MonikaiSettings.Default.DarkMode = (string)this.comboBoxNightMode.SelectedItem;
             MonikaiSettings.Default.UserName = this.textBoxName.Text;
-            MonikaiSettings.Default.NickName = this.textBoxNickName.Text;
             MonikaiSettings.Default.Language = (string) this.comboBoxLanguage.SelectedItem;
             if (this.comboBoxScreen.SelectedItem != null && Screen.AllScreens != null)
             {
@@ -466,6 +469,10 @@ namespace MonikAI
         { 
             this.mainWindow.ILuvU();
             this.Close();
+        }
+        private async void Button_Click_5(object sender, RoutedEventArgs e)
+        {
+            await this.HotkeySetTask(this.txtButton, () => MonikaiSettings.Default.HotkeyHide = this.txtButton.Text);
         }
     }
 }

@@ -77,6 +77,7 @@ namespace MonikAI
         private bool screenIsLocked;
 
         private SettingsWindow settingsWindow;
+        private ButtonWindow buttonWindow;
 
         public MainWindow()
         {
@@ -93,6 +94,7 @@ namespace MonikAI
             this.updaterInitTask = Task.Run(async () => await this.updater.Init());
 
             this.settingsWindow = new SettingsWindow(this);
+            this.buttonWindow = new ButtonWindow(this);
 
             // Init background images
             this.backgroundDay = new BitmapImage();
@@ -510,6 +512,7 @@ namespace MonikAI
                         var hidePressed = false;
                         var exitPressed = false;
                         var settingsPressed = false;
+                        var buttonPressed = false;
                         // Set position anew to correct for fullscreen apps hiding taskbar
                         this.Dispatcher.Invoke(() =>
                         {
@@ -521,13 +524,13 @@ namespace MonikAI
                             hidePressed = this.AreKeysPressed(MonikaiSettings.Default.HotkeyHide);
                             exitPressed = this.AreKeysPressed(MonikaiSettings.Default.HotkeyExit);
                             settingsPressed = this.AreKeysPressed(MonikaiSettings.Default.HotkeySettings);
+                            buttonPressed = this.AreKeysPressed(MonikaiSettings.Default.HotkeyButton);
                         });
 
 
                         if (hidePressed && (DateTime.Now - this.lastKeyComboTime).TotalSeconds > 2)
                         {
                             this.lastKeyComboTime = DateTime.Now;
-
                             if (this.Visibility == Visibility.Visible)
                             {
                                 this.Dispatcher.Invoke(this.Hide);
@@ -541,20 +544,11 @@ namespace MonikAI
                             {
                                 this.Dispatcher.Invoke(this.Show);
                             }
-                        }
 
+                        }
                         if (exitPressed)
                         {
-                            var expression =
-                                new Expression(
-                                    "Goodbye for now! Come back soon please~", "b");
-                            MonikaiSettings.Default.IsColdShutdown = false;
-                            MonikaiSettings.Default.Save();
-                            expression.Executed += (o, args) =>
-                            {
-                                this.Dispatcher.Invoke(() => { Environment.Exit(0); });
-                            };
-                            this.Say(new[] {expression});
+                            Exit();
                         }
 
                         if (settingsPressed)
@@ -565,6 +559,17 @@ namespace MonikAI
                                 {
                                     this.settingsWindow = new SettingsWindow(this);
                                     this.settingsWindow.Show();
+                                }
+                            });
+                        }
+                        if (buttonPressed)
+                        {
+                            this.Dispatcher.Invoke(() =>
+                            {
+                                if (this.buttonWindow == null || !this.buttonWindow.IsVisible)
+                                {
+                                    this.buttonWindow = new ButtonWindow(this);
+                                    this.buttonWindow.Show();
                                 }
                             });
                         }
@@ -1021,7 +1026,18 @@ namespace MonikAI
             public readonly int right;
             public readonly int bottom;
         }
-
+        internal void Exit()
+        {
+            var expression =
+            new Expression("Goodbye for now! Come back soon please~", "b");
+            MonikaiSettings.Default.IsColdShutdown = false;
+            MonikaiSettings.Default.Save();
+            expression.Executed += (o, args) =>
+            {
+                this.Dispatcher.Invoke(() => { Environment.Exit(0); });
+            };
+            this.Say(new[] { expression });
+        }
         internal void ILuvU()
         {
             var rand = new Random(); 
