@@ -1,6 +1,6 @@
 {
   "ProgramVersion": 30,
-  "ResponsesVersion": 14,
+  "ResponsesVersion": 15,
   "ProgramURL": "https://github.com/Lytasia/MonikAI/raw/master/docs/MonikAI.exe",
   "ResponseURLs": [
     "https://raw.githubusercontent.com/Lytasia/MonikAI/master/docs/application.csv",
