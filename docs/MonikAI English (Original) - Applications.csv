@@ -1,4 +1,4 @@
-"#Applications have to be specified using their executable name. So ""firefox.exe"" instead of ""Firefox Browser"" for example.",,you can use {name} and {date} as placeholders for obvious things,,,,,,,,,,,,,
+#Applications have to be specified using their executable name. So ""firefox.exe"" instead of ""Firefox Browser"" for example.",,you can use {name} and {date} as placeholders for obvious things,,,,,,,,,,,,,
 #Notes,Application,Text,Face,Text,Face,Text,Face,Text,Face,Text,Face,Text,Face,,
 ,"3dsmax.exe, FusionLauncher.exe, maya.exe","Oh, you like to do 3D work?",b,,,,,,,,,,,,
 ,audacity.exe,Editing some sound files?,b,That's pretty neat. Do you do this often?,k,,,,,,,,,,
