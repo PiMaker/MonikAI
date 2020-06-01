@@ -8,17 +8,14 @@
     <Setting Name="FirstLaunch" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-	  <Setting Name="UserName" Type="System.String" Scope="User">
+    <Setting Name="UserName" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-	<Setting Name="NickName" Type="System.String" Scope="User">
-		<Value Profile="(Default)" />
-	</Setting>
-	  <Setting Name="PotatoPC" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="NickName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="Screen" Type="System.String" Scope="User">
-      <Value Profile="(Default)">MonikAI</Value> 
+    <Setting Name="PotatoPC" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="AutoUpdate" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -35,7 +32,7 @@
     <Setting Name="HotkeyExit" Type="System.String" Scope="User">
       <Value Profile="(Default)">CTRL-SHIFT-F12</Value>
     </Setting>
-	  <Setting Name="IsColdShutdown" Type="System.Boolean" Scope="User">
+    <Setting Name="IsColdShutdown" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="LastUpdateConfig" Type="System.String" Scope="User">
@@ -70,6 +67,12 @@
     </Setting>
     <Setting Name="Language" Type="System.String" Scope="User">
       <Value Profile="(Default)">English</Value>
+    </Setting>
+    <Setting Name="Screen" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="HotkeyButton" Type="System.String" Scope="User">
+      <Value Profile="(Default)">F1</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -12,7 +12,7 @@ namespace MonikAI {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.5.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.6.0.0")]
     internal sealed partial class MonikaiSettings : global::System.Configuration.ApplicationSettingsBase {
         
         private static MonikaiSettings defaultInstance = ((MonikaiSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new MonikaiSettings())));
@@ -80,18 +80,6 @@ namespace MonikAI {
             }
             set {
                 this["PotatoPC"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("MonikAI")]
-        public string Screen {
-            get {
-                return ((string)(this["Screen"]));
-            }
-            set {
-                this["Screen"] = value;
             }
         }
         
@@ -296,6 +284,30 @@ namespace MonikAI {
             }
             set {
                 this["Language"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Screen {
+            get {
+                return ((string)(this["Screen"]));
+            }
+            set {
+                this["Screen"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("F1")]
+        public string HotkeyButton {
+            get {
+                return ((string)(this["HotkeyButton"]));
+            }
+            set {
+                this["HotkeyButton"] = value;
             }
         }
     }

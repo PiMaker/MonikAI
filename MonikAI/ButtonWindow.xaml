@@ -1,0 +1,20 @@
+﻿<Window x:Class="MonikAI.ButtonWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MonikAI"
+        mc:Ignorable="d"
+        Title="Button" Height="148.427" Width="294.809" WindowStyle="None" ResizeMode="NoResize" ShowInTaskbar="False">
+    <Grid Margin="0,0,2,2">
+        <Grid.Background>
+            <ImageBrush ImageSource="/MonikAI;component/gui/background.png" Stretch="UniformToFill"/>
+        </Grid.Background>
+
+        <Button x:Name="Setting" Content="Setting" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="42,69,0,0" Height="20" Width="45" FontSize="10" FontFamily="Times New Roman" RenderTransformOrigin="1.282,0.755" Click="Setting_Click"/>
+        <Button x:Name="Exit" Content="Exit" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="124,69,116,0" Height="20" Width="45" FontSize="10" FontFamily="Times New Roman" RenderTransformOrigin="1.282,0.755" Click="Exit_Click"/>
+        <Button x:Name="Hides" Content="Visibility" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="208,69,0,0" Height="20" Width="43" FontSize="10" FontFamily="Times New Roman" RenderTransformOrigin="1.282,0.755" Click="Hide_Click"/>
+        <Button x:Name="ILuvU" Content="Say 'I Luv U'" HorizontalAlignment="Center" VerticalAlignment="Center" Height="20" Width="69" FontSize="10" FontFamily="Times New Roman" RenderTransformOrigin="1.282,0.755" Click="ILuvU_Click" Margin="109,21,107,97"/>
+        <Button x:Name="Close" Content="Close" HorizontalAlignment="Center" VerticalAlignment="Center" Height="19" Width="43" FontSize="10" FontFamily="Times New Roman" RenderTransformOrigin="1.282,0.755" Margin="232,109,10,10" Click="Close_Click"/>
+    </Grid>
+</Window>
