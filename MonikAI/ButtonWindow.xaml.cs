@@ -22,16 +22,10 @@ namespace MonikAI
         private readonly MainWindow mainWindow;
         private SettingsWindow settingsWindow;
 
-        private void Setting_Click(object sender, RoutedEventArgs e)
+        private void Setting_Click(object sender, RoutedEventArgs e) //When Setiing Button is clicked
         {
-            this.Dispatcher.Invoke(() =>
-            {
-                if (this.settingsWindow == null || !this.settingsWindow.IsVisible)
-                {
-                    this.settingsWindow = new SettingsWindow(this);
-                    this.settingsWindow.Show();
-                }
-            });
+            this.Close();
+            mainWindow.Setting();
         }
         public ButtonWindow(MainWindow mainWindow)
         {
@@ -41,6 +35,7 @@ namespace MonikAI
 
         private void Exit_Click(object sender, RoutedEventArgs e)
         {
+            this.Close();
             mainWindow.Exit();
         }
 
@@ -64,6 +59,7 @@ namespace MonikAI
 
         private void ILuvU_Click(object sender, RoutedEventArgs e)
         {
+            this.Close();
             mainWindow.ILuvU();
         }
     }

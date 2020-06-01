@@ -546,31 +546,26 @@ namespace MonikAI
                             }
 
                         }
+
                         if (exitPressed)
                         {
                             Exit();
                         }
 
+
                         if (settingsPressed)
                         {
-                            this.Dispatcher.Invoke(() =>
-                            {
-                                if (this.settingsWindow == null || !this.settingsWindow.IsVisible)
-                                {
-                                    this.settingsWindow = new SettingsWindow(this);
-                                    this.settingsWindow.Show();
-                                }
-                            });
+                            Setting();
                         }
+
                         if (buttonPressed)
                         {
                             this.Dispatcher.Invoke(() =>
                             {
-                                if (this.buttonWindow == null || !this.buttonWindow.IsVisible)
-                                {
-                                    this.buttonWindow = new ButtonWindow(this);
-                                    this.buttonWindow.Show();
-                                }
+                                buttonWindow.Close();
+                                this.buttonWindow = new ButtonWindow(this);
+                                this.buttonWindow.Show();
+                                
                             });
                         }
 
@@ -1026,18 +1021,7 @@ namespace MonikAI
             public readonly int right;
             public readonly int bottom;
         }
-        internal void Exit()
-        {
-            var expression =
-            new Expression("Goodbye for now! Come back soon please~", "b");
-            MonikaiSettings.Default.IsColdShutdown = false;
-            MonikaiSettings.Default.Save();
-            expression.Executed += (o, args) =>
-            {
-                this.Dispatcher.Invoke(() => { Environment.Exit(0); });
-            };
-            this.Say(new[] { expression });
-        }
+
         internal void ILuvU()
         {
             var rand = new Random(); 
@@ -1072,5 +1056,29 @@ namespace MonikAI
                 });
             }
         }
+        internal void Setting()
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                if (this.settingsWindow == null || !this.settingsWindow.IsVisible)
+                {
+                    this.settingsWindow = new SettingsWindow(this);
+                    this.settingsWindow.Show();
+                }
+            });
+        }
+        public void Exit()
+        {
+            var expression =
+            new Expression("Goodbye for now! Come back soon please~", "b");
+            MonikaiSettings.Default.IsColdShutdown = false;
+            MonikaiSettings.Default.Save();
+            expression.Executed += (o, args) =>
+            {
+                this.Dispatcher.Invoke(() => { Environment.Exit(0); });
+            };
+            this.Say(new[] { expression });
+        
+    }
     }
 }

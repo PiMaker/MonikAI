@@ -472,7 +472,7 @@ namespace MonikAI
         }
         private async void Button_Click_5(object sender, RoutedEventArgs e)
         {
-            await this.HotkeySetTask(this.txtButton, () => MonikaiSettings.Default.HotkeyHide = this.txtButton.Text);
+            await this.HotkeySetTask(this.txtButton, () => MonikaiSettings.Default.HotkeyButton = this.txtButton.Text);
         }
     }
 }
