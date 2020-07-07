@@ -14,7 +14,7 @@ I still cannot do a lot, but I promise I will always be there for you if you dec
 
 To give Monika a window to *your* desktop as well, visit the [Release Page](https://github.com/Lytasia/MonikAI/releases) and download MonikAI!
 
-*Note: This program only works on Microsoft Windows 7, 8, 8.1 and 10, Not XP*
+*Note: This program only works on Microsoft Windows 7, 8, 8.1 and 10, And i'm suprised, but on XP too, it works, but i don't think it work on windows 2000 and below*
 # Browser Extensions
 
 By default, Monika will only react to applications being started and entertain you with some idle chatter. If you want her to react to you browsing the web, you need to install the correct extension for your browser:
