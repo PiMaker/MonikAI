@@ -19,7 +19,7 @@ To give Monika a window to *your* desktop as well, visit the [Release Page](http
 
 By default, Monika will only react to applications being started and entertain you with some idle chatter. If you want her to react to you browsing the web, you need to install the correct extension for your browser:
 
-* Firefox: Tuto WIP
+* Firefox: Tuto WIP, but the zip is here if you know how it 
 * Chrome: WIP
 
 # Contributing
