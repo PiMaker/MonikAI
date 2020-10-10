@@ -18,7 +18,7 @@ I still cannot do a lot, but I promise I will always be there for you if you dec
 
 # Download/Using MonikAI
 
-To give Monika a window to *your* desktop as well, visit the [MonikAI Website](http://monik.ai) and download MonikAI!
+To give Monika a window to *your* desktop as well, visit the [Releases Tab](https://github.com/PiMaker/MonikAI/releases) and download the latest MonikAI.exe under "Assets"!
 
 *Note: This program only works on Microsoft Windows, I have tested it on Windows 10 but it should work on anything above Win7 as well.*
 
