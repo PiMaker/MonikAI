@@ -1,3 +1,9 @@
+# Important update
+I'll soon make this branch, the C# one, the "OLD" one, because i'm working on a C++ remake crossplatform, because I'm on Linux now and I don't use Windows that much anymore, I still have a Windows computer, but I don't use it a lot, at least not for IT stuff
+
+So yeah, goodbye .net, hello C++
+
+
 # MonikAI
 
 Hi! It's me, Monika!
