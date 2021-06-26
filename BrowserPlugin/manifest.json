@@ -1,11 +1,6 @@
 {
 
-    "applications": {
-        "gecko": {
-          "id": "{b52a151e-ab46-4c1c-9587-8323103ed04b}",
-          "strict_min_version": "57.0"
-        }
-    },
+   
 
     "manifest_version": 2,
     "name": "MonikAI",
